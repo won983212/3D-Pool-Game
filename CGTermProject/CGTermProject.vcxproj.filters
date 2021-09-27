@@ -82,6 +82,7 @@
     </None>
     <None Include="res\models\scene.gltf" />
     <None Include="assimp-vc142-mtd.dll" />
+    <None Include="res\models\untitled.mtl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\texture\container.jpg">
@@ -117,5 +118,8 @@
     <Image Include="res\models\Pad.jpg">
       <Filter>리소스 파일</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="res\models\untitled.obj" />
   </ItemGroup>
 </Project>

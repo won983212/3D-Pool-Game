@@ -176,6 +176,7 @@
     <None Include="assimp-vc142-mtd.dll" />
     <None Include="res\models\scene.bin" />
     <None Include="res\models\scene.gltf" />
+    <None Include="res\models\untitled.mtl" />
     <None Include="res\shader\lighting.frag" />
     <None Include="res\shader\lighting.vert" />
     <None Include="res\shader\simple.frag" />
@@ -193,6 +194,9 @@
     <Image Include="res\texture\container.jpg" />
     <Image Include="res\texture\container2.png" />
     <Image Include="res\texture\container2_specular.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="res\models\untitled.obj" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
