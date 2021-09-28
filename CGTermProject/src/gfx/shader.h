@@ -16,6 +16,7 @@ namespace commoncg
 	class ShaderProgram
 	{
 	public:
+		~ShaderProgram();
 		void addShader(const GLchar* path, GLenum type);
 		void load();
 		void use() const;

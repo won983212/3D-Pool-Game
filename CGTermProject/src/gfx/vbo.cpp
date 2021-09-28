@@ -6,6 +6,11 @@ VBO::VBO(int bufferType)
 	:bufferType(bufferType), handle(-1)
 { }
 
+VBO::~VBO()
+{
+	destroy();
+}
+
 void VBO::create()
 {
 	glGenBuffers(1, &handle);

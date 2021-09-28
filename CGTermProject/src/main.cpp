@@ -7,8 +7,6 @@
 #include "dirlight.h"
 #include "util/util.h"
 
-
-
 DirectionalLight light;
 ShaderProgram shader;
 model::AssetModel myModel;
@@ -41,7 +39,7 @@ void render(float partialTime)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    angle += 0.1f;
+    angle += 0.03f;
     light.data.direction = glm::vec4(cos(angle), -1.0f, sin(angle), 1.0f);
     light.update();
 

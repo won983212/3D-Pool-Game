@@ -6,11 +6,12 @@ namespace commoncg
 	class Texture
 	{
 	public:
-		static Texture cacheImage(const char* imageFilePath);
+		~Texture();
 		void loadImage(const char* imageFilePath);
 		void bind() const;
 		void destroy();
 		GLuint getTextureID() const;
+		static Texture cacheImage(const char* imageFilePath);
 		static void unbind();
 	private:
 		GLuint textureId = 0;

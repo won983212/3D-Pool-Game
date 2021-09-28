@@ -160,6 +160,7 @@
     <ClInclude Include="src\gfx\vao.h" />
     <ClInclude Include="src\gfx\vbo.h" />
     <ClInclude Include="src\gfx\window.h" />
+    <ClInclude Include="src\model\ball.h" />
     <ClInclude Include="src\model\model.h" />
     <ClInclude Include="src\util\stb_image.h" />
     <ClInclude Include="src\util\util.h" />
@@ -174,6 +175,7 @@
     <ClCompile Include="src\gfx\vbo.cpp" />
     <ClCompile Include="src\gfx\window.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\model\ball.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp-vc142-mtd.dll" />

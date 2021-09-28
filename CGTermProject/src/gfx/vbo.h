@@ -8,6 +8,7 @@ namespace commoncg
 	{
 	public:
 		VBO(int bufferType = GL_ARRAY_BUFFER);
+		~VBO();
 		void create();
 		void destroy() const;
 		void bind() const;

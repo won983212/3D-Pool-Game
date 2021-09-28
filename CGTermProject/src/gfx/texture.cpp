@@ -9,6 +9,11 @@
 std::unordered_map<std::string, Texture> loaded_textures;
 
 
+Texture::~Texture()
+{
+	destroy();
+}
+
 Texture Texture::cacheImage(const char* imageFilePath)
 {
 	std::string str_s(imageFilePath);

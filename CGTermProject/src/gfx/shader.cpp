@@ -46,6 +46,11 @@ static GLuint _compileShaderSource(const char* filePath, GLenum shaderType)
 	return shader;
 }
 
+ShaderProgram::~ShaderProgram()
+{
+	destroy();
+}
+
 void ShaderProgram::addShader(const GLchar* path, GLenum type)
 {
 	if (shader_index >= SHADER_MAX_COUNT)
