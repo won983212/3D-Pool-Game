@@ -17,3 +17,6 @@ using namespace commoncg;
 
 #define SCREEN_WIDTH 512
 #define SCREEN_HEIGHT 512
+
+#define UNIFORM_BINDING_MATERIAL 1
+#define UNIFORM_BINDING_LIGHT 2

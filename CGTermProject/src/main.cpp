@@ -6,6 +6,18 @@
 #include "gfx/camera.h"
 #include "util/util.h"
 
+
+struct Light
+{
+    glm::vec4 diffuse;
+    glm::vec4 ambient;
+    glm::vec4 specular;
+};
+
+
+struct Light light;
+VBO uboLight(GL_UNIFORM_BUFFER);
+
 ShaderProgram shader;
 model::Model myModel;
 Camera cam(0, 0, -3, -90, 0);
@@ -22,7 +34,16 @@ void init()
 	shader.load();
 	shader.use();
 
-	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    light.diffuse = glm::vec4(0.8f);
+    light.ambient = glm::vec4(0.2f);
+    light.specular = glm::vec4(1.0f);
+
+    uboLight.create();
+    uboLight.bindBufferRange(UNIFORM_BINDING_LIGHT, 0, sizeof(light));
+    uboLight.buffer(sizeof(light), &light);
+    uboLight.unbind();
+
+	glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
     glEnable(GL_DEPTH_TEST);
 }
 
@@ -39,7 +60,7 @@ void render(float partialTime)
     shader.setUniform("m", model);
     shader.setUniform("viewPos", cam.position);
 
-    myModel.Draw(shader);
+    myModel.draw(shader);
 }
 
 void destroy()

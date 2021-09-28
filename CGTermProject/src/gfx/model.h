@@ -12,12 +12,19 @@
 #include "shader.h"
 
 #define MESH_TEXTURE_TYPE_SIZE 4
+#define MESH_MATERIAL_TYPE_SIZE 4
+
 
 namespace model
 {
 	enum class TextureType
 	{
 		DIFFUSE, SPECULAR, NORMAL, HEIGHT
+	};
+
+	enum class MaterialColorType
+	{
+		AMBIENT, DIFFUSE, SPECULAR, EMISSIVE
 	};
 
 	struct Vertex
@@ -31,36 +38,41 @@ namespace model
 	{
 		unsigned int id;
 		TextureType type;
-		std::string path;
+	};
+
+	struct Material
+	{
+		float diffuse[4];
+		float ambient[4];
+		float specular[4];
+		float emissive[4];
+		float shininess;
+		int texCount[MESH_MATERIAL_TYPE_SIZE];
 	};
 
 	class Mesh
 	{
 	public:
-		std::vector<Vertex> verties;
-		std::vector<unsigned int> indices;
 		std::vector<Texture> textures;
 	private:
 		commoncg::VAO vao;
-		commoncg::VBO vbo, ebo;
+		commoncg::VBO vbo, ebo, u_material;
+		struct Material uMat;
+		int indiceSize;
 	public:
-		Mesh(std::vector<Vertex> verties, std::vector<unsigned int> indices, std::vector<Texture> textures);
-		void Draw(commoncg::ShaderProgram& shader);
+		Mesh(std::string directory, aiMesh* mesh, const aiScene* scene);
+		std::vector<model::Texture> loadMaterialTextures(std::string directory, aiMaterial* mat, aiTextureType type, TextureType textureType);
+		void draw(commoncg::ShaderProgram& shader);
 	private:
-		void setupMesh();
+		void bindMaterial() const;
 	};
 
 	class Model
 	{
 	public:
-		void Draw(commoncg::ShaderProgram& shader);
+		void draw(commoncg::ShaderProgram& shader);
 		void loadModel(std::string path);
 	private:
-		void processNode(aiNode* node, const aiScene* scene);
-		Mesh processMesh(aiMesh* mesh, const aiScene* scene);
-		std::vector<model::Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, TextureType textureType);
-	private:
-		std::unordered_map<std::string, model::Texture> loaded_textures;
 		std::vector<Mesh> meshes;
 		std::string directory;
 	};

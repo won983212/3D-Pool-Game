@@ -176,27 +176,21 @@
     <None Include="assimp-vc142-mtd.dll" />
     <None Include="res\models\scene.bin" />
     <None Include="res\models\scene.gltf" />
-    <None Include="res\models\untitled.mtl" />
     <None Include="res\shader\lighting.frag" />
     <None Include="res\shader\lighting.vert" />
     <None Include="res\shader\simple.frag" />
     <None Include="res\shader\simple.vert" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="res\models\Pad.jpg" />
     <Image Include="res\models\textures\Wheel_baseColor.png" />
     <Image Include="res\models\textures\Wheel_metallicRoughness.png" />
     <Image Include="res\models\textures\Wheel_normal.png" />
     <Image Include="res\models\Wheel_baseColor.png" />
     <Image Include="res\models\Wheel_metallicRoughness.png" />
     <Image Include="res\models\Wheel_normal.png" />
-    <Image Include="res\models\Wood.png" />
     <Image Include="res\texture\container.jpg" />
     <Image Include="res\texture\container2.png" />
     <Image Include="res\texture\container2_specular.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Object Include="res\models\untitled.obj" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
