@@ -42,7 +42,13 @@
     <ClInclude Include="src\gfx\camera.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="src\gfx\model.h">
+    <ClInclude Include="src\model\assetmodel.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dirlight.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="src\model\model.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
@@ -68,7 +74,10 @@
     <ClCompile Include="src\gfx\camera.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="src\gfx\model.cpp">
+    <ClCompile Include="src\model\assetmodel.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dirlight.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

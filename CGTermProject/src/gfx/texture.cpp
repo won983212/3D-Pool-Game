@@ -1,10 +1,30 @@
 #define STB_IMAGE_IMPLEMENTATION
 
 #include <iostream>
+#include <unordered_map>
 #include "texture.h"
 #include "../util/util.h"
 #include "../util/stb_image.h"
 
+std::unordered_map<std::string, Texture> loaded_textures;
+
+
+Texture Texture::cacheImage(const char* imageFilePath)
+{
+	std::string str_s(imageFilePath);
+	if (loaded_textures.find(str_s) != loaded_textures.end())
+	{
+		std::cout << "Cached: " << str_s << std::endl;
+		return loaded_textures[str_s];
+	}
+
+	commoncg::Texture texture;
+	texture.loadImage(imageFilePath);
+
+	loaded_textures.insert(std::make_pair(str_s, texture));
+	std::cout << "Loaded: " << str_s << std::endl;
+	return texture;
+}
 
 void Texture::loadImage(const char* imageFilePath)
 {
@@ -41,7 +61,6 @@ void Texture::bind() const
 		return;
 	}
 
-	glActiveTexture(active);
 	glBindTexture(GL_TEXTURE_2D, textureId);
 }
 

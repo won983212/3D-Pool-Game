@@ -1,6 +1,7 @@
-#include "texture.h"
-#include "model.h"
+#include <iostream>
+#include "../gfx/texture.h"
 #include "../util/util.h"
+#include "assetmodel.h"
 
 using namespace model;
 using namespace std;
@@ -13,7 +14,13 @@ const string textureUniformNames[MESH_TEXTURE_TYPE_SIZE] =
 	"texture_height"
 };
 
-std::unordered_map<std::string, model::Texture> loaded_textures;
+const aiTextureType textureTypes[MESH_TEXTURE_TYPE_SIZE] =
+{
+	aiTextureType_DIFFUSE,
+	aiTextureType_SPECULAR,
+	aiTextureType_NORMALS,
+	aiTextureType_HEIGHT
+};
 
 
 static void fillMaterialColor(float* dst, MaterialColorType colorType, const aiMaterial* mtl, float def_r, float def_g, float def_b, float def_a)
@@ -52,8 +59,8 @@ static void fillMaterialColor(float* dst, MaterialColorType colorType, const aiM
 	memcpy(dst, color, sizeof(color));
 }
 
-Mesh::Mesh(std::string directory, aiMesh* mesh, const aiScene* scene)
-	: ebo(GL_ELEMENT_ARRAY_BUFFER), u_material(GL_UNIFORM_BUFFER), indiceSize(0)
+Mesh::Mesh(const AssetModel* parent, aiMesh* mesh, const aiScene* scene)
+	: vao(), ebo(GL_ELEMENT_ARRAY_BUFFER), parent(parent), indiceSize(0), materialIndex(-1)
 {
 	vector<Vertex> vertices;
 	vector<unsigned int> indices;
@@ -98,41 +105,7 @@ Mesh::Mesh(std::string directory, aiMesh* mesh, const aiScene* scene)
 
 	// materials
 	if (mesh->mMaterialIndex >= 0)
-	{
-		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-
-		// diffuse
-		vector<model::Texture> diffuseMaps = loadMaterialTextures(directory, material, aiTextureType_DIFFUSE, TextureType::DIFFUSE);
-		textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-
-		// specular
-		vector<model::Texture> specularMaps = loadMaterialTextures(directory, material, aiTextureType_SPECULAR, TextureType::SPECULAR);
-		textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
-
-		// normal
-		vector<model::Texture> normalMaps = loadMaterialTextures(directory, material, aiTextureType_NORMALS, TextureType::NORMAL);
-		textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
-
-		// height
-		vector<model::Texture> heightMaps = loadMaterialTextures(directory, material, aiTextureType_HEIGHT, TextureType::HEIGHT);
-		textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
-
-
-		// uniform block material setup
-		fillMaterialColor(uMat.ambient, MaterialColorType::AMBIENT, material, 0.2f, 0.2f, 0.2f, 1.0f);
-		fillMaterialColor(uMat.diffuse, MaterialColorType::DIFFUSE, material, 0.3f, 0.3f, 0.3f, 1.0f);
-		fillMaterialColor(uMat.specular, MaterialColorType::SPECULAR, material, 0.0f, 0.0f, 0.0f, 1.0f);
-		fillMaterialColor(uMat.emissive, MaterialColorType::EMISSIVE, material, 0.0f, 0.0f, 0.0f, 1.0f);
-
-		// get shininess
-		float shininess = 0.0;
-		aiGetMaterialFloat(material, AI_MATKEY_SHININESS, &shininess);
-		uMat.shininess = shininess;
-
-		// send to buffer
-		u_material.create();
-		bindMaterial();
-	}
+		materialIndex = mesh->mMaterialIndex;
 
 	// allocate at VAO
 	vao.create();
@@ -150,49 +123,26 @@ Mesh::Mesh(std::string directory, aiMesh* mesh, const aiScene* scene)
 	VAO::unbind();
 }
 
-vector<model::Texture> Mesh::loadMaterialTextures(std::string directory, aiMaterial* mat, aiTextureType type, TextureType textureType)
-{
-	vector<model::Texture> textures;
-	for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
-	{
-		aiString str;
-		mat->GetTexture(type, i, &str);
-
-		std::string str_s(str.C_Str());
-		if (loaded_textures.find(str_s) != loaded_textures.end())
-		{
-			textures.push_back(loaded_textures[str_s]);
-		}
-		else
-		{
-			commoncg::Texture texture;
-			texture.loadImage((directory + '/' + str_s).c_str());
-
-			model::Texture tex;
-			tex.id = texture.getTextureID();
-			tex.type = textureType;
-			textures.push_back(tex);
-			loaded_textures.insert(std::make_pair(str.C_Str(), tex));
-		}
-	}
-
-	uMat.texCount[(int)textureType] = textures.size();
-	return textures;
-}
-
 void Mesh::draw(ShaderProgram& shader)
 {
-	for (unsigned int i = 0; i < textures.size(); i++)
+	Material* uMat = parent->materials[materialIndex];
+	for (unsigned int i = 0; i < MESH_TEXTURE_TYPE_SIZE; i++)
 	{
-		TextureType type = textures[i].type;
-		string name = textureUniformNames[(int)type];
-		
+		// ignore not loaded texture.
+		if (uMat->textureIndex[i] == -1)
+			continue;
+
+		// get texture info
+		ModelTexture* texture = parent->textures[uMat->textureIndex[i]];
+		string name = textureUniformNames[(int)texture->type];
+
+		// bind texture
 		shader.setUniform(name.c_str(), (int)i);
 		glActiveTexture(GL_TEXTURE0 + i);
-		glBindTexture(GL_TEXTURE_2D, textures[i].id);
+		texture->texture.bind();
 	}
 
-	bindMaterial();
+	parent->bindMaterial(materialIndex);
 
 	vao.bind();
 	glDrawElements(GL_TRIANGLES, indiceSize, GL_UNSIGNED_INT, 0);
@@ -201,21 +151,22 @@ void Mesh::draw(ShaderProgram& shader)
 	glActiveTexture(GL_TEXTURE0);
 }
 
-void Mesh::bindMaterial() const
-{
-	u_material.bindBufferRange(UNIFORM_BINDING_MATERIAL, 0, sizeof(struct Material));
-	u_material.buffer(sizeof(uMat), &uMat, GL_DYNAMIC_DRAW);
-	u_material.unbind();
-}
-
-
-void Model::draw(ShaderProgram& shader)
+void AssetModel::draw(ShaderProgram& shader)
 {
 	for (unsigned int i = 0; i < meshes.size(); i++)
-		meshes[i].draw(shader);
+		meshes[i]->draw(shader);
 }
 
-void Model::loadModel(string path)
+void AssetModel::bindMaterial(unsigned int index) const
+{
+	if (index < 0)
+		return;
+	uMaterial.bindBufferRange(UNIFORM_BINDING_MATERIAL, 0, sizeof(struct Material));
+	uMaterial.buffer(sizeof(struct Material), materials[index], GL_DYNAMIC_DRAW);
+	uMaterial.unbind();
+}
+
+void AssetModel::loadModel(string path)
 {
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs);
@@ -226,10 +177,70 @@ void Model::loadModel(string path)
 		return;
 	}
 
+	// resource path
 	directory = path.substr(0, path.find_last_of('/'));
+
+	// load all materials
+	uMaterial.create();
+	for (unsigned int i = 0; i < scene->mNumMaterials; i++)
+	{
+		aiMaterial* material = scene->mMaterials[i];
+		struct Material* uMat = new Material();
+
+		// load textures
+		for (unsigned int i = 0; i < MESH_TEXTURE_TYPE_SIZE; i++)
+		{
+			if (material->GetTextureCount(textureTypes[i]) == 0)
+			{
+				uMat->textureIndex[i] = -1;
+				continue;
+			}
+
+			// get texture location
+			aiString str;
+			material->GetTexture(textureTypes[i], 0, &str);
+			std::string str_s(str.C_Str());
+
+			// load texture
+			ModelTexture* tex = new ModelTexture();
+			tex->texture = Texture::cacheImage((directory + '/' + str_s).c_str());
+			tex->type = (TextureType)i;
+			textures.push_back(tex);
+
+			// set textureIndex
+			uMat->textureIndex[i] = textures.size() - 1;
+		}
+
+		// uniform block material setup
+		fillMaterialColor(uMat->ambient, MaterialColorType::AMBIENT, material, 0.2f, 0.2f, 0.2f, 1.0f);
+		fillMaterialColor(uMat->diffuse, MaterialColorType::DIFFUSE, material, 0.3f, 0.3f, 0.3f, 1.0f);
+		fillMaterialColor(uMat->specular, MaterialColorType::SPECULAR, material, 0.0f, 0.0f, 0.0f, 1.0f);
+		fillMaterialColor(uMat->emissive, MaterialColorType::EMISSIVE, material, 0.0f, 0.0f, 0.0f, 1.0f);
+
+		// get shininess
+		float shininess = 0.0;
+		aiGetMaterialFloat(material, AI_MATKEY_SHININESS, &shininess);
+		uMat->shininess = shininess;
+
+		// add to material dictionary
+		materials.push_back(uMat);
+	}
+
+	// load all meshes
 	for (unsigned int i = 0; i < scene->mNumMeshes; i++)
 	{
 		aiMesh* mesh = scene->mMeshes[i];
-		meshes.push_back(Mesh(directory, mesh, scene));
+		meshes.push_back(new Mesh(this, mesh, scene));
 	}
+}
+
+AssetModel::~AssetModel()
+{
+	for (unsigned int i = 0; i < meshes.size(); i++)
+		delete meshes[i];
+	for (unsigned int i = 0; i < materials.size(); i++)
+		delete materials[i];
+	for (unsigned int i = 0; i < textures.size(); i++)
+		delete textures[i];
+	uMaterial.destroy();
 }

@@ -2,28 +2,19 @@
 #include <math.h>
 #include "gfx/window.h"
 #include "gfx/shader.h"
-#include "gfx/model.h"
 #include "gfx/camera.h"
+#include "model/assetmodel.h"
+#include "dirlight.h"
 #include "util/util.h"
 
 
-struct Light
-{
-    glm::vec4 diffuse;
-    glm::vec4 ambient;
-    glm::vec4 specular;
-};
 
-
-struct Light light;
-VBO uboLight(GL_UNIFORM_BUFFER);
-
+DirectionalLight light;
 ShaderProgram shader;
-model::Model myModel;
-Camera cam(0, 0, -3, -90, 0);
+model::AssetModel myModel;
+Camera cam(-45, 30, -20, 14, -35);
 
 glm::vec2 lastMouse(0, 0);
-
 
 void init()
 {
@@ -34,22 +25,25 @@ void init()
 	shader.load();
 	shader.use();
 
-    light.diffuse = glm::vec4(0.8f);
-    light.ambient = glm::vec4(0.2f);
-    light.specular = glm::vec4(1.0f);
-
-    uboLight.create();
-    uboLight.bindBufferRange(UNIFORM_BINDING_LIGHT, 0, sizeof(light));
-    uboLight.buffer(sizeof(light), &light);
-    uboLight.unbind();
+    light.create();
+    light.data.direction = glm::vec4(1.0f, -1.0f, -1.0f, 1.0f);
+    light.data.diffuse = glm::vec4(0.8f);
+    light.data.ambient = glm::vec4(0.2f);
+    light.data.specular = glm::vec4(1.0f);
+    light.update();
 
 	glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
     glEnable(GL_DEPTH_TEST);
 }
 
+float angle = 0;
 void render(float partialTime)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    angle += 0.1f;
+    light.data.direction = glm::vec4(cos(angle), -1.0f, sin(angle), 1.0f);
+    light.update();
 
     glm::mat4 model = glm::mat4(1.0f);
     glm::mat4 view = cam.getViewMatrix();
@@ -98,6 +92,7 @@ void mouse(int button, int state, int x, int y)
 void keyboard(unsigned char key, int x, int y)
 {
     const float speed = 0.8f;
+    const float xyzSpeed = 0.1f;
     switch (key)
     {
     case 'w':

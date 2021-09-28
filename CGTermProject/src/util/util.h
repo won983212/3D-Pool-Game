@@ -15,8 +15,8 @@ using namespace commoncg;
 #define randomVal(min, max) ((float)(min + (max - min) * drand48()))
 #endif
 
-#define SCREEN_WIDTH 512
-#define SCREEN_HEIGHT 512
+#define SCREEN_WIDTH 800
+#define SCREEN_HEIGHT 600
 
 #define UNIFORM_BINDING_MATERIAL 1
 #define UNIFORM_BINDING_LIGHT 2
