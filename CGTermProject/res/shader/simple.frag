@@ -5,7 +5,10 @@ layout (std140, binding = 1) uniform Material {
 	vec4 ambient;
 	vec4 specular;
 	vec4 emissive;
-	int textureIndex[4];
+	int texIndexDiffuse;
+	int texIndexSpecular;
+	int texIndexNormal;
+	int texIndexHeight;
 	float shininess;
 } material;
 
@@ -40,7 +43,7 @@ void main()
 	vec3 diffuse = vec3(light.diffuse) * diffuseScale;
 
 	// apply texture
-	if(material.textureIndex[0] != -1){
+	if(material.texIndexDiffuse != -1){
 		diffuse = diffuse * vec3(texture(texture_diffuse, texCoord));
 		ambient = ambient * vec3(texture(texture_diffuse, texCoord));
 	} else {
@@ -49,14 +52,14 @@ void main()
 	}
 	
 	// specular
-	vec3 reflectVec = reflect(-lightDir, normal);
-	float specularScale = pow(max(dot(viewVec, reflectVec), 0.0f), material.shininess);
-	vec3 specular = vec3(light.specular) * specularScale;
-	if(material.textureIndex[1] != -1){
+	vec3 reflectVec = reflect(-lightDir, norm);
+	float specularScale = pow(max(dot(viewVec, reflectVec), 0.0f), max(material.shininess, 1f));
+	vec3 specular = 0.5f * vec3(light.specular) * specularScale;
+	if(material.texIndexSpecular != -1){
 		specular *= vec3(material.specular);
 	} else {
 		specular *= vec3(texture(texture_specular, texCoord));
 	}
-
-	FragColor = vec4(diffuse, 1.0f);
+	
+	FragColor = vec4(ambient + diffuse + specular, 1.0f);
 }

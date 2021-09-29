@@ -6,14 +6,6 @@
 using namespace model;
 using namespace std;
 
-const string textureUniformNames[MESH_TEXTURE_TYPE_SIZE] =
-{
-	"texture_diffuse",
-	"texture_specular",
-	"texture_normal",
-	"texture_height"
-};
-
 const aiTextureType textureTypes[MESH_TEXTURE_TYPE_SIZE] =
 {
 	aiTextureType_DIFFUSE,
@@ -60,7 +52,7 @@ static void fillMaterialColor(float* dst, MaterialColorType colorType, const aiM
 }
 
 Mesh::Mesh(const AssetModel* parent, aiMesh* mesh, const aiScene* scene)
-	: vao(), ebo(GL_ELEMENT_ARRAY_BUFFER), parent(parent), indiceSize(0), materialIndex(-1)
+	: ebo(GL_ELEMENT_ARRAY_BUFFER), parent(parent), indiceSize(0), materialIndex(-1)
 {
 	vector<Vertex> vertices;
 	vector<unsigned int> indices;
@@ -129,20 +121,22 @@ void Mesh::draw(ShaderProgram& shader)
 	for (unsigned int i = 0; i < MESH_TEXTURE_TYPE_SIZE; i++)
 	{
 		// ignore not loaded texture.
-		if (uMat->textureIndex[i] == -1)
+		if (uMat->texIndex[i] == -1)
 			continue;
 
 		// get texture info
-		ModelTexture* texture = parent->textures[uMat->textureIndex[i]];
+		ModelTexture* texture = parent->textures[uMat->texIndex[i]];
 		string name = textureUniformNames[(int)texture->type];
 
 		// bind texture
 		shader.setUniform(name.c_str(), (int)i);
 		glActiveTexture(GL_TEXTURE0 + i);
-		texture->texture.bind();
+		texture->texture->bind();
 	}
 
-	parent->bindMaterial(materialIndex);
+	// bind material to shader
+	if (materialIndex >= 0)
+		model::bindMaterial(parent->materials[materialIndex]);
 
 	vao.bind();
 	glDrawElements(GL_TRIANGLES, indiceSize, GL_UNSIGNED_INT, 0);
@@ -155,15 +149,15 @@ void AssetModel::draw(ShaderProgram& shader)
 {
 	for (unsigned int i = 0; i < meshes.size(); i++)
 		meshes[i]->draw(shader);
-}
 
-void AssetModel::bindMaterial(unsigned int index) const
-{
-	if (index < 0)
-		return;
-	uMaterial.bindBufferRange(UNIFORM_BINDING_MATERIAL, 0, sizeof(struct Material));
-	uMaterial.buffer(sizeof(struct Material), materials[index], GL_DYNAMIC_DRAW);
-	uMaterial.unbind();
+	// all texture unbind
+	for (unsigned int i = 0; i < MESH_TEXTURE_TYPE_SIZE; i++)
+	{
+		glActiveTexture(GL_TEXTURE0 + i);
+		Texture::unbind();
+	}
+
+	glActiveTexture(GL_TEXTURE0);
 }
 
 void AssetModel::loadModel(string path)
@@ -181,7 +175,6 @@ void AssetModel::loadModel(string path)
 	directory = path.substr(0, path.find_last_of('/'));
 
 	// load all materials
-	uMaterial.create();
 	for (unsigned int i = 0; i < scene->mNumMaterials; i++)
 	{
 		aiMaterial* material = scene->mMaterials[i];
@@ -192,7 +185,7 @@ void AssetModel::loadModel(string path)
 		{
 			if (material->GetTextureCount(textureTypes[i]) == 0)
 			{
-				uMat->textureIndex[i] = -1;
+				uMat->texIndex[i] = -1;
 				continue;
 			}
 
@@ -205,10 +198,10 @@ void AssetModel::loadModel(string path)
 			ModelTexture* tex = new ModelTexture();
 			tex->texture = Texture::cacheImage((directory + '/' + str_s).c_str());
 			tex->type = (TextureType)i;
-			textures.push_back(tex);
 
 			// set textureIndex
-			uMat->textureIndex[i] = textures.size() - 1;
+			uMat->texIndex[i] = textures.size();
+			textures.push_back(tex);
 		}
 
 		// uniform block material setup
@@ -242,5 +235,4 @@ AssetModel::~AssetModel()
 		delete materials[i];
 	for (unsigned int i = 0; i < textures.size(); i++)
 		delete textures[i];
-	uMaterial.destroy();
 }

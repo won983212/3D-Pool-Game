@@ -162,6 +162,7 @@
     <ClInclude Include="src\gfx\window.h" />
     <ClInclude Include="src\model\ball.h" />
     <ClInclude Include="src\model\model.h" />
+    <ClInclude Include="src\scene.h" />
     <ClInclude Include="src\util\stb_image.h" />
     <ClInclude Include="src\util\util.h" />
   </ItemGroup>
@@ -176,6 +177,8 @@
     <ClCompile Include="src\gfx\window.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\model\ball.cpp" />
+    <ClCompile Include="src\model\model.cpp" />
+    <ClCompile Include="src\scene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp-vc142-mtd.dll" />
@@ -193,6 +196,7 @@
     <Image Include="res\models\Wheel_baseColor.png" />
     <Image Include="res\models\Wheel_metallicRoughness.png" />
     <Image Include="res\models\Wheel_normal.png" />
+    <Image Include="res\textures\ball_10.png" />
     <Image Include="res\texture\container.jpg" />
     <Image Include="res\texture\container2.png" />
     <Image Include="res\texture\container2_specular.png" />

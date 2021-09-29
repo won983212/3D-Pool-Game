@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 #include <unordered_map>
 #include "../gfx/gfx.h"
 #include "../gfx/texture.h"
@@ -8,6 +9,14 @@
 
 namespace model
 {
+	const std::string textureUniformNames[MESH_TEXTURE_TYPE_SIZE] =
+	{
+		"texture_diffuse",
+		"texture_specular",
+		"texture_normal",
+		"texture_height"
+	};
+
 	enum class TextureType
 	{
 		DIFFUSE, SPECULAR, NORMAL, HEIGHT
@@ -31,7 +40,9 @@ namespace model
 		float ambient[4];
 		float specular[4];
 		float emissive[4];
-		int textureIndex[MESH_TEXTURE_TYPE_SIZE];
+		int texIndex[4];
 		float shininess;
 	};
+
+	void bindMaterial(const struct Material* materials);
 }

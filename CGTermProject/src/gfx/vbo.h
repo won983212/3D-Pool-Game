@@ -10,6 +10,7 @@ namespace commoncg
 		VBO(int bufferType = GL_ARRAY_BUFFER);
 		~VBO();
 		void create();
+		bool isCreated() const;
 		void destroy() const;
 		void bind() const;
 		void buffer(GLsizeiptr size, const void* data, GLenum drawingHint = GL_STATIC_DRAW) const;

@@ -16,6 +16,11 @@ void VBO::create()
 	glGenBuffers(1, &handle);
 }
 
+bool VBO::isCreated() const
+{
+	return handle != -1;
+}
+
 void VBO::destroy() const
 {
 	checkIfCreated("destroy");
@@ -48,7 +53,7 @@ void VBO::unbind() const
 
 void VBO::checkIfCreated(std::string methodName) const
 {
-	if (handle == -1)
+	if (!isCreated())
 	{
 		std::string message = "Error: Called " + methodName + "() before creating.";
 		std::cout << message << std::endl;

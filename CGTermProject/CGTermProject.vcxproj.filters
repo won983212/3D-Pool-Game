@@ -54,6 +54,9 @@
     <ClInclude Include="src\model\ball.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="src\scene.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\gfx\shader.cpp">
@@ -84,6 +87,12 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="src\model\ball.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="src\model\model.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="src\scene.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
@@ -124,6 +133,9 @@
       <Filter>리소스 파일</Filter>
     </Image>
     <Image Include="res\models\textures\Wheel_metallicRoughness.png">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\textures\ball_10.png">
       <Filter>리소스 파일</Filter>
     </Image>
   </ItemGroup>

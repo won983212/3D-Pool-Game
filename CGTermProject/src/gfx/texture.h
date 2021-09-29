@@ -11,7 +11,7 @@ namespace commoncg
 		void bind() const;
 		void destroy();
 		GLuint getTextureID() const;
-		static Texture cacheImage(const char* imageFilePath);
+		static Texture* cacheImage(const char* imageFilePath);
 		static void unbind();
 	private:
 		GLuint textureId = 0;

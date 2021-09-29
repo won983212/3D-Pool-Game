@@ -6,7 +6,7 @@
 #include "../util/util.h"
 #include "../util/stb_image.h"
 
-std::unordered_map<std::string, Texture> loaded_textures;
+std::unordered_map<std::string, Texture*> loaded_textures;
 
 
 Texture::~Texture()
@@ -14,20 +14,16 @@ Texture::~Texture()
 	destroy();
 }
 
-Texture Texture::cacheImage(const char* imageFilePath)
+Texture* Texture::cacheImage(const char* imageFilePath)
 {
 	std::string str_s(imageFilePath);
 	if (loaded_textures.find(str_s) != loaded_textures.end())
-	{
-		std::cout << "Cached: " << str_s << std::endl;
 		return loaded_textures[str_s];
-	}
 
-	commoncg::Texture texture;
-	texture.loadImage(imageFilePath);
+	commoncg::Texture* texture = new Texture();
+	texture->loadImage(imageFilePath);
 
 	loaded_textures.insert(std::make_pair(str_s, texture));
-	std::cout << "Loaded: " << str_s << std::endl;
 	return texture;
 }
 

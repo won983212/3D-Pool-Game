@@ -15,7 +15,7 @@ namespace model
 {
 	struct ModelTexture
 	{
-		commoncg::Texture texture;
+		const commoncg::Texture* texture;
 		TextureType type;
 	};
 
@@ -36,13 +36,10 @@ namespace model
 	class AssetModel
 	{
 	public:
-		AssetModel() : uMaterial(GL_UNIFORM_BUFFER) {};
+		AssetModel() {};
 		~AssetModel();
 		void draw(commoncg::ShaderProgram& shader);
 		void loadModel(std::string path);
-		void bindMaterial(unsigned int index) const;
-	private:
-		commoncg::VBO uMaterial;
 	public:
 		std::vector<Mesh*> meshes;
 		std::vector<struct Material*> materials;

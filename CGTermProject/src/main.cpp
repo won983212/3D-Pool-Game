@@ -4,12 +4,14 @@
 #include "gfx/shader.h"
 #include "gfx/camera.h"
 #include "model/assetmodel.h"
+#include "model/ball.h"
 #include "dirlight.h"
 #include "util/util.h"
 
 DirectionalLight light;
 ShaderProgram shader;
 model::AssetModel myModel;
+model::Ball ball;
 Camera cam(-45, 30, -20, 14, -35);
 
 glm::vec2 lastMouse(0, 0);
@@ -17,6 +19,7 @@ glm::vec2 lastMouse(0, 0);
 void init()
 {
     myModel.loadModel("res/models/untitled.obj");
+    ball.init("res/textures/ball_10.png");
 
 	shader.addShader("res/shader/simple.vert", GL_VERTEX_SHADER);
 	shader.addShader("res/shader/simple.frag", GL_FRAGMENT_SHADER);
@@ -26,12 +29,14 @@ void init()
     light.create();
     light.data.direction = glm::vec4(1.0f, -1.0f, -1.0f, 1.0f);
     light.data.diffuse = glm::vec4(0.8f);
-    light.data.ambient = glm::vec4(0.2f);
+    light.data.ambient = glm::vec4(0.1f);
     light.data.specular = glm::vec4(1.0f);
     light.update();
 
 	glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
 }
 
 float angle = 0;
@@ -49,10 +54,12 @@ void render(float partialTime)
 
     shader.setUniform("p", projection);
     shader.setUniform("v", view);
-    shader.setUniform("m", model);
+    shader.setUniform("m", glm::mat4(1.0f));
     shader.setUniform("viewPos", cam.position);
-
     myModel.draw(shader);
+
+    shader.setUniform("m", glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 4.0f, 0.0f)));
+    ball.draw(shader);
 }
 
 void destroy()
