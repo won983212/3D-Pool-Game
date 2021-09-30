@@ -2,6 +2,8 @@
 #include "camera.h"
 #include "../util/util.h"
 
+using namespace commoncg;
+
 glm::mat4 Camera::getViewMatrix() const
 {
 	return glm::lookAt(position, position + front, up);

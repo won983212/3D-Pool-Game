@@ -2,8 +2,8 @@
 #include <fstream>
 #include <sstream>
 #include "shader.h"
-#include "../util/util.h"
 
+using namespace commoncg;
 
 static GLuint _compileShaderSource(const char* filePath, GLenum shaderType)
 {

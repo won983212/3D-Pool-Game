@@ -1,6 +1,7 @@
 #include <iostream>
 #include "vbo.h"
-#include "../util/util.h"
+
+using namespace commoncg;
 
 VBO::VBO(int bufferType)
 	:bufferType(bufferType), handle(-1)

@@ -7,6 +7,7 @@
 using namespace std;
 using namespace model;
 using namespace glm;
+using namespace commoncg;
 
 const struct Material ballMaterial = 
 {
@@ -39,7 +40,7 @@ static void addSphereVertex(vector<Vertex>& vertices, int iPitch, int iYaw)
 	vertices.push_back(vert);
 }
 
-void Ball::init(const char* texturePath)
+void Ball::init()
 {
 	if (BALL_RENDER_STEP < 2)
 	{
@@ -48,7 +49,6 @@ void Ball::init(const char* texturePath)
 	}
 
 	vector<Vertex> vertices;
-	texture = Texture::cacheImage(texturePath);
 
 	vao.create();
 	vbo.create();
@@ -86,14 +86,11 @@ void Ball::draw(ShaderProgram& shader)
 {
 	// use GL_TEXTURE0 as texture_diffuse
 	shader.setUniform(textureUniformNames[(int)TextureType::DIFFUSE].c_str(), 0);
-	texture->bind();
 
 	// bind material
 	model::bindMaterial(&ballMaterial);
 
 	vao.bind();
 	glDrawArrays(GL_TRIANGLES, 0, verticesSize);
-
 	VAO::unbind();
-	Texture::unbind();
 }

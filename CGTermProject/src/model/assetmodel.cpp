@@ -1,9 +1,9 @@
 #include <iostream>
 #include "../gfx/texture.h"
-#include "../util/util.h"
 #include "assetmodel.h"
 
 using namespace model;
+using namespace commoncg;
 using namespace std;
 
 const aiTextureType textureTypes[MESH_TEXTURE_TYPE_SIZE] =

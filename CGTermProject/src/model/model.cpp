@@ -2,6 +2,9 @@
 #include "../gfx/vbo.h"
 #include "../util/util.h"
 
+using namespace commoncg;
+
+// material ubo
 VBO uMaterial(GL_UNIFORM_BUFFER);
 
 void model::bindMaterial(const struct Material* materials)

@@ -4,7 +4,7 @@
 namespace commoncg
 {
 	typedef void (*WindowCallback)();
-	typedef void (*RenderCallback)(float partialTime);
+	typedef void (*UpdateCallback)(float partialTime);
 	typedef void (*ReshapeCallback)(int w, int h);
 	typedef void (*KeyboardCallback)(unsigned char key, int x, int y);
 	typedef void (*MouseCallback)(int button, int state, int x, int y);
@@ -14,13 +14,14 @@ namespace commoncg
 	{
 	public:
 		Window(const char* title, int* argcp, char** argv);
-		void create(WindowCallback init, RenderCallback render);
+		void create(WindowCallback init, UpdateCallback render);
 		void setDestroyFunc(WindowCallback destory);
 		void setReshapeFunc(ReshapeCallback reshape) const;
 		void setKeyboardFunc(KeyboardCallback keyEvent) const;
 		void setMouseFunc(MouseCallback mouseEvent) const;
 		void setMouseDragFunc(MouseMotionCallback mouseEvent) const;
 		void setMouseWheelFunc(MouseCallback mouseEvent) const;
+		void setIdleFunc(UpdateCallback idle);
 		float getPartialTime() const;
 		void loop() const;
 	private:
@@ -29,7 +30,8 @@ namespace commoncg
 	private:
 		static Window* inst;
 		WindowCallback destroy = NULL;
-		RenderCallback render = NULL;
+		UpdateCallback idle = NULL;
+		UpdateCallback render = NULL;
 		const char* title;
 		float partialTime = 0;
 		long lastFrame = 0;

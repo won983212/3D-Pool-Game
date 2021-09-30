@@ -5,6 +5,7 @@
 #include "window.h"
 #include "../util/util.h"
 
+using namespace commoncg;
 
 Window* Window::inst = NULL;
 
@@ -14,7 +15,7 @@ Window::Window(const char* title, int* argcp, char** argv)
 	glutInit(argcp, argv);
 }
 
-void Window::create(WindowCallback init, RenderCallback display)
+void Window::create(WindowCallback init, UpdateCallback display)
 {
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
 	glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -60,10 +61,14 @@ void Window::setMouseWheelFunc(MouseCallback mouseEvent) const
 	glutMouseWheelFunc(mouseEvent);
 }
 
-
 void Window::setMouseDragFunc(MouseMotionCallback mouseEvent) const
 {
 	glutMotionFunc(mouseEvent);
+}
+
+void Window::setIdleFunc(UpdateCallback idle)
+{
+	this->idle = idle;
 }
 
 void Window::renderWrapper()
@@ -91,6 +96,10 @@ void Window::update()
 
 	inst->partialTime = lastFrame == 0 ? 0 : (float)(currentTime - lastFrame) / CLOCKS_PER_SEC;
 	inst->lastFrame = currentTime;
+
+	if (inst->idle != NULL)
+		inst->idle(inst->partialTime);
+
 	glutPostRedisplay();
 }
 

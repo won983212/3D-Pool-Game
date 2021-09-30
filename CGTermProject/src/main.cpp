@@ -1,70 +1,26 @@
 #include <iostream>
 #include <math.h>
 #include "gfx/window.h"
-#include "gfx/shader.h"
-#include "gfx/camera.h"
-#include "model/assetmodel.h"
-#include "model/ball.h"
-#include "dirlight.h"
-#include "util/util.h"
+#include "scene.h"
 
-DirectionalLight light;
-ShaderProgram shader;
-model::AssetModel myModel;
-model::Ball ball;
-Camera cam(-45, 30, -20, 14, -35);
+using namespace commoncg;
 
+Scene scene;
 glm::vec2 lastMouse(0, 0);
 
 void init()
 {
-    myModel.loadModel("res/models/untitled.obj");
-    ball.init("res/textures/ball_10.png");
-
-	shader.addShader("res/shader/simple.vert", GL_VERTEX_SHADER);
-	shader.addShader("res/shader/simple.frag", GL_FRAGMENT_SHADER);
-	shader.load();
-	shader.use();
-
-    light.create();
-    light.data.direction = glm::vec4(1.0f, -1.0f, -1.0f, 1.0f);
-    light.data.diffuse = glm::vec4(0.8f);
-    light.data.ambient = glm::vec4(0.1f);
-    light.data.specular = glm::vec4(1.0f);
-    light.update();
-
+    scene.init();
 	glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 }
 
-float angle = 0;
 void render(float partialTime)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    angle += 0.03f;
-    light.data.direction = glm::vec4(cos(angle), -1.0f, sin(angle), 1.0f);
-    light.update();
-
-    glm::mat4 model = glm::mat4(1.0f);
-    glm::mat4 view = cam.getViewMatrix();
-    glm::mat4 projection = glm::perspective(DEGTORAD(45.0f), (float)SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 100.0f);
-
-    shader.setUniform("p", projection);
-    shader.setUniform("v", view);
-    shader.setUniform("m", glm::mat4(1.0f));
-    shader.setUniform("viewPos", cam.position);
-    myModel.draw(shader);
-
-    shader.setUniform("m", glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 4.0f, 0.0f)));
-    ball.draw(shader);
-}
-
-void destroy()
-{
-	shader.destroy();
+    scene.render(partialTime);
 }
 
 void reshape(int w, int h)
@@ -77,9 +33,9 @@ void drag(int x, int y)
     glm::vec2 mouse = glm::vec2(x, y);
     glm::vec2 delta = mouse - lastMouse;
 
-    cam.yaw += delta.x / 8.0f;
-    cam.pitch += -delta.y / 8.0f;
-    cam.update();
+    scene.cam.yaw += delta.x / 8.0f;
+    scene.cam.pitch += -delta.y / 8.0f;
+    scene.cam.update();
 
     lastMouse.x = x;
     lastMouse.y = y;
@@ -98,36 +54,42 @@ void keyboard(unsigned char key, int x, int y)
 {
     const float speed = 0.8f;
     const float xyzSpeed = 0.1f;
+
     switch (key)
     {
     case 'w':
-        cam.position += speed * cam.getFront();
-        cam.update();
+        scene.cam.position += speed * scene.cam.getFront();
+        scene.cam.update();
         break;
     case 's':
-        cam.position += -speed * cam.getFront();
-        cam.update();
+        scene.cam.position += -speed * scene.cam.getFront();
+        scene.cam.update();
         break;
     case 'a':
-        cam.position += -speed * cam.getRight();
-        cam.update();
+        scene.cam.position += -speed * scene.cam.getRight();
+        scene.cam.update();
         break;
     case 'd':
-        cam.position += speed * cam.getRight();
-        cam.update();
+        scene.cam.position += speed * scene.cam.getRight();
+        scene.cam.update();
         break;
     }
 }
 
+void update(float partialTime)
+{
+    scene.update(partialTime);
+}
+
 int main(int argc, char* argv[])
 {
-    Window wnd("CG Term Project", &argc, argv);
+    Window wnd("Pocket ball (CG Term Project)", &argc, argv);
 	wnd.create(init, render);
     wnd.setMouseDragFunc(drag);
     wnd.setMouseFunc(mouse);
     wnd.setKeyboardFunc(keyboard);
     wnd.setReshapeFunc(reshape);
-	wnd.setDestroyFunc(destroy);
+    wnd.setIdleFunc(update);
 	wnd.loop();
 	return 0;
 }

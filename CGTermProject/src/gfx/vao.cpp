@@ -1,6 +1,7 @@
 #include <iostream>
 #include "vao.h"
-#include "../util/util.h"
+
+using namespace commoncg;
 
 VAO::~VAO()
 {

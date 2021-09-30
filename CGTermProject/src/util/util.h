@@ -1,7 +1,5 @@
 #pragma once
 
-using namespace commoncg;
-
 #ifndef M_PI
 #define M_PI (3.1415926535897932384626433832795f)
 #define DEGTORAD(degree) ((degree) * (M_PI / 180.0f))
@@ -20,3 +18,8 @@ using namespace commoncg;
 
 #define UNIFORM_BINDING_MATERIAL 1
 #define UNIFORM_BINDING_LIGHT 2
+#define UNIFORM_BINDING_VIEWMAT 3
+
+// table size is 2.84m x 1.42m
+#define BALL_RENDER_STEP 30
+#define BALL_RADIUS 0.44f

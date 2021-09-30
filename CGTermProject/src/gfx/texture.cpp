@@ -3,9 +3,11 @@
 #include <iostream>
 #include <unordered_map>
 #include "texture.h"
-#include "../util/util.h"
 #include "../util/stb_image.h"
 
+using namespace commoncg;
+
+// loaded texture cache
 std::unordered_map<std::string, Texture*> loaded_textures;
 
 

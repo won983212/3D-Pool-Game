@@ -151,7 +151,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\dirlight.h" />
     <ClInclude Include="src\gfx\camera.h" />
     <ClInclude Include="src\gfx\gfx.h" />
     <ClInclude Include="src\model\assetmodel.h" />
@@ -162,12 +161,12 @@
     <ClInclude Include="src\gfx\window.h" />
     <ClInclude Include="src\model\ball.h" />
     <ClInclude Include="src\model\model.h" />
+    <ClInclude Include="src\pooltable.h" />
     <ClInclude Include="src\scene.h" />
     <ClInclude Include="src\util\stb_image.h" />
     <ClInclude Include="src\util\util.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\dirlight.cpp" />
     <ClCompile Include="src\gfx\camera.cpp" />
     <ClCompile Include="src\model\assetmodel.cpp" />
     <ClCompile Include="src\gfx\shader.cpp" />
@@ -178,6 +177,7 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\model\ball.cpp" />
     <ClCompile Include="src\model\model.cpp" />
+    <ClCompile Include="src\pooltable.cpp" />
     <ClCompile Include="src\scene.cpp" />
   </ItemGroup>
   <ItemGroup>
