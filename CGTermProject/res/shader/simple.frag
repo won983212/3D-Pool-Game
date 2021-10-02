@@ -52,8 +52,8 @@ void main()
 	}
 	
 	// specular
-	vec3 reflectVec = reflect(-lightDir, norm);
-	float specularScale = pow(max(dot(viewVec, reflectVec), 0.0f), max(material.shininess, 1.0f));
+	vec3 highwayVec = normalize(lightDir + viewVec);
+	float specularScale = pow(max(dot(norm, highwayVec), 0.0f), max(material.shininess * 4, 0.0f));
 	vec3 specular = 0.5f * vec3(light.specular) * specularScale;
 	if(material.texIndexSpecular != -1){
 		specular *= vec3(material.specular);
