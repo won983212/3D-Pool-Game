@@ -153,6 +153,7 @@
   <ItemGroup>
     <ClInclude Include="src\gfx\camera.h" />
     <ClInclude Include="src\gfx\gfx.h" />
+    <ClInclude Include="src\gfx\skybox.h" />
     <ClInclude Include="src\model\assetmodel.h" />
     <ClInclude Include="src\gfx\shader.h" />
     <ClInclude Include="src\gfx\texture.h" />
@@ -168,6 +169,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\gfx\camera.cpp" />
+    <ClCompile Include="src\gfx\skybox.cpp" />
     <ClCompile Include="src\model\assetmodel.cpp" />
     <ClCompile Include="src\gfx\shader.cpp" />
     <ClCompile Include="src\gfx\texture.cpp" />
@@ -182,12 +184,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp-vc142-mtd.dll" />
+    <None Include="freeglut.dll" />
+    <None Include="glew32.dll" />
     <None Include="res\models\scene.bin" />
     <None Include="res\models\scene.gltf" />
     <None Include="res\shader\lighting.frag" />
     <None Include="res\shader\lighting.vert" />
     <None Include="res\shader\simple.frag" />
     <None Include="res\shader\simple.vert" />
+    <None Include="res\shader\skybox.frag" />
+    <None Include="res\shader\skybox.vert" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\models\textures\Wheel_baseColor.png" />

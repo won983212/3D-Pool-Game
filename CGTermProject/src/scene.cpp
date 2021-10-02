@@ -8,12 +8,12 @@
 using namespace glm;
 using namespace commoncg;
 
-float lightAngle = 0;
 Texture* ballTexture;
-model::AssetModel modelPoolTable;
 
 void Scene::init()
 {
+    skybox.load("res/textures/skybox", "res/shader/skybox.vert", "res/shader/skybox.frag");
+
     ballTexture = Texture::cacheImage("res/textures/ball_10.png");
     modelBall.init();
 
@@ -39,9 +39,6 @@ void Scene::init()
 
 void Scene::update(float partialTime)
 {
-    lightAngle += M_PI * partialTime;
-    light.direction = vec4(cos(lightAngle), -1.0f, sin(lightAngle), 1.0f);
-    updateLight();
     table.update(partialTime);
 }
 
@@ -83,4 +80,7 @@ void Scene::render(float partialTime)
     Texture::unbind();
     shader.setUniform("model", mat4(1.0f));
     modelPoolTable.draw(shader);
+
+    // skybox
+    skybox.render(shader);
 }

@@ -3,6 +3,7 @@
 #include "gfx/gfx.h"
 #include "gfx/vbo.h"
 #include "gfx/camera.h"
+#include "gfx/skybox.h"
 #include "model/assetmodel.h"
 #include "model/ball.h"
 #include "pooltable.h"
@@ -45,8 +46,9 @@ private:
     // pool table physics simulator
     PoolTable table;
     // models
-    // model::AssetModel modelPoolTable;
+    model::AssetModel modelPoolTable;
     model::Ball modelBall;
     // graphics
     commoncg::ShaderProgram shader;
+    commoncg::Skybox skybox;
 };

@@ -28,8 +28,8 @@ void PoolTable::update(float partialTime) const
 
 		// update velocity
 		float vel = glm::length(ball->velocity);
-		if (vel > 0)
-			ball->velocity *= 0.99; // friction
+		//if (vel > 0)
+			//ball->velocity *= 0.99; // friction
 
 		// update position
 		ball->position += partialTime * ball->velocity;
