@@ -122,6 +122,7 @@
     <None Include="glew32.dll" />
     <None Include="res\shader\cubemap.vert" />
     <None Include="res\shader\eqrtocubemap.frag" />
+    <None Include="res\textures\skybox\skybox.hdr" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\texture\container.jpg">
@@ -152,6 +153,56 @@
       <Filter>리소스 파일</Filter>
     </Image>
     <Image Include="res\textures\ball_10.png">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\textures\skybox\env.dds" />
+    <Image Include="res\textures\skybox\irr.dds" />
+    <Image Include="res\textures\ball_0.png">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\textures\ball_1.png">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\textures\ball_2.png">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\textures\ball_3.png">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\textures\ball_4.png">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\textures\ball_5.png">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\textures\ball_6.png">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\textures\ball_7.png">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\textures\ball_8.png">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\textures\ball_9.png">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\textures\ball_11.png">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\textures\ball_12.png">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\textures\ball_13.png">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\textures\ball_14.png">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\textures\ball_15.png">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\textures\brdf.png">
       <Filter>리소스 파일</Filter>
     </Image>
   </ItemGroup>

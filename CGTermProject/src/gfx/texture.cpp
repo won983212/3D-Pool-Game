@@ -19,20 +19,20 @@ Texture::~Texture()
 	destroy();
 }
 
-Texture* Texture::cacheImage(const char* imageFilePath)
+Texture* Texture::cacheImage(const char* imageFilePath, GLint wrapParam)
 {
 	std::string str_s(imageFilePath);
 	if (loaded_textures.find(str_s) != loaded_textures.end())
 		return loaded_textures[str_s];
 
 	commoncg::Texture* texture = new Texture();
-	texture->loadImage(imageFilePath);
+	texture->loadImage(imageFilePath, wrapParam);
 
 	loaded_textures.insert(std::make_pair(str_s, texture));
 	return texture;
 }
 
-void Texture::loadImage(const char* imageFilePath)
+void Texture::loadImage(const char* imageFilePath, GLint wrapParam)
 {
 	bool hdr = false;
 	std::string ext = std::string(imageFilePath);
@@ -43,7 +43,7 @@ void Texture::loadImage(const char* imageFilePath)
 
 	if (ext == "dds")
 	{
-		loadDDSImage(imageFilePath);
+		loadDDSImage(imageFilePath, wrapParam);
 		return;
 	}
 	else if (ext == "hdr")
@@ -60,8 +60,8 @@ void Texture::loadImage(const char* imageFilePath)
 	bind();
 
 	// setup parameters
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapParam);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapParam);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -101,7 +101,7 @@ static void handleError(std::string message, void* header, void* buffer, FILE* f
 }
 
 // Reference: https://gist.github.com/tilkinsc/13191c0c1e5d6b25fbe79bbd2288a673
-void Texture::loadDDSImage(const char* imageFilePath)
+void Texture::loadDDSImage(const char* imageFilePath, GLint wrapParam)
 {
 	unsigned char* header;
 	unsigned int blockSize, format;
@@ -182,8 +182,8 @@ void Texture::loadDDSImage(const char* imageFilePath)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, mipmapLevels - 1);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapParam);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapParam);
 
 	unsigned int offset = 0;
 	unsigned int size = 0;

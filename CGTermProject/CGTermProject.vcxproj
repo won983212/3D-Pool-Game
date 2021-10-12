@@ -196,6 +196,7 @@
     <None Include="res\shader\pbr.vert" />
     <None Include="res\shader\skybox.frag" />
     <None Include="res\shader\skybox.vert" />
+    <None Include="res\textures\skybox\skybox.hdr" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\models\textures\Wheel_baseColor.png" />
@@ -204,7 +205,25 @@
     <Image Include="res\models\Wheel_baseColor.png" />
     <Image Include="res\models\Wheel_metallicRoughness.png" />
     <Image Include="res\models\Wheel_normal.png" />
+    <Image Include="res\textures\ball_0.png" />
+    <Image Include="res\textures\ball_1.png" />
     <Image Include="res\textures\ball_10.png" />
+    <Image Include="res\textures\ball_11.png" />
+    <Image Include="res\textures\ball_12.png" />
+    <Image Include="res\textures\ball_13.png" />
+    <Image Include="res\textures\ball_14.png" />
+    <Image Include="res\textures\ball_15.png" />
+    <Image Include="res\textures\ball_2.png" />
+    <Image Include="res\textures\ball_3.png" />
+    <Image Include="res\textures\ball_4.png" />
+    <Image Include="res\textures\ball_5.png" />
+    <Image Include="res\textures\ball_6.png" />
+    <Image Include="res\textures\ball_7.png" />
+    <Image Include="res\textures\ball_8.png" />
+    <Image Include="res\textures\ball_9.png" />
+    <Image Include="res\textures\brdf.png" />
+    <Image Include="res\textures\skybox\env.dds" />
+    <Image Include="res\textures\skybox\irr.dds" />
     <Image Include="res\texture\container.jpg" />
     <Image Include="res\texture\container2.png" />
     <Image Include="res\texture\container2_specular.png" />

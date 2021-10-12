@@ -37,7 +37,13 @@ void Scene::init()
     shader.addShader("res/shader/pbr.frag", GL_FRAGMENT_SHADER);
     shader.load();
     shader.use();
-    shader.setUniform("brdfMap", 2);
+    shader.setUniform("texture_albedo", PBR_TEXTURE_INDEX_ALBEDO);
+    shader.setUniform("texture_metallic", PBR_TEXTURE_INDEX_METALLIC);
+    shader.setUniform("texture_roughness", PBR_TEXTURE_INDEX_ROUGHNESS);
+    shader.setUniform("texture_normal", PBR_TEXTURE_INDEX_NORMAL);
+    shader.setUniform("irradianceMap", PBR_TEXTURE_INDEX_IRRADIANCEMAP);
+    shader.setUniform("specularMap", PBR_TEXTURE_INDEX_SPECULARMAP);
+    shader.setUniform("brdfMap", PBR_TEXTURE_INDEX_BRDFMAP);
 
     skybox.beginLoad();
     skybox.loadHDRSkybox("res/textures/skybox/skybox.hdr");
@@ -91,7 +97,7 @@ void Scene::render()
 
     // bind env maps and brdf LUT (lookup texture).
     skybox.bindEnvironmentTextures();
-    glActiveTexture(GL_TEXTURE2);
+    glActiveTexture(GL_TEXTURE0 + PBR_TEXTURE_INDEX_BRDFMAP);
     brdfLUT.bind();
 
     // TODO debug light

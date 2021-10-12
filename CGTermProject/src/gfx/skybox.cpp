@@ -190,19 +190,16 @@ void Skybox::endLoad(const ShaderProgram& shader)
     glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
-    shader.use();
-    shader.setUniform("irradianceMap", 0);
-    shader.setUniform("specularMap", 1);
-
     glDeleteFramebuffers(1, &fbo);
     glDeleteRenderbuffers(1, &rbo);
+    shader.use();
 }
 
 void Skybox::bindEnvironmentTextures() const
 {
-    glActiveTexture(GL_TEXTURE0);
+    glActiveTexture(GL_TEXTURE0 + PBR_TEXTURE_INDEX_IRRADIANCEMAP);
     glBindTexture(GL_TEXTURE_CUBE_MAP, irrTextureId);
-    glActiveTexture(GL_TEXTURE1);
+    glActiveTexture(GL_TEXTURE0 + PBR_TEXTURE_INDEX_SPECULARMAP);
     glBindTexture(GL_TEXTURE_CUBE_MAP, specularTextureId);
 }
 

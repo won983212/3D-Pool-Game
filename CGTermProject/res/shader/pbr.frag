@@ -37,17 +37,16 @@ layout (std140, binding = 2) uniform Light
 
 uniform vec3 camPos;
 
-// env maps
-uniform samplerCube irradianceMap;
-uniform samplerCube specularMap;
-uniform sampler2D brdfMap;
-
 // textures
 uniform sampler2D texture_albedo;
 uniform sampler2D texture_metallic;
 uniform sampler2D texture_roughness;
-uniform sampler2D texture_ao;
 uniform sampler2D texture_normal;
+
+// env maps
+uniform samplerCube irradianceMap;
+uniform samplerCube specularMap;
+uniform sampler2D brdfMap;
 
 
 // calculate normal from normal map.

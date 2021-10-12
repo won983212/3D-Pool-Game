@@ -114,8 +114,8 @@ void Mesh::draw(ShaderProgram& shader)
 		string name = textureUniformNames[(int)texture->type];
 
 		// bind texture
-		shader.setUniform(name.c_str(), (int)i);
-		glActiveTexture(BASE_TEXTURE_ID + i);
+		shader.setUniform(name.c_str(), texturePBRIndexes[i]);
+		glActiveTexture(GL_TEXTURE0 + texturePBRIndexes[i]);
 		texture->texture->bind();
 	}
 
@@ -126,8 +126,6 @@ void Mesh::draw(ShaderProgram& shader)
 	vao.bind();
 	glDrawElements(GL_TRIANGLES, indiceSize, GL_UNSIGNED_INT, 0);
 	VAO::unbind();
-
-	glActiveTexture(GL_TEXTURE0);
 }
 
 void AssetModel::draw(ShaderProgram& shader)
@@ -138,18 +136,18 @@ void AssetModel::draw(ShaderProgram& shader)
 	// all texture unbind
 	for (unsigned int i = 0; i < MESH_TEXTURE_TYPE_SIZE; i++)
 	{
-		glActiveTexture(BASE_TEXTURE_ID + i);
+		glActiveTexture(GL_TEXTURE0 + texturePBRIndexes[i]);
 		Texture::unbind();
 	}
 
 	glActiveTexture(GL_TEXTURE0);
 }
 
-void AssetModel::loadTexture(string texPath, Material* uMat, int id)
+void AssetModel::loadTexture(const aiScene* scene, string texPath, Material* uMat, int id)
 {
 	// load texture
 	ModelTexture* tex = new ModelTexture();
-	tex->texture = Texture::cacheImage((directory + '/' + texPath).c_str());
+	tex->texture = Texture::cacheImage((directory + '/' + texPath).c_str(), GL_REPEAT);
 	tex->type = (TextureType)id;
 
 	// set textureIndex
@@ -183,7 +181,7 @@ void AssetModel::loadModel(string path)
 		// load textures
 		string albedoTexPath = getTexPathAssimp(material, AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_BASE_COLOR_TEXTURE);
 		if (!albedoTexPath.empty())
-			loadTexture(albedoTexPath, uMat, 0);
+			loadTexture(scene, albedoTexPath, uMat, 0);
 
 		string mrTexPath = getTexPathAssimp(material, AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_METALLICROUGHNESS_TEXTURE);
 		if (!mrTexPath.empty())
@@ -191,19 +189,19 @@ void AssetModel::loadModel(string path)
 			int dashIdx = mrTexPath.find("-");
 			if (dashIdx == string::npos)
 			{
-				loadTexture(mrTexPath, uMat, 1);
+				loadTexture(scene, mrTexPath, uMat, 1);
 			}
 			else
 			{
-				loadTexture(mrTexPath.substr(0, dashIdx), uMat, 1);
+				loadTexture(scene, mrTexPath.substr(0, dashIdx), uMat, 1);
 				if(mrTexPath.size() > dashIdx + 1)
-					loadTexture(mrTexPath.substr(dashIdx + 1), uMat, 2);
+					loadTexture(scene, mrTexPath.substr(dashIdx + 1), uMat, 2);
 			}
 		}
 
 		string normalTexPath = getTexPathAssimp(material, aiTextureType_NORMALS, 0);
 		if (!normalTexPath.empty())
-			loadTexture(normalTexPath, uMat, 3);
+			loadTexture(scene, normalTexPath, uMat, 3);
 
 		// uniform block material setup
 		uMat->albedo = getVecAssimp(material, glm::vec4(1.0f), AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_BASE_COLOR_FACTOR);

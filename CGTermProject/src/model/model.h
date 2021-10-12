@@ -3,9 +3,11 @@
 #include <unordered_map>
 #include "../gfx/gfx.h"
 #include "../gfx/texture.h"
+#include "../util/util.h"
 
 #define MESH_TEXTURE_TYPE_SIZE 4
 #define MESH_MATERIAL_TYPE_SIZE 4
+#define DEFAULT_AO 0.3f
 
 namespace model
 {
@@ -15,6 +17,14 @@ namespace model
 		"texture_metallic",
 		"texture_roughness",
 		"texture_normal"
+	};
+
+	const int texturePBRIndexes[MESH_TEXTURE_TYPE_SIZE] =
+	{
+		PBR_TEXTURE_INDEX_ALBEDO,
+		PBR_TEXTURE_INDEX_METALLIC,
+		PBR_TEXTURE_INDEX_ROUGHNESS,
+		PBR_TEXTURE_INDEX_NORMAL
 	};
 
 	enum class TextureType
