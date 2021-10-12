@@ -25,7 +25,7 @@ class Scene
 {
 public:
     Scene() : uboLight(GL_UNIFORM_BUFFER), uboView(GL_UNIFORM_BUFFER), 
-        cam(-45, 30, -20, 14, -35), table(glm::vec2(42.0f, 22.0f)) {};
+            cam(0, 30, 10), table(glm::vec2(5.5f, 10.8f)) {};
     void init();
     void update(float partialTime);
     void render();
@@ -45,7 +45,7 @@ public:
     commoncg::Texture brdfLUT;
 private:
     // light
-    LightData lights[2];
+    LightData lights[3];
     commoncg::VBO uboLight;
     // view
     ViewMatrixData view;

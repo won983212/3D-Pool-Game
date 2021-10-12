@@ -4,6 +4,7 @@
 #include "scene.h"
 #include "gfx/texture.h"
 #include "util/util.h"
+#include "model/quad.h"
 
 using namespace glm;
 using namespace commoncg;
@@ -11,24 +12,18 @@ using namespace commoncg;
 // TODO debug global variables
 Texture ballTexture;
 model::Material ballMaterial;
-model::Material lightMaterial;
 
 void Scene::init()
 {
-    // TODO Debug initialize
+    // TODO (Debug) initialize
     ballTexture.loadImage("res/textures/ball_10.png");
     ballMaterial.albedo = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
-    ballMaterial.metallic = 0.5f;
-    ballMaterial.roughness = 0.2f;
-    ballMaterial.ao = 0.3f;
+    ballMaterial.metallic = 0.1f;
+    ballMaterial.roughness = 0.1f;
+    ballMaterial.ao = DEFAULT_AO;
     for (int i = 0; i < 4; i++)
         ballMaterial.texIndex[i] = -1;
-    lightMaterial.albedo = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-    lightMaterial.metallic = 0.0f;
-    lightMaterial.roughness = 1.0f;
-    lightMaterial.ao = 0.3f;
-    for (int i = 0; i < 4; i++)
-        lightMaterial.texIndex[i] = -1;
+    ballMaterial.texIndex[(int)model::TextureType::ALBEDO] = 1;
 
     brdfLUT.loadImage("res/textures/brdf.png");
     modelBall.init(BALL_RADIUS);
@@ -56,13 +51,17 @@ void Scene::init()
     uboView.create();
 
     LightData light;
-    light.position = vec4(10.0f, 10.0f, 10.0f, 1.0f);
-    light.color = vec4(300.0f);
+    light.position = vec4(0.0f, 3.0f, 5.0f, 1.0f);
+    light.color = vec4(50);
     lights[0] = light;
 
-    light.position = vec4(-10.0f, 10.0f, -10.0f, 1.0f);
-    light.color = vec4(300.0f);
+    light.position = vec4(0.0f, 3.0f, 0.0f, 1.0f);
+    light.color = vec4(50);
     lights[1] = light;
+
+    light.position = vec4(0.0f, 3.0f, -5.0f, 1.0f);
+    light.color = vec4(50);
+    lights[2] = light;
     updateLight();
 
     view.view = cam.getViewMatrix();
@@ -93,22 +92,18 @@ void Scene::render()
 {
     view.view = cam.getViewMatrix();
     updateView();
-    shader.setUniform("camPos", cam.position);
+    shader.setUniform("camPos", cam.getEyePosition());
 
     // bind env maps and brdf LUT (lookup texture).
     skybox.bindEnvironmentTextures();
     glActiveTexture(GL_TEXTURE0 + PBR_TEXTURE_INDEX_BRDFMAP);
     brdfLUT.bind();
 
-    // TODO debug light
-    model::bindMaterial(&lightMaterial);
-    shader.setUniform("model", translate(mat4(1.0f), vec3(10.0f, 10.0f, 10.0f)));
-    modelBall.draw();
-    shader.setUniform("model", translate(mat4(1.0f), vec3(-10.0f, 10.0f, -10.0f)));
-    modelBall.draw();
+    // TODO (Debug) bind ball texture
+    glActiveTexture(GL_TEXTURE0 + PBR_TEXTURE_INDEX_ALBEDO);
+    ballTexture.bind();
 
     // balls
-    //ballTexture.bind();
     model::bindMaterial(&ballMaterial);
     const std::vector<Ball*> balls = table.getBalls();
     for (unsigned int i = 0; i < balls.size(); i++)

@@ -123,6 +123,10 @@
     <None Include="res\shader\cubemap.vert" />
     <None Include="res\shader\eqrtocubemap.frag" />
     <None Include="res\textures\skybox\skybox.hdr" />
+    <None Include="res\models\table.bin">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\models\table.gltf" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\texture\container.jpg">
@@ -205,5 +209,26 @@
     <Image Include="res\textures\brdf.png">
       <Filter>리소스 파일</Filter>
     </Image>
+    <Image Include="res\models\table.png">
+      <Filter>리소스 파일</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="res\sounds\중.wav">
+      <Filter>리소스 파일</Filter>
+    </Media>
+    <Media Include="res\sounds\bgm.mp3" />
+    <Media Include="res\sounds\강.wav">
+      <Filter>리소스 파일</Filter>
+    </Media>
+    <Media Include="res\sounds\강하게.wav">
+      <Filter>리소스 파일</Filter>
+    </Media>
+    <Media Include="res\sounds\약.wav">
+      <Filter>리소스 파일</Filter>
+    </Media>
+    <Media Include="res\sounds\약하게.wav">
+      <Filter>리소스 파일</Filter>
+    </Media>
   </ItemGroup>
 </Project>

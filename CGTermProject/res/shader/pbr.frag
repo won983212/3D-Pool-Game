@@ -1,5 +1,5 @@
 #version 420
-const int LIGHT_SIZE = 2;
+const int LIGHT_SIZE = 3;
 const float PI = 3.14159265359;
 const float MAX_REFLECTION_LOD = 7.0;
 

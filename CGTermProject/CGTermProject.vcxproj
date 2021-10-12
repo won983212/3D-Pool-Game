@@ -190,6 +190,8 @@
     <None Include="glew32.dll" />
     <None Include="res\models\scene.bin" />
     <None Include="res\models\scene.gltf" />
+    <None Include="res\models\table.bin" />
+    <None Include="res\models\table.gltf" />
     <None Include="res\shader\cubemap.vert" />
     <None Include="res\shader\eqrtocubemap.frag" />
     <None Include="res\shader\pbr.frag" />
@@ -199,6 +201,7 @@
     <None Include="res\textures\skybox\skybox.hdr" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="res\models\table.png" />
     <Image Include="res\models\textures\Wheel_baseColor.png" />
     <Image Include="res\models\textures\Wheel_metallicRoughness.png" />
     <Image Include="res\models\textures\Wheel_normal.png" />
@@ -227,6 +230,14 @@
     <Image Include="res\texture\container.jpg" />
     <Image Include="res\texture\container2.png" />
     <Image Include="res\texture\container2_specular.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="res\sounds\bgm.mp3" />
+    <Media Include="res\sounds\강.wav" />
+    <Media Include="res\sounds\강하게.wav" />
+    <Media Include="res\sounds\약.wav" />
+    <Media Include="res\sounds\약하게.wav" />
+    <Media Include="res\sounds\중.wav" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

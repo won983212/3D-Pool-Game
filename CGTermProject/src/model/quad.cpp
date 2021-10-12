@@ -14,7 +14,12 @@ void Quad::init(float width, float height, vec3 normal)
 	float hW = width / 2;
 	float hH = height / 2;
 
-	vec3 right = normalize(cross(vec3(0, 1, 0), normal));
+	vec3 right;
+	if (normal == vec3(0, 1, 0))
+		right = vec3(1, 0, 0);
+	else
+		right = normalize(cross(vec3(0, 1, 0), normal));
+
 	vec3 up = normalize(cross(normal, right));
 
 	vector<Vertex> vertices;
