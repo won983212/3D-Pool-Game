@@ -7,7 +7,7 @@ namespace commoncg
 	{
 	public:
 		~Texture();
-		void loadImage(const char* imageFilePath, GLint wrapParam = GL_CLAMP_TO_EDGE);
+		void loadImage(const char* imageFilePath, GLint wrapParam = GL_CLAMP_TO_EDGE, bool useMipmap = false);
 		void bind(GLenum target = GL_TEXTURE_2D) const;
 		void destroy();
 		GLuint getTextureID() const;
@@ -15,7 +15,7 @@ namespace commoncg
 		int getHeight() const;
 		int getCountChannels() const;
 		int getCountMipmap() const;
-		static Texture* cacheImage(const char* imageFilePath, GLint wrapParam = GL_CLAMP_TO_EDGE);
+		static Texture* cacheImage(const char* imageFilePath, GLint wrapParam = GL_CLAMP_TO_EDGE, bool useMipmap = false);
 		static void unbind(GLenum target = GL_TEXTURE_2D);
 	private:
 		void loadDDSImage(const char* imageFilePath, GLint wrapParam = GL_REPEAT);

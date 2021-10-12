@@ -14,8 +14,6 @@ void init()
     scene.init();
 	glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
 }
 
 void render()

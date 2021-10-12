@@ -19,20 +19,20 @@ Texture::~Texture()
 	destroy();
 }
 
-Texture* Texture::cacheImage(const char* imageFilePath, GLint wrapParam)
+Texture* Texture::cacheImage(const char* imageFilePath, GLint wrapParam, bool useMipmap)
 {
 	std::string str_s(imageFilePath);
 	if (loaded_textures.find(str_s) != loaded_textures.end())
 		return loaded_textures[str_s];
 
 	commoncg::Texture* texture = new Texture();
-	texture->loadImage(imageFilePath, wrapParam);
+	texture->loadImage(imageFilePath, wrapParam, useMipmap);
 
 	loaded_textures.insert(std::make_pair(str_s, texture));
 	return texture;
 }
 
-void Texture::loadImage(const char* imageFilePath, GLint wrapParam)
+void Texture::loadImage(const char* imageFilePath, GLint wrapParam, bool useMipmap)
 {
 	bool hdr = false;
 	std::string ext = std::string(imageFilePath);
@@ -62,7 +62,7 @@ void Texture::loadImage(const char* imageFilePath, GLint wrapParam)
 	// setup parameters
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapParam);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapParam);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, useMipmap ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	// load texture
@@ -83,11 +83,14 @@ void Texture::loadImage(const char* imageFilePath, GLint wrapParam)
 		GLenum format = hdr ? GL_RGB : GL_RGBA;
 		GLenum type = hdr ? GL_FLOAT : GL_UNSIGNED_BYTE;
 		glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, data);
+		if (useMipmap)
+			glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else
 	{
 		std::cout << "Failed to load texture: " << imageFilePath << " (HDR: " << hdr << ")" << std::endl;
 	}
+	stbi_image_free(data);
 }
 
 static void handleError(std::string message, void* header, void* buffer, FILE* file)

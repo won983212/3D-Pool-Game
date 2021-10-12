@@ -147,7 +147,7 @@ void AssetModel::loadTexture(const aiScene* scene, string texPath, Material* uMa
 {
 	// load texture
 	ModelTexture* tex = new ModelTexture();
-	tex->texture = Texture::cacheImage((directory + '/' + texPath).c_str(), GL_REPEAT);
+	tex->texture = Texture::cacheImage((directory + '/' + texPath).c_str(), GL_REPEAT, true);
 	tex->type = (TextureType)id;
 
 	// set textureIndex
