@@ -7,6 +7,7 @@ using namespace commoncg;
 
 Scene scene;
 glm::vec2 lastMouse(0, 0);
+bool keyState[256];
 
 void init()
 {
@@ -17,10 +18,10 @@ void init()
     glCullFace(GL_BACK);
 }
 
-void render(float partialTime)
+void render()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    scene.render(partialTime);
+    scene.render();
 }
 
 void reshape(int w, int h)
@@ -52,42 +53,52 @@ void mouse(int button, int state, int x, int y)
 
 void keyboard(unsigned char key, int x, int y)
 {
-    const float speed = 0.8f;
-    const float xyzSpeed = 0.1f;
+    keyState[key] = true;
+}
 
-    switch (key)
-    {
-    case 'w':
-        scene.cam.position += speed * scene.cam.getFront();
-        scene.cam.update();
-        break;
-    case 's':
-        scene.cam.position += -speed * scene.cam.getFront();
-        scene.cam.update();
-        break;
-    case 'a':
-        scene.cam.position += -speed * scene.cam.getRight();
-        scene.cam.update();
-        break;
-    case 'd':
-        scene.cam.position += speed * scene.cam.getRight();
-        scene.cam.update();
-        break;
-    }
+void keyboardUp(unsigned char key, int x, int y)
+{
+    keyState[key] = false;
 }
 
 void update(float partialTime)
 {
+    const float speed = 10.0f * partialTime;
+    const float xyzSpeed = 0.1f;
+
     scene.update(partialTime);
+
+    if (keyState['w'])
+    {
+        scene.cam.position += speed * scene.cam.getFront();
+        scene.cam.update();
+    }
+    if (keyState['s'])
+    {
+        scene.cam.position += -speed * scene.cam.getFront();
+        scene.cam.update();
+    }
+    if (keyState['a'])
+    {
+        scene.cam.position += -speed * scene.cam.getRight();
+        scene.cam.update();
+    }
+    if (keyState['d'])
+    {
+        scene.cam.position += speed * scene.cam.getRight();
+        scene.cam.update();
+    }
 }
 
 int main(int argc, char* argv[])
 {
+    memset(keyState, 0, sizeof(keyState));
     Window wnd("Pocket ball (CG Term Project)", &argc, argv);
-	wnd.create(init, render);
+	wnd.create(init, render, true);
     wnd.setMouseDragFunc(drag);
     wnd.setMouseFunc(mouse);
     wnd.setKeyboardFunc(keyboard);
+    wnd.setKeyboardUpFunc(keyboardUp);
     wnd.setReshapeFunc(reshape);
     wnd.setIdleFunc(update);
 	wnd.loop();

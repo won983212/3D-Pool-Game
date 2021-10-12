@@ -33,9 +33,6 @@
     <ClInclude Include="src\util\util.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="src\util\stb_image.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="src\gfx\texture.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -58,6 +55,12 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="src\gfx\skybox.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="src\3rd\stb_image.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="src\model\quad.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
@@ -101,12 +104,13 @@
     <ClCompile Include="src\gfx\skybox.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="src\model\quad.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\shader\simple.vert" />
-    <None Include="res\shader\simple.frag" />
-    <None Include="res\shader\lighting.frag" />
-    <None Include="res\shader\lighting.vert" />
+    <None Include="res\shader\pbr.vert" />
+    <None Include="res\shader\pbr.frag" />
     <None Include="res\models\scene.bin">
       <Filter>리소스 파일</Filter>
     </None>
@@ -116,6 +120,8 @@
     <None Include="res\shader\skybox.frag" />
     <None Include="freeglut.dll" />
     <None Include="glew32.dll" />
+    <None Include="res\shader\cubemap.vert" />
+    <None Include="res\shader\eqrtocubemap.frag" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\texture\container.jpg">

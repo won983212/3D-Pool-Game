@@ -120,7 +120,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>../Linking/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
@@ -137,7 +137,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>../Linking/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
@@ -151,6 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\3rd\stb_image.h" />
     <ClInclude Include="src\gfx\camera.h" />
     <ClInclude Include="src\gfx\gfx.h" />
     <ClInclude Include="src\gfx\skybox.h" />
@@ -162,9 +163,9 @@
     <ClInclude Include="src\gfx\window.h" />
     <ClInclude Include="src\model\ball.h" />
     <ClInclude Include="src\model\model.h" />
+    <ClInclude Include="src\model\quad.h" />
     <ClInclude Include="src\pooltable.h" />
     <ClInclude Include="src\scene.h" />
-    <ClInclude Include="src\util\stb_image.h" />
     <ClInclude Include="src\util\util.h" />
   </ItemGroup>
   <ItemGroup>
@@ -179,6 +180,7 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\model\ball.cpp" />
     <ClCompile Include="src\model\model.cpp" />
+    <ClCompile Include="src\model\quad.cpp" />
     <ClCompile Include="src\pooltable.cpp" />
     <ClCompile Include="src\scene.cpp" />
   </ItemGroup>
@@ -188,10 +190,10 @@
     <None Include="glew32.dll" />
     <None Include="res\models\scene.bin" />
     <None Include="res\models\scene.gltf" />
-    <None Include="res\shader\lighting.frag" />
-    <None Include="res\shader\lighting.vert" />
-    <None Include="res\shader\simple.frag" />
-    <None Include="res\shader\simple.vert" />
+    <None Include="res\shader\cubemap.vert" />
+    <None Include="res\shader\eqrtocubemap.frag" />
+    <None Include="res\shader\pbr.frag" />
+    <None Include="res\shader\pbr.vert" />
     <None Include="res\shader\skybox.frag" />
     <None Include="res\shader\skybox.vert" />
   </ItemGroup>

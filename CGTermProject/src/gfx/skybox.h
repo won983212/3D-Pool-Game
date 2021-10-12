@@ -2,6 +2,7 @@
 
 #include "gfx.h"
 #include "shader.h"
+#include "texture.h"
 #include "vao.h"
 #include "vbo.h"
 
@@ -10,12 +11,21 @@ namespace commoncg
 	class Skybox
 	{
 	public:
-		void load(const char* textureDirPath, const char* skyboxVertShader, const char* skyboxFragShader);
-		void render(const ShaderProgram& shader) const;
+		void beginLoad();
+		void loadHDRSkybox(const char* hdrTexturePath);
+		void loadDDSIrradianceMap(const char* ddsTexturePath);
+		void loadDDSSpecularMap(const char* ddsTexturePath);
+		void endLoad(const ShaderProgram& shader);
+		void render(const ShaderProgram& shader, glm::mat4 view) const;
+		void bindEnvironmentTextures() const;
+	private:
+		GLuint loadEquirectangularMap(const char* texturePath, int width, int height, bool flipY);
 	private:
 		ShaderProgram skyboxShader;
-		GLuint textureId;
+		GLuint textureId, irrTextureId, specularTextureId;
 		VAO vao;
 		VBO vbo;
+		GLuint fbo, rbo;
+		ShaderProgram cubemapConvertShader;
 	};
 }

@@ -14,10 +14,11 @@ namespace commoncg
 	{
 	public:
 		Window(const char* title, int* argcp, char** argv);
-		void create(WindowCallback init, UpdateCallback render);
+		void create(WindowCallback init, WindowCallback render, bool useMSAA = false);
 		void setDestroyFunc(WindowCallback destory);
 		void setReshapeFunc(ReshapeCallback reshape) const;
 		void setKeyboardFunc(KeyboardCallback keyEvent) const;
+		void setKeyboardUpFunc(KeyboardCallback keyEvent) const;
 		void setMouseFunc(MouseCallback mouseEvent) const;
 		void setMouseDragFunc(MouseMotionCallback mouseEvent) const;
 		void setMouseWheelFunc(MouseCallback mouseEvent) const;
@@ -30,8 +31,8 @@ namespace commoncg
 	private:
 		static Window* inst;
 		WindowCallback destroy = NULL;
+		WindowCallback render = NULL;
 		UpdateCallback idle = NULL;
-		UpdateCallback render = NULL;
 		const char* title;
 		float partialTime = 0;
 		long lastFrame = 0;

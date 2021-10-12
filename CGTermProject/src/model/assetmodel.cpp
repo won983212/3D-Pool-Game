@@ -1,54 +1,39 @@
 #include <iostream>
 #include "../gfx/texture.h"
 #include "assetmodel.h"
+#include "assimp/pbrmaterial.h"
+
 
 using namespace model;
 using namespace commoncg;
 using namespace std;
 
-const aiTextureType textureTypes[MESH_TEXTURE_TYPE_SIZE] =
+
+static string getTexPathAssimp(aiMaterial* material, aiTextureType type, unsigned int index)
 {
-	aiTextureType_DIFFUSE,
-	aiTextureType_SPECULAR,
-	aiTextureType_NORMALS,
-	aiTextureType_HEIGHT
-};
+	if (material->GetTextureCount(type) > 0)
+	{
+		aiString ai_filename;
+		if (material->GetTexture(type, index, &ai_filename) == AI_SUCCESS)
+			return ai_filename.C_Str();
+	}
+	return "";
+}
 
-
-static void fillMaterialColor(float* dst, MaterialColorType colorType, const aiMaterial* mtl, float def_r, float def_g, float def_b, float def_a)
+static glm::vec4 getVecAssimp(aiMaterial* material, glm::vec4 defaultValue, const char* key, unsigned int type, unsigned int index)
 {
-	aiColor4D aiColor;
-	aiReturn aiRet;
-	float color[] = { def_r, def_g, def_b, def_a };
+	aiColor4D ai_color;
+	if (material->Get(key, type, index, ai_color) == AI_SUCCESS)
+		return glm::vec4(ai_color.r, ai_color.g, ai_color.b, ai_color.a);
+	return defaultValue;
+}
 
-	switch (colorType)
-	{
-	case MaterialColorType::AMBIENT:
-		aiRet = aiGetMaterialColor(mtl, AI_MATKEY_COLOR_AMBIENT, &aiColor);
-		break;
-	case MaterialColorType::DIFFUSE:
-		aiRet = aiGetMaterialColor(mtl, AI_MATKEY_COLOR_DIFFUSE, &aiColor);
-		break;
-	case MaterialColorType::SPECULAR:
-		aiRet = aiGetMaterialColor(mtl, AI_MATKEY_COLOR_SPECULAR, &aiColor);
-		break;
-	case MaterialColorType::EMISSIVE:
-		aiRet = aiGetMaterialColor(mtl, AI_MATKEY_COLOR_EMISSIVE, &aiColor);
-		break;
-	default:
-		cout << "Error: Unknown color type: " << (int)colorType << endl;
-		return;
-	}
-
-	if (AI_SUCCESS == aiRet)
-	{
-		color[0] = aiColor.r;
-		color[1] = aiColor.g;
-		color[2] = aiColor.b;
-		color[3] = aiColor.a;
-	}
-
-	memcpy(dst, color, sizeof(color));
+static float getFloatAssimp(aiMaterial* material, float defaultValue, const char* key, unsigned int type, unsigned int index)
+{
+	float data;
+	if (material->Get(key, type, index, data) == AI_SUCCESS)
+		return data;
+	return defaultValue;
 }
 
 Mesh::Mesh(const AssetModel* parent, aiMesh* mesh, const aiScene* scene)
@@ -130,7 +115,7 @@ void Mesh::draw(ShaderProgram& shader)
 
 		// bind texture
 		shader.setUniform(name.c_str(), (int)i);
-		glActiveTexture(GL_TEXTURE0 + i);
+		glActiveTexture(BASE_TEXTURE_ID + i);
 		texture->texture->bind();
 	}
 
@@ -153,11 +138,23 @@ void AssetModel::draw(ShaderProgram& shader)
 	// all texture unbind
 	for (unsigned int i = 0; i < MESH_TEXTURE_TYPE_SIZE; i++)
 	{
-		glActiveTexture(GL_TEXTURE0 + i);
+		glActiveTexture(BASE_TEXTURE_ID + i);
 		Texture::unbind();
 	}
 
 	glActiveTexture(GL_TEXTURE0);
+}
+
+void AssetModel::loadTexture(string texPath, Material* uMat, int id)
+{
+	// load texture
+	ModelTexture* tex = new ModelTexture();
+	tex->texture = Texture::cacheImage((directory + '/' + texPath).c_str());
+	tex->type = (TextureType)id;
+
+	// set textureIndex
+	uMat->texIndex[id] = textures.size();
+	textures.push_back(tex);
 }
 
 void AssetModel::loadModel(string path)
@@ -178,42 +175,41 @@ void AssetModel::loadModel(string path)
 	for (unsigned int i = 0; i < scene->mNumMaterials; i++)
 	{
 		aiMaterial* material = scene->mMaterials[i];
-		struct Material* uMat = new Material();
+		Material* uMat = new Material();
+
+		for (int j = 0; j < MESH_TEXTURE_TYPE_SIZE; j++)
+			uMat->texIndex[j] = -1;
 
 		// load textures
-		for (unsigned int i = 0; i < MESH_TEXTURE_TYPE_SIZE; i++)
+		string albedoTexPath = getTexPathAssimp(material, AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_BASE_COLOR_TEXTURE);
+		if (!albedoTexPath.empty())
+			loadTexture(albedoTexPath, uMat, 0);
+
+		string mrTexPath = getTexPathAssimp(material, AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_METALLICROUGHNESS_TEXTURE);
+		if (!mrTexPath.empty())
 		{
-			if (material->GetTextureCount(textureTypes[i]) == 0)
+			int dashIdx = mrTexPath.find("-");
+			if (dashIdx == string::npos)
 			{
-				uMat->texIndex[i] = -1;
-				continue;
+				loadTexture(mrTexPath, uMat, 1);
 			}
-
-			// get texture location
-			aiString str;
-			material->GetTexture(textureTypes[i], 0, &str);
-			std::string str_s(str.C_Str());
-
-			// load texture
-			ModelTexture* tex = new ModelTexture();
-			tex->texture = Texture::cacheImage((directory + '/' + str_s).c_str());
-			tex->type = (TextureType)i;
-
-			// set textureIndex
-			uMat->texIndex[i] = textures.size();
-			textures.push_back(tex);
+			else
+			{
+				loadTexture(mrTexPath.substr(0, dashIdx), uMat, 1);
+				if(mrTexPath.size() > dashIdx + 1)
+					loadTexture(mrTexPath.substr(dashIdx + 1), uMat, 2);
+			}
 		}
 
-		// uniform block material setup
-		fillMaterialColor(uMat->ambient, MaterialColorType::AMBIENT, material, 0.2f, 0.2f, 0.2f, 1.0f);
-		fillMaterialColor(uMat->diffuse, MaterialColorType::DIFFUSE, material, 0.3f, 0.3f, 0.3f, 1.0f);
-		fillMaterialColor(uMat->specular, MaterialColorType::SPECULAR, material, 0.0f, 0.0f, 0.0f, 1.0f);
-		fillMaterialColor(uMat->emissive, MaterialColorType::EMISSIVE, material, 0.0f, 0.0f, 0.0f, 1.0f);
+		string normalTexPath = getTexPathAssimp(material, aiTextureType_NORMALS, 0);
+		if (!normalTexPath.empty())
+			loadTexture(normalTexPath, uMat, 3);
 
-		// get shininess
-		float shininess = 0.0;
-		aiGetMaterialFloat(material, AI_MATKEY_SHININESS, &shininess);
-		uMat->shininess = shininess;
+		// uniform block material setup
+		uMat->albedo = getVecAssimp(material, glm::vec4(1.0f), AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_BASE_COLOR_FACTOR);
+		uMat->metallic = getFloatAssimp(material, 1.0f, AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_METALLIC_FACTOR);
+		uMat->roughness = getFloatAssimp(material, 1.0f, AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_ROUGHNESS_FACTOR);
+		uMat->ao = DEFAULT_AO;
 
 		// add to material dictionary
 		materials.push_back(uMat);

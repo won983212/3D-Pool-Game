@@ -11,20 +11,15 @@ namespace model
 {
 	const std::string textureUniformNames[MESH_TEXTURE_TYPE_SIZE] =
 	{
-		"texture_diffuse",
-		"texture_specular",
-		"texture_normal",
-		"texture_height"
+		"texture_albedo",
+		"texture_metallic",
+		"texture_roughness",
+		"texture_normal"
 	};
 
 	enum class TextureType
 	{
-		DIFFUSE, SPECULAR, NORMAL, HEIGHT
-	};
-
-	enum class MaterialColorType
-	{
-		AMBIENT, DIFFUSE, SPECULAR, EMISSIVE
+		ALBEDO, METALLIC, ROUGHNESS, NORMAL
 	};
 
 	struct Vertex
@@ -36,12 +31,11 @@ namespace model
 
 	struct Material
 	{
-		float diffuse[4];
-		float ambient[4];
-		float specular[4];
-		float emissive[4];
-		int texIndex[4];
-		float shininess;
+		glm::vec4 albedo;
+		float metallic;
+		float roughness;
+		float ao;
+		int texIndex[MESH_TEXTURE_TYPE_SIZE];
 	};
 
 	void bindMaterial(const struct Material* materials);

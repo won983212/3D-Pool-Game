@@ -8,28 +8,55 @@
 using namespace glm;
 using namespace commoncg;
 
-Texture* ballTexture;
+// TODO debug global variables
+Texture ballTexture;
+model::Material ballMaterial;
+model::Material lightMaterial;
 
 void Scene::init()
 {
-    skybox.load("res/textures/skybox", "res/shader/skybox.vert", "res/shader/skybox.frag");
+    // TODO Debug initialize
+    ballTexture.loadImage("res/textures/ball_10.png");
+    ballMaterial.albedo = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
+    ballMaterial.metallic = 0.5f;
+    ballMaterial.roughness = 0.2f;
+    ballMaterial.ao = 0.3f;
+    for (int i = 0; i < 4; i++)
+        ballMaterial.texIndex[i] = -1;
+    lightMaterial.albedo = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+    lightMaterial.metallic = 0.0f;
+    lightMaterial.roughness = 1.0f;
+    lightMaterial.ao = 0.3f;
+    for (int i = 0; i < 4; i++)
+        lightMaterial.texIndex[i] = -1;
 
-    ballTexture = Texture::cacheImage("res/textures/ball_10.png");
-    modelBall.init();
+    brdfLUT.loadImage("res/textures/brdf.png");
+    modelBall.init(BALL_RADIUS);
 
-    shader.addShader("res/shader/simple.vert", GL_VERTEX_SHADER);
-    shader.addShader("res/shader/simple.frag", GL_FRAGMENT_SHADER);
+    shader.addShader("res/shader/pbr.vert", GL_VERTEX_SHADER);
+    shader.addShader("res/shader/pbr.frag", GL_FRAGMENT_SHADER);
     shader.load();
     shader.use();
+    shader.setUniform("brdfMap", 2);
 
-    modelPoolTable.loadModel("res/models/untitled.obj");
+    skybox.beginLoad();
+    skybox.loadHDRSkybox("res/textures/skybox/skybox.hdr");
+    skybox.loadDDSIrradianceMap("res/textures/skybox/irr.dds");
+    skybox.loadDDSSpecularMap("res/textures/skybox/env.dds");
+    skybox.endLoad(shader);
+
+    modelPoolTable.loadModel("res/models/table.gltf");
     uboLight.create();
     uboView.create();
 
-    light.direction = vec4(1.0f, -1.0f, -1.0f, 1.0f);
-    light.diffuse = vec4(0.8f);
-    light.ambient = vec4(0.1f);
-    light.specular = vec4(1.0f);
+    LightData light;
+    light.position = vec4(10.0f, 10.0f, 10.0f, 1.0f);
+    light.color = vec4(300.0f);
+    lights[0] = light;
+
+    light.position = vec4(-10.0f, 10.0f, -10.0f, 1.0f);
+    light.color = vec4(300.0f);
+    lights[1] = light;
     updateLight();
 
     view.view = cam.getViewMatrix();
@@ -44,8 +71,8 @@ void Scene::update(float partialTime)
 
 void Scene::updateLight()
 {
-    uboLight.bindBufferRange(UNIFORM_BINDING_LIGHT, 0, sizeof(light));
-    uboLight.buffer(sizeof(light), &light);
+    uboLight.bindBufferRange(UNIFORM_BINDING_LIGHT, 0, sizeof(lights));
+    uboLight.buffer(sizeof(lights), &lights);
     uboLight.unbind();
 }
 
@@ -56,14 +83,27 @@ void Scene::updateView()
     uboView.unbind();
 }
 
-void Scene::render(float partialTime)
+void Scene::render()
 {
     view.view = cam.getViewMatrix();
     updateView();
+    shader.setUniform("camPos", cam.position);
 
-    shader.setUniform("viewPos", cam.position);
-    ballTexture->bind();
+    // bind env maps and brdf LUT (lookup texture).
+    skybox.bindEnvironmentTextures();
+    glActiveTexture(GL_TEXTURE2);
+    brdfLUT.bind();
 
+    // TODO debug light
+    model::bindMaterial(&lightMaterial);
+    shader.setUniform("model", translate(mat4(1.0f), vec3(10.0f, 10.0f, 10.0f)));
+    modelBall.draw();
+    shader.setUniform("model", translate(mat4(1.0f), vec3(-10.0f, 10.0f, -10.0f)));
+    modelBall.draw();
+
+    // balls
+    //ballTexture.bind();
+    model::bindMaterial(&ballMaterial);
     const std::vector<Ball*> balls = table.getBalls();
     for (unsigned int i = 0; i < balls.size(); i++)
     {
@@ -74,13 +114,17 @@ void Scene::render(float partialTime)
         model = model * glm::toMat4(balls[i]->rotation);
 
         shader.setUniform("model", model);
-        modelBall.draw(shader);
+        modelBall.draw();
     }
-
     Texture::unbind();
-    shader.setUniform("model", mat4(1.0f));
+
+    // render pool table
+    mat4 model = mat4(1.0f);
+    model = scale(model, vec3(5.0f));
+    model = rotate(model, DEGTORAD(90.0f), vec3(1, 0, 0));
+    shader.setUniform("model", model);
     modelPoolTable.draw(shader);
 
     // skybox
-    skybox.render(shader);
+    skybox.render(shader, cam.getViewMatrix());
 }

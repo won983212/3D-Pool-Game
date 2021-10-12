@@ -9,12 +9,10 @@
 #include "pooltable.h"
 
 
-struct DirectionalLightData
+struct LightData
 {
-    glm::vec4 direction;
-    glm::vec4 diffuse;
-    glm::vec4 ambient;
-    glm::vec4 specular;
+    glm::vec4 position;
+    glm::vec4 color;
 };
 
 struct ViewMatrixData
@@ -30,19 +28,11 @@ public:
         cam(-45, 30, -20, 14, -35), table(glm::vec2(42.0f, 22.0f)) {};
     void init();
     void update(float partialTime);
-    void render(float partialTime);
+    void render();
 private:
     void updateLight();
     void updateView();
 public:
-    commoncg::Camera cam;
-private:
-    // light
-    DirectionalLightData light;
-    commoncg::VBO uboLight;
-    // view
-    ViewMatrixData view;
-    commoncg::VBO uboView;
     // pool table physics simulator
     PoolTable table;
     // models
@@ -51,4 +41,13 @@ private:
     // graphics
     commoncg::ShaderProgram shader;
     commoncg::Skybox skybox;
+    commoncg::Camera cam;
+    commoncg::Texture brdfLUT;
+private:
+    // light
+    LightData lights[2];
+    commoncg::VBO uboLight;
+    // view
+    ViewMatrixData view;
+    commoncg::VBO uboView;
 };

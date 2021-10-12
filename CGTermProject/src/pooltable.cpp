@@ -9,8 +9,6 @@ PoolTable::PoolTable(glm::vec2 size)
 	for (int i = 0; i < 20; i++)
 	{
 		Ball* ball = addBall(randomVal(-size.x / 2, size.x / 2), randomVal(-size.y / 2, size.y / 2));
-		ball->velocity.x = randomVal(-30, 30);
-		ball->velocity.y = randomVal(-30, 30);
 	}
 }
 
@@ -28,6 +26,7 @@ void PoolTable::update(float partialTime) const
 
 		// update velocity
 		float vel = glm::length(ball->velocity);
+		// TODO Debug
 		//if (vel > 0)
 			//ball->velocity *= 0.99; // friction
 

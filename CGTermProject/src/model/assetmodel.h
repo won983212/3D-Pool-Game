@@ -10,6 +10,9 @@
 #include "../gfx/vbo.h"
 #include "../gfx/shader.h"
 
+#define BASE_TEXTURE_ID GL_TEXTURE3
+#define DEFAULT_AO 0.3f
+
 
 namespace model
 {
@@ -40,6 +43,8 @@ namespace model
 		~AssetModel();
 		void draw(commoncg::ShaderProgram& shader);
 		void loadModel(std::string path);
+	private:
+		void loadTexture(std::string texPath, Material* uMat, int id);
 	public:
 		std::vector<Mesh*> meshes;
 		std::vector<struct Material*> materials;

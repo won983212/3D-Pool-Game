@@ -15,16 +15,33 @@ Window::Window(const char* title, int* argcp, char** argv)
 	glutInit(argcp, argv);
 }
 
-void Window::create(WindowCallback init, UpdateCallback display)
+void Window::create(WindowCallback init, WindowCallback display, bool useMSAA)
 {
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
+	if (useMSAA)
+	{
+		glutSetOption(GLUT_MULTISAMPLE, 4);
+		glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_MULTISAMPLE);
+	}
+	else
+	{
+		glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
+	}
+
 	glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 	glutCreateWindow(title);
 	glewInit();
-	init();
+	glutIgnoreKeyRepeat(1);
 
+	if (useMSAA)
+	{
+		glEnable(GL_MULTISAMPLE);
+		glHint(GL_MULTISAMPLE_FILTER_HINT_NV, GL_NICEST);
+	}
+
+	init();
 	this->render = display;
 	inst = this;
+
 	glutDisplayFunc(renderWrapper);
 	glutIdleFunc(update);
 }
@@ -51,6 +68,11 @@ void Window::setKeyboardFunc(KeyboardCallback keyEvent) const
 	glutKeyboardFunc(keyEvent);
 }
 
+void Window::setKeyboardUpFunc(KeyboardCallback keyEvent) const
+{
+	glutKeyboardUpFunc(keyEvent);
+}
+
 void Window::setMouseFunc(MouseCallback mouseEvent) const
 {
 	glutMouseFunc(mouseEvent);
@@ -73,7 +95,7 @@ void Window::setIdleFunc(UpdateCallback idle)
 
 void Window::renderWrapper()
 {
-	inst->render(inst->partialTime);
+	inst->render();
 	glutSwapBuffers();
 }
 

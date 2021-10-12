@@ -17,6 +17,7 @@ namespace commoncg
 		void attr(GLuint index, GLuint size, GLenum type, GLsizei stride, size_t offset) const;
 		static void unbind();
 		void checkIfCreated(std::string methodName) const;
+		bool isCreated() const;
 	private:
 		GLuint handle;
 	};

@@ -56,3 +56,8 @@ void VAO::checkIfCreated(std::string methodName) const
 		throw message;
 	}
 }
+
+bool VAO::isCreated() const
+{
+	return handle != -1;
+}
