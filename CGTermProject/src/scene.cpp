@@ -9,25 +9,31 @@
 using namespace glm;
 using namespace commoncg;
 
-// TODO debug global variables
-Texture ballTexture;
-model::Material ballMaterial;
+const model::Material BALL_MATERIAL = 
+{
+    glm::vec4(1.0f, 1.0f, 0.0f, 1.0f),  // albedo
+    0.1f,           // metallic
+    0.1f,           // roughness
+    DEFAULT_AO,     // ao
+    0, -1, -1, -1   // texIndex
+};
 
 void Scene::init()
 {
-    // TODO (Debug) initialize
-    ballTexture.loadImage("res/textures/ball_10.png");
-    ballMaterial.albedo = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
-    ballMaterial.metallic = 0.1f;
-    ballMaterial.roughness = 0.1f;
-    ballMaterial.ao = DEFAULT_AO;
-    for (int i = 0; i < 4; i++)
-        ballMaterial.texIndex[i] = -1;
-    ballMaterial.texIndex[(int)model::TextureType::ALBEDO] = 1;
-
+    // initalize graphic variables
     brdfLUT.loadImage("res/textures/brdf.png");
+    uboLight.create();
+    uboView.create();
+
+    // prepare ball textures
+    for (int i = 0; i < BALL_TEXTURE_COUNT; i++)
+        ballTextures[i] = Texture::cacheImage(("res/textures/ball_" + std::to_string(i) + ".png").c_str());
+
+    // model
+    modelPoolTable.loadModel("res/models/pooltable.gltf");
     modelBall.init(BALL_RADIUS);
 
+    // shader
     shader.addShader("res/shader/pbr.vert", GL_VERTEX_SHADER);
     shader.addShader("res/shader/pbr.frag", GL_FRAGMENT_SHADER);
     shader.load();
@@ -40,16 +46,14 @@ void Scene::init()
     shader.setUniform("specularMap", PBR_TEXTURE_INDEX_SPECULARMAP);
     shader.setUniform("brdfMap", PBR_TEXTURE_INDEX_BRDFMAP);
 
+    // skybox
     skybox.beginLoad();
     skybox.loadHDRSkybox("res/textures/skybox/skybox.hdr");
     skybox.loadDDSIrradianceMap("res/textures/skybox/irr.dds");
     skybox.loadDDSSpecularMap("res/textures/skybox/env.dds");
     skybox.endLoad(shader);
 
-    modelPoolTable.loadModel("res/models/table.gltf");
-    uboLight.create();
-    uboView.create();
-
+    // lights
     LightData light;
     light.position = vec4(0.0f, 3.0f, 5.0f, 1.0f);
     light.color = vec4(50);
@@ -64,7 +68,8 @@ void Scene::init()
     lights[2] = light;
     updateLight();
 
-    view.view = cam.getViewMatrix();
+    // camera (view)
+    cam.getViewMatrix(&view.view);
     view.projection = perspective(DEGTORAD(45.0f), (float)SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 100.0f);
     updateView();
 }
@@ -90,8 +95,9 @@ void Scene::updateView()
 
 void Scene::render()
 {
-    view.view = cam.getViewMatrix();
-    updateView();
+    // update only when cam has changed.
+    if (cam.getViewMatrix(&view.view))
+        updateView();
     shader.setUniform("camPos", cam.getEyePosition());
 
     // bind env maps and brdf LUT (lookup texture).
@@ -99,12 +105,8 @@ void Scene::render()
     glActiveTexture(GL_TEXTURE0 + PBR_TEXTURE_INDEX_BRDFMAP);
     brdfLUT.bind();
 
-    // TODO (Debug) bind ball texture
-    glActiveTexture(GL_TEXTURE0 + PBR_TEXTURE_INDEX_ALBEDO);
-    ballTexture.bind();
-
     // balls
-    model::bindMaterial(&ballMaterial);
+    model::bindMaterial(&BALL_MATERIAL);
     const std::vector<Ball*> balls = table.getBalls();
     for (unsigned int i = 0; i < balls.size(); i++)
     {
@@ -114,6 +116,8 @@ void Scene::render()
         model = translate(model, vec3(pos.x, BALL_RADIUS, pos.y));
         model = model * glm::toMat4(balls[i]->rotation);
 
+        glActiveTexture(GL_TEXTURE0 + PBR_TEXTURE_INDEX_ALBEDO);
+        ballTextures[i]->bind();
         shader.setUniform("model", model);
         modelBall.draw();
     }
@@ -127,5 +131,5 @@ void Scene::render()
     modelPoolTable.draw(shader);
 
     // skybox
-    skybox.render(shader, cam.getViewMatrix());
+    skybox.render(shader, view.view);
 }

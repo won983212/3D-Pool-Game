@@ -29,4 +29,4 @@
 #define PBR_TEXTURE_INDEX_BRDFMAP 6
 
 // table size is 2.84m x 1.42m, ball size is 0.06m
-#define BALL_RADIUS 0.16f
+#define BALL_RADIUS 0.13f

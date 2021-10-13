@@ -203,10 +203,9 @@ void Skybox::bindEnvironmentTextures() const
     glBindTexture(GL_TEXTURE_CUBE_MAP, specularTextureId);
 }
 
-void Skybox::render(const ShaderProgram& shader, glm::mat4 view) const // TODO view must used by uniform block.
+void Skybox::render(const ShaderProgram& shader, glm::mat4 view) const
 {
     skyboxShader.use();
-    skyboxShader.setUniform("view", view);
     glDepthFunc(GL_LEQUAL);
 
     vao.bind();

@@ -8,6 +8,8 @@
 #include "model/ball.h"
 #include "pooltable.h"
 
+#define BALL_TEXTURE_COUNT 16
+
 
 struct LightData
 {
@@ -42,7 +44,6 @@ public:
     commoncg::ShaderProgram shader;
     commoncg::Skybox skybox;
     commoncg::Camera cam;
-    commoncg::Texture brdfLUT;
 private:
     // light
     LightData lights[3];
@@ -50,4 +51,7 @@ private:
     // view
     ViewMatrixData view;
     commoncg::VBO uboView;
+    // graphics
+    commoncg::Texture brdfLUT;
+    commoncg::Texture* ballTextures[BALL_TEXTURE_COUNT];
 };

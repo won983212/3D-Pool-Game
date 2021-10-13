@@ -5,9 +5,12 @@
 const float errorTolerance = 0.01f;
 using namespace commoncg;
 
-glm::mat4 Camera::getViewMatrix() const
+bool Camera::getViewMatrix(glm::mat4* view)
 {
-	return view;
+	bool ret = dirty;
+	*view = this->view;
+	dirty = false;
+	return ret;
 }
 
 glm::vec3 Camera::getFront() const
@@ -53,4 +56,5 @@ void Camera::update()
 
 	// get view matrix
 	view = glm::lookAt(eye * zoom, center, up);
+	dirty = true;
 }

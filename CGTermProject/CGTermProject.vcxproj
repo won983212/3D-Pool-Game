@@ -166,6 +166,7 @@
     <ClInclude Include="src\model\quad.h" />
     <ClInclude Include="src\pooltable.h" />
     <ClInclude Include="src\scene.h" />
+    <ClInclude Include="src\ui\uiscreen.h" />
     <ClInclude Include="src\util\util.h" />
   </ItemGroup>
   <ItemGroup>
@@ -183,17 +184,20 @@
     <ClCompile Include="src\model\quad.cpp" />
     <ClCompile Include="src\pooltable.cpp" />
     <ClCompile Include="src\scene.cpp" />
+    <ClCompile Include="src\ui\uiscreen.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp-vc142-mtd.dll" />
     <None Include="freeglut.dll" />
     <None Include="glew32.dll" />
+    <None Include="res\models\pooltable.bin" />
+    <None Include="res\models\pooltable.gltf" />
     <None Include="res\models\scene.bin" />
     <None Include="res\models\scene.gltf" />
-    <None Include="res\models\table.bin" />
-    <None Include="res\models\table.gltf" />
     <None Include="res\shader\cubemap.vert" />
     <None Include="res\shader\eqrtocubemap.frag" />
+    <None Include="res\shader\gui.frag" />
+    <None Include="res\shader\gui.vert" />
     <None Include="res\shader\pbr.frag" />
     <None Include="res\shader\pbr.vert" />
     <None Include="res\shader\skybox.frag" />

@@ -63,6 +63,9 @@
     <ClInclude Include="src\model\quad.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="src\ui\uiscreen.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\gfx\shader.cpp">
@@ -107,6 +110,9 @@
     <ClCompile Include="src\model\quad.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="src\ui\uiscreen.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shader\pbr.vert" />
@@ -123,10 +129,12 @@
     <None Include="res\shader\cubemap.vert" />
     <None Include="res\shader\eqrtocubemap.frag" />
     <None Include="res\textures\skybox\skybox.hdr" />
-    <None Include="res\models\table.bin">
+    <None Include="res\models\pooltable.bin">
       <Filter>리소스 파일</Filter>
     </None>
-    <None Include="res\models\table.gltf" />
+    <None Include="res\models\pooltable.gltf" />
+    <None Include="res\shader\gui.vert" />
+    <None Include="res\shader\gui.frag" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\texture\container.jpg">
