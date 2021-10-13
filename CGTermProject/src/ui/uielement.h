@@ -23,6 +23,8 @@ public:
 
 public:
 	void setBounds(float x, float y, float width, float height);
+	void setLocation(float x, float y);
+	void setSize(float width, float height);
 	static UIVertex makeVertex(float x, float y, int color, float u, float v);
 	static UIVertex makeVertex(float x, float y, int color);
 	static UIVertex makeVertex(float x, float y, float u, float v);

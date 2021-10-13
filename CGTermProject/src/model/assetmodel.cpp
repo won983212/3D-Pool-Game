@@ -116,7 +116,7 @@ void Mesh::draw()
 		// bind texture
 		ShaderProgram::getContextShader()->setUniform(name.c_str(), texturePBRIndexes[i]);
 		glActiveTexture(GL_TEXTURE0 + texturePBRIndexes[i]);
-		texture->texture->use();
+		texture->texture->bind();
 	}
 
 	// bind material to shader

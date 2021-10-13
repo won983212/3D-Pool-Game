@@ -28,7 +28,7 @@ void Scene::init()
 
     // prepare ball textures
     for (int i = 0; i < BALL_TEXTURE_COUNT; i++)
-        ballTextures[i] = Texture::cacheImage(("res/texture/ball_" + std::to_string(i) + ".png").c_str());
+        ballTextures[i] = Texture::cacheImage(("res/texture/ball/ball_" + std::to_string(i) + ".png").c_str());
 
     // model
     modelPoolTable.loadModel("res/model/pooltable.gltf");
@@ -107,7 +107,7 @@ void Scene::render()
     // bind env maps and brdf LUT (lookup texture).
     skybox.bindEnvironmentTextures();
     glActiveTexture(GL_TEXTURE0 + PBR_TEXTURE_INDEX_BRDFMAP);
-    brdfLUT.use();
+    brdfLUT.bind();
 
     // balls
     model::bindMaterial(&BALL_MATERIAL);
@@ -121,7 +121,7 @@ void Scene::render()
         model = model * glm::toMat4(balls[i]->rotation);
 
         glActiveTexture(GL_TEXTURE0 + PBR_TEXTURE_INDEX_ALBEDO);
-        ballTextures[i]->use();
+        ballTextures[i]->bind();
         shader.setUniform("model", model);
         modelBall.draw();
     }

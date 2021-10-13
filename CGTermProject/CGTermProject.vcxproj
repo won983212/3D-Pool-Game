@@ -168,6 +168,8 @@
     <ClInclude Include="src\scene.h" />
     <ClInclude Include="src\ui\button.h" />
     <ClInclude Include="src\ui\font.h" />
+    <ClInclude Include="src\ui\image.h" />
+    <ClInclude Include="src\ui\label.h" />
     <ClInclude Include="src\ui\screenmenu.h" />
     <ClInclude Include="src\ui\uielement.h" />
     <ClInclude Include="src\ui\uiscreen.h" />
@@ -190,6 +192,8 @@
     <ClCompile Include="src\scene.cpp" />
     <ClCompile Include="src\ui\button.cpp" />
     <ClCompile Include="src\ui\font.cpp" />
+    <ClCompile Include="src\ui\image.cpp" />
+    <ClCompile Include="src\ui\label.cpp" />
     <ClCompile Include="src\ui\screenmenu.cpp" />
     <ClCompile Include="src\ui\uielement.cpp" />
     <ClCompile Include="src\ui\uiscreen.cpp" />

@@ -105,7 +105,7 @@ GLuint Skybox::loadEquirectangularMap(const char* texturePath, int width, int he
     cubemapConvertShader.setUniform("flipY", flipY);
 
     glActiveTexture(GL_TEXTURE0);
-    texture.use();
+    texture.bind();
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
     for (int lv = 0; lv < mipmapLevel; lv++)

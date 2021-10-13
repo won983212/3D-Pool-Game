@@ -2,8 +2,18 @@
 
 void UIElement::setBounds(float x, float y, float width, float height)
 {
+	setLocation(x, y);
+	setSize(width, height);
+}
+
+void UIElement::setLocation(float x, float y)
+{
 	this->x = x;
 	this->y = y;
+}
+
+void UIElement::setSize(float width, float height)
+{
 	this->width = width;
 	this->height = height;
 }

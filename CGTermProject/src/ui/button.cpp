@@ -42,7 +42,7 @@ void Button::onMouseMove(int x, int y)
 	hover = false;
 }
 
-void Button::setText(const char* text)
+void Button::setText(std::wstring text)
 {
 	this->text = text;
 }

@@ -57,7 +57,7 @@ void Texture::loadImage(const char* imageFilePath, GLint wrapParam, bool useMipm
 		std::cout << "Failed to allocate memory for texture" << std::endl;
 		return;
 	}
-	use();
+	bind();
 
 	// setup parameters
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapParam);
@@ -180,7 +180,7 @@ void Texture::loadDDSImage(const char* imageFilePath, GLint wrapParam)
 		return;
 	}
 
-	use();
+	bind();
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, mipmapLevels - 1);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -212,7 +212,7 @@ void Texture::loadDDSImage(const char* imageFilePath, GLint wrapParam)
 	unbind();
 }
 
-void Texture::use(GLenum target) const
+void Texture::bind(GLenum target) const
 {
 	if (textureId == 0)
 	{

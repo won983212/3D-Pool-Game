@@ -46,7 +46,7 @@ void FontRenderer::init(const char* fontPath)
 	VAO::unbind();
 }
 
-bool FontRenderer::cacheGlyph(char c, Glyph* glyph)
+bool FontRenderer::cacheGlyph(FT_ULong c, Glyph* glyph)
 {
 	if (glyphCache.find(c) != glyphCache.end())
 	{
@@ -92,7 +92,7 @@ bool FontRenderer::cacheGlyph(char c, Glyph* glyph)
 	return true;
 }
 
-void FontRenderer::renderText(std::string text, float x, float y, int color, float scale, bool centered)
+void FontRenderer::renderText(std::wstring text, float x, float y, int color, float scale, bool centered)
 {
 	ShaderProgram::getContextShader()->setUniform("useFont", true);
 	glActiveTexture(GL_TEXTURE0 + PBR_TEXTURE_INDEX_ALBEDO);
@@ -106,7 +106,7 @@ void FontRenderer::renderText(std::string text, float x, float y, int color, flo
 		y -= (h.aboveBase + h.belowBase) / 2.0f - h.aboveBase;
 	}
 
-	std::string::const_iterator c;
+	std::wstring::const_iterator c;
 	for (c = text.begin(); c != text.end(); c++)
 	{
 		Glyph glyph;
@@ -148,7 +148,7 @@ void FontRenderer::renderText(std::string text, float x, float y, int color, flo
 	ShaderProgram::getContextShader()->setUniform("useFont", false);
 }
 
-void FontRenderer::renderText(ShaderProgram& guiShader, std::string text, float x, float y, int color, float scale, bool centered)
+void FontRenderer::renderText(ShaderProgram& guiShader, std::wstring text, float x, float y, int color, float scale, bool centered)
 {
 	ShaderProgram::push();
 	guiShader.use();
@@ -156,10 +156,10 @@ void FontRenderer::renderText(ShaderProgram& guiShader, std::string text, float 
 	ShaderProgram::pop();
 }
 
-int FontRenderer::width(std::string text, float scale)
+int FontRenderer::width(std::wstring text, float scale)
 {
 	int w = 0;
-	std::string::const_iterator c;
+	std::wstring::const_iterator c;
 	for (c = text.begin(); c != text.end(); c++)
 	{
 		Glyph glyph;
@@ -167,14 +167,14 @@ int FontRenderer::width(std::string text, float scale)
 			continue;
 		w += glyph.advance >> 6;
 	}
-	return w * scale;
+	return (int)(w * scale);
 }
 
-FontHeight FontRenderer::maxHeight(std::string text, float scale)
+FontHeight FontRenderer::maxHeight(std::wstring text, float scale)
 {
 	int topMax = 0;
 	int bottomMax = 0;
-	std::string::const_iterator c;
+	std::wstring::const_iterator c;
 	for (c = text.begin(); c != text.end(); c++)
 	{
 		Glyph glyph;

@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 #include "uielement.h"
 
 class Button : public UIElement
@@ -8,10 +9,10 @@ public:
 	virtual void postRender();
 	virtual void onMouse(int button, int state, int x, int y);
 	virtual void onMouseMove(int x, int y);
-	void setText(const char* text);
+	void setText(std::wstring text);
 	void setTextScale(float scale);
 private:
-	const char* text;
+	std::wstring text;
 	bool hover = false;
 	float textScale = 0.6f;
 };

@@ -67,9 +67,12 @@ void UIScreen::render()
 	{
 		vertices.clear();
 		uiShader.setUniform("useTexture", elements[i]->render(vertices));
-		vao.use();
-		vbo.buffer(vertices.size() * sizeof(UIVertex), &vertices[0]);
-		glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+		if (!vertices.empty())
+		{
+			vao.use();
+			vbo.buffer(vertices.size() * sizeof(UIVertex), &vertices[0]);
+			glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+		}
 		elements[i]->postRender();
 	}
 
