@@ -26,7 +26,7 @@ void Quad::init(float width, float height, vec3 normal)
 
 	vao.create();
 	vbo.create();
-	vao.bind();
+	vao.use();
 
 	Vertex v;
 	v.normal = normalize(normal);
@@ -70,7 +70,7 @@ void Quad::init(float width, float height, vec3 normal)
 
 void Quad::draw()
 {
-	vao.bind();
+	vao.use();
 	glDrawArrays(GL_TRIANGLES, 0, verticesSize);
 	VAO::unbind();
 }

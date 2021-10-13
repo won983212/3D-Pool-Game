@@ -28,7 +28,7 @@ void VBO::destroy() const
 	glDeleteBuffers(1, &handle);
 }
 
-void VBO::bind() const
+void VBO::use() const
 {
 	checkIfCreated("bind");
 	glBindBuffer(bufferType, handle);
@@ -37,7 +37,7 @@ void VBO::bind() const
 void VBO::buffer(GLsizeiptr size, const void* data, GLenum drawingHint) const
 {
 	checkIfCreated("buffer");
-	bind();
+	use();
 	glBufferData(bufferType, size, data, drawingHint);
 }
 

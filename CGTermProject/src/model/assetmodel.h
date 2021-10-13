@@ -30,7 +30,7 @@ namespace model
 		const AssetModel* parent;
 	public:
 		Mesh(const AssetModel* parent, aiMesh* mesh, const aiScene* scene);
-		void draw(commoncg::ShaderProgram& shader);
+		void draw();
 	};
 
 	class AssetModel
@@ -38,7 +38,7 @@ namespace model
 	public:
 		AssetModel() {};
 		~AssetModel();
-		void draw(commoncg::ShaderProgram& shader);
+		void draw();
 		void loadModel(std::string path);
 	private:
 		void loadTexture(const aiScene* scene, std::string texPath, Material* uMat, int id);

@@ -47,6 +47,9 @@ namespace commoncg
 		void setUniform(const char* name, int* values, int count = 1) const;
 		void setUniform(const char* name, const int value) const;
 
+		static void push();
+		static void pop();
+		static const ShaderProgram* getContextShader();
 	private:
 		GLuint handle;
 		Shader shaders[SHADER_MAX_COUNT];

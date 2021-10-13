@@ -89,7 +89,7 @@ Mesh::Mesh(const AssetModel* parent, aiMesh* mesh, const aiScene* scene)
 	vbo.create();
 	ebo.create();
 
-	vao.bind();
+	vao.use();
 	vbo.buffer(vertices.size() * sizeof(Vertex), &vertices[0]);
 	ebo.buffer(indices.size() * sizeof(unsigned int), &indices[0]);
 
@@ -100,7 +100,7 @@ Mesh::Mesh(const AssetModel* parent, aiMesh* mesh, const aiScene* scene)
 	VAO::unbind();
 }
 
-void Mesh::draw(ShaderProgram& shader)
+void Mesh::draw()
 {
 	Material* uMat = parent->materials[materialIndex];
 	for (unsigned int i = 0; i < MESH_TEXTURE_TYPE_SIZE; i++)
@@ -114,24 +114,24 @@ void Mesh::draw(ShaderProgram& shader)
 		string name = textureUniformNames[(int)texture->type];
 
 		// bind texture
-		shader.setUniform(name.c_str(), texturePBRIndexes[i]);
+		ShaderProgram::getContextShader()->setUniform(name.c_str(), texturePBRIndexes[i]);
 		glActiveTexture(GL_TEXTURE0 + texturePBRIndexes[i]);
-		texture->texture->bind();
+		texture->texture->use();
 	}
 
 	// bind material to shader
 	if (materialIndex >= 0)
 		model::bindMaterial(parent->materials[materialIndex]);
 
-	vao.bind();
+	vao.use();
 	glDrawElements(GL_TRIANGLES, indiceSize, GL_UNSIGNED_INT, 0);
 	VAO::unbind();
 }
 
-void AssetModel::draw(ShaderProgram& shader)
+void AssetModel::draw()
 {
 	for (unsigned int i = 0; i < meshes.size(); i++)
-		meshes[i]->draw(shader);
+		meshes[i]->draw();
 
 	// all texture unbind
 	for (unsigned int i = 0; i < MESH_TEXTURE_TYPE_SIZE; i++)

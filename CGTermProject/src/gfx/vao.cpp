@@ -19,7 +19,7 @@ void VAO::destroy()
 	glDeleteVertexArrays(1, &handle);
 }
 
-void VAO::bind() const
+void VAO::use() const
 {
 	checkIfCreated("bind");
 	glBindVertexArray(handle);
@@ -28,8 +28,8 @@ void VAO::bind() const
 void VAO::attr(VBO vbo, GLuint index, GLuint size, GLenum type, GLsizei stride, size_t offset) const
 {
 	checkIfCreated("attr");
-	bind();
-	vbo.bind();
+	use();
+	vbo.use();
 	glVertexAttribPointer(index, size, type, GL_FALSE, stride, (void*)offset);
 	glEnableVertexAttribArray(index);
 }
@@ -37,7 +37,7 @@ void VAO::attr(VBO vbo, GLuint index, GLuint size, GLenum type, GLsizei stride, 
 void VAO::attr(GLuint index, GLuint size, GLenum type, GLsizei stride, size_t offset) const
 {
 	checkIfCreated("attr");
-	bind();
+	use();
 	glVertexAttribPointer(index, size, type, GL_FALSE, stride, (void*)offset);
 	glEnableVertexAttribArray(index);
 }

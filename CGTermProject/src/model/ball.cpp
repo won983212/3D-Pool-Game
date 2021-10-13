@@ -42,7 +42,7 @@ void Ball::init(float radius, int step)
 
 	vao.create();
 	vbo.create();
-	vao.bind();
+	vao.use();
 
 	// prepare vertices
 	for (int i = 0; i < step; i++) // pitch
@@ -74,7 +74,7 @@ void Ball::init(float radius, int step)
 
 void Ball::draw()
 {
-	vao.bind();
+	vao.use();
 	glDrawArrays(GL_TRIANGLES, 0, verticesSize);
 	VAO::unbind();
 }

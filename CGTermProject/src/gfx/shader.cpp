@@ -1,9 +1,15 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <stack>
 #include "shader.h"
 
 using namespace commoncg;
+
+const int MAX_STACK_SIZE = 1000;
+
+std::stack<const ShaderProgram*> shaderStack;
+const ShaderProgram* lastUses = nullptr;
 
 static GLuint _compileShaderSource(const char* filePath, GLenum shaderType)
 {
@@ -91,9 +97,9 @@ void ShaderProgram::load()
 
 void ShaderProgram::use() const
 {
+	lastUses = this;
 	glUseProgram(handle);
 }
-
 
 void ShaderProgram::destroy() const
 {
@@ -178,4 +184,39 @@ void ShaderProgram::setUniform(const char* name, int* values, int count) const
 void ShaderProgram::setUniform(const char* name, const int iValue) const
 {
 	glUniform1i(glGetUniformLocation(handle, name), iValue);
+}
+
+void ShaderProgram::push()
+{
+	if (lastUses != nullptr)
+	{
+		if(shaderStack.size() < MAX_STACK_SIZE)
+			shaderStack.push(lastUses);
+		else
+			std::cout << "Error: Shader stack overflow" << std::endl;
+	}
+	else
+	{
+		std::cout << "Error: Can't push. Shader is not bound." << std::endl;
+	}
+}
+
+void ShaderProgram::pop()
+{
+	if (shaderStack.empty())
+	{
+		std::cout << "Error: Can't pop. No shader to pop" << std::endl;
+	}
+	else
+	{
+		shaderStack.top()->use();
+		shaderStack.pop();
+	}
+}
+
+const ShaderProgram* ShaderProgram::getContextShader()
+{
+	if (lastUses == nullptr)
+		std::cout << "Warning: Current context has not shader." << std::endl;
+	return lastUses;
 }

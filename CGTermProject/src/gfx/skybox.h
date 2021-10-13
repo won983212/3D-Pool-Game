@@ -15,8 +15,8 @@ namespace commoncg
 		void loadHDRSkybox(const char* hdrTexturePath);
 		void loadDDSIrradianceMap(const char* ddsTexturePath);
 		void loadDDSSpecularMap(const char* ddsTexturePath);
-		void endLoad(const ShaderProgram& shader);
-		void render(const ShaderProgram& shader, glm::mat4 view) const;
+		void endLoad();
+		void render(glm::mat4 view) const;
 		void bindEnvironmentTextures() const;
 	private:
 		GLuint loadEquirectangularMap(const char* texturePath, int width, int height, bool flipY);

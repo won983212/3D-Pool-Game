@@ -21,6 +21,7 @@ const glm::mat4 views[] =
 const int skyboxTexSize = 1024;
 const int irradianceTexSize = 32;
 const int specularTexSize = 256;
+
 const float skyboxVertices[] = {
     -1.0f,  1.0f, -1.0f,
     -1.0f, -1.0f, -1.0f,
@@ -65,6 +66,7 @@ const float skyboxVertices[] = {
      1.0f, -1.0f,  1.0f
 };
 
+
 GLuint Skybox::loadEquirectangularMap(const char* texturePath, int width, int height, bool flipY)
 {
     if (!vao.isCreated())
@@ -103,7 +105,7 @@ GLuint Skybox::loadEquirectangularMap(const char* texturePath, int width, int he
     cubemapConvertShader.setUniform("flipY", flipY);
 
     glActiveTexture(GL_TEXTURE0);
-    texture.bind();
+    texture.use();
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
     for (int lv = 0; lv < mipmapLevel; lv++)
@@ -124,7 +126,7 @@ GLuint Skybox::loadEquirectangularMap(const char* texturePath, int width, int he
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, cubemapTextureId, lv);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            vao.bind();
+            vao.use();
             glDrawArrays(GL_TRIANGLES, 0, 36);
             VAO::unbind();
         }
@@ -157,10 +159,12 @@ void Skybox::beginLoad()
     // prepare cube vao, vbo
     vao.create();
     vbo.create();
-    vao.bind();
+    vao.use();
     vbo.buffer(sizeof(skyboxVertices), skyboxVertices);
     vao.attr(0, 3, GL_FLOAT, SIZEOF(float, 3), 0);
     VAO::unbind();
+
+    ShaderProgram::push();
 
     // prepare conversion shader.
     cubemapConvertShader.addShader("res/shader/cubemap.vert", GL_VERTEX_SHADER);
@@ -178,7 +182,7 @@ void Skybox::beginLoad()
     skyboxShader.setUniform("skyboxMap", 0);
 }
 
-void Skybox::endLoad(const ShaderProgram& shader)
+void Skybox::endLoad()
 {
     if (!vao.isCreated())
     {
@@ -192,7 +196,7 @@ void Skybox::endLoad(const ShaderProgram& shader)
 
     glDeleteFramebuffers(1, &fbo);
     glDeleteRenderbuffers(1, &rbo);
-    shader.use();
+    ShaderProgram::pop();
 }
 
 void Skybox::bindEnvironmentTextures() const
@@ -203,17 +207,18 @@ void Skybox::bindEnvironmentTextures() const
     glBindTexture(GL_TEXTURE_CUBE_MAP, specularTextureId);
 }
 
-void Skybox::render(const ShaderProgram& shader, glm::mat4 view) const
+void Skybox::render(glm::mat4 view) const
 {
+    ShaderProgram::push();
     skyboxShader.use();
     glDepthFunc(GL_LEQUAL);
 
-    vao.bind();
+    vao.use();
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, textureId);
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
     VAO::unbind();
     glDepthFunc(GL_LESS);
-    shader.use();
+    ShaderProgram::pop();
 }

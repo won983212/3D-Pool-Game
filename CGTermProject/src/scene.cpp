@@ -51,7 +51,7 @@ void Scene::init()
     skybox.loadHDRSkybox("res/textures/skybox/skybox.hdr");
     skybox.loadDDSIrradianceMap("res/textures/skybox/irr.dds");
     skybox.loadDDSSpecularMap("res/textures/skybox/env.dds");
-    skybox.endLoad(shader);
+    skybox.endLoad();
 
     // lights
     LightData light;
@@ -103,7 +103,7 @@ void Scene::render()
     // bind env maps and brdf LUT (lookup texture).
     skybox.bindEnvironmentTextures();
     glActiveTexture(GL_TEXTURE0 + PBR_TEXTURE_INDEX_BRDFMAP);
-    brdfLUT.bind();
+    brdfLUT.use();
 
     // balls
     model::bindMaterial(&BALL_MATERIAL);
@@ -117,7 +117,7 @@ void Scene::render()
         model = model * glm::toMat4(balls[i]->rotation);
 
         glActiveTexture(GL_TEXTURE0 + PBR_TEXTURE_INDEX_ALBEDO);
-        ballTextures[i]->bind();
+        ballTextures[i]->use();
         shader.setUniform("model", model);
         modelBall.draw();
     }
@@ -128,8 +128,8 @@ void Scene::render()
     model = scale(model, vec3(5.0f));
     model = rotate(model, DEGTORAD(90.0f), vec3(1, 0, 0));
     shader.setUniform("model", model);
-    modelPoolTable.draw(shader);
+    modelPoolTable.draw();
 
     // skybox
-    skybox.render(shader, view.view);
+    skybox.render(view.view);
 }

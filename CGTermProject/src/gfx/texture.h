@@ -8,7 +8,7 @@ namespace commoncg
 	public:
 		~Texture();
 		void loadImage(const char* imageFilePath, GLint wrapParam = GL_CLAMP_TO_EDGE, bool useMipmap = false);
-		void bind(GLenum target = GL_TEXTURE_2D) const;
+		void use(GLenum target = GL_TEXTURE_2D) const;
 		void destroy();
 		GLuint getTextureID() const;
 		int getWidth() const;
