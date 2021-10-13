@@ -21,16 +21,16 @@ const model::Material BALL_MATERIAL =
 void Scene::init()
 {
     // initalize graphic variables
-    brdfLUT.loadImage("res/textures/brdf.png");
+    brdfLUT.loadImage("res/texture/brdf.png");
     uboLight.create();
     uboView.create();
 
     // prepare ball textures
     for (int i = 0; i < BALL_TEXTURE_COUNT; i++)
-        ballTextures[i] = Texture::cacheImage(("res/textures/ball_" + std::to_string(i) + ".png").c_str());
+        ballTextures[i] = Texture::cacheImage(("res/texture/ball_" + std::to_string(i) + ".png").c_str());
 
     // model
-    modelPoolTable.loadModel("res/models/pooltable.gltf");
+    modelPoolTable.loadModel("res/model/pooltable.gltf");
     modelBall.init(BALL_RADIUS);
 
     // shader
@@ -46,11 +46,14 @@ void Scene::init()
     shader.setUniform("specularMap", PBR_TEXTURE_INDEX_SPECULARMAP);
     shader.setUniform("brdfMap", PBR_TEXTURE_INDEX_BRDFMAP);
 
+    // gui screen
+    ui.init();
+
     // skybox
     skybox.beginLoad();
-    skybox.loadHDRSkybox("res/textures/skybox/skybox.hdr");
-    skybox.loadDDSIrradianceMap("res/textures/skybox/irr.dds");
-    skybox.loadDDSSpecularMap("res/textures/skybox/env.dds");
+    skybox.loadHDRSkybox("res/texture/skybox/skybox.hdr");
+    skybox.loadDDSIrradianceMap("res/texture/skybox/irr.dds");
+    skybox.loadDDSSpecularMap("res/texture/skybox/env.dds");
     skybox.endLoad();
 
     // lights
@@ -132,4 +135,7 @@ void Scene::render()
 
     // skybox
     skybox.render(view.view);
+
+    // gui
+    ui.render(view.view);
 }

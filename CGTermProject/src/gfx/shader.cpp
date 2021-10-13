@@ -188,30 +188,28 @@ void ShaderProgram::setUniform(const char* name, const int iValue) const
 
 void ShaderProgram::push()
 {
-	if (lastUses != nullptr)
+	if (lastUses == nullptr)
 	{
-		if(shaderStack.size() < MAX_STACK_SIZE)
-			shaderStack.push(lastUses);
-		else
-			std::cout << "Error: Shader stack overflow" << std::endl;
+		std::cout << "Warning: Ignore pushing request. Shader is not bound." << std::endl;
+		return;
 	}
+
+	if(shaderStack.size() < MAX_STACK_SIZE)
+		shaderStack.push(lastUses);
 	else
-	{
-		std::cout << "Error: Can't push. Shader is not bound." << std::endl;
-	}
+		std::cout << "Error: Shader stack overflow" << std::endl;
 }
 
 void ShaderProgram::pop()
 {
 	if (shaderStack.empty())
 	{
-		std::cout << "Error: Can't pop. No shader to pop" << std::endl;
+		std::cout << "Warning: Can't pop. No shader to pop" << std::endl;
+		return;
 	}
-	else
-	{
-		shaderStack.top()->use();
-		shaderStack.pop();
-	}
+
+	shaderStack.top()->use();
+	shaderStack.pop();
 }
 
 const ShaderProgram* ShaderProgram::getContextShader()

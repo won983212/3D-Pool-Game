@@ -166,6 +166,7 @@
     <ClInclude Include="src\model\quad.h" />
     <ClInclude Include="src\pooltable.h" />
     <ClInclude Include="src\scene.h" />
+    <ClInclude Include="src\ui\button.h" />
     <ClInclude Include="src\ui\uiscreen.h" />
     <ClInclude Include="src\util\util.h" />
   </ItemGroup>
@@ -184,14 +185,15 @@
     <ClCompile Include="src\model\quad.cpp" />
     <ClCompile Include="src\pooltable.cpp" />
     <ClCompile Include="src\scene.cpp" />
+    <ClCompile Include="src\ui\button.cpp" />
     <ClCompile Include="src\ui\uiscreen.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp-vc142-mtd.dll" />
     <None Include="freeglut.dll" />
     <None Include="glew32.dll" />
-    <None Include="res\models\pooltable.bin" />
-    <None Include="res\models\pooltable.gltf" />
+    <None Include="res\model\pooltable.bin" />
+    <None Include="res\model\pooltable.gltf" />
     <None Include="res\models\scene.bin" />
     <None Include="res\models\scene.gltf" />
     <None Include="res\shader\cubemap.vert" />
@@ -202,46 +204,46 @@
     <None Include="res\shader\pbr.vert" />
     <None Include="res\shader\skybox.frag" />
     <None Include="res\shader\skybox.vert" />
-    <None Include="res\textures\skybox\skybox.hdr" />
+    <None Include="res\texture\skybox\skybox.hdr" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="res\models\table.png" />
+    <Image Include="res\model\table.png" />
     <Image Include="res\models\textures\Wheel_baseColor.png" />
     <Image Include="res\models\textures\Wheel_metallicRoughness.png" />
     <Image Include="res\models\textures\Wheel_normal.png" />
     <Image Include="res\models\Wheel_baseColor.png" />
     <Image Include="res\models\Wheel_metallicRoughness.png" />
     <Image Include="res\models\Wheel_normal.png" />
-    <Image Include="res\textures\ball_0.png" />
-    <Image Include="res\textures\ball_1.png" />
-    <Image Include="res\textures\ball_10.png" />
-    <Image Include="res\textures\ball_11.png" />
-    <Image Include="res\textures\ball_12.png" />
-    <Image Include="res\textures\ball_13.png" />
-    <Image Include="res\textures\ball_14.png" />
-    <Image Include="res\textures\ball_15.png" />
-    <Image Include="res\textures\ball_2.png" />
-    <Image Include="res\textures\ball_3.png" />
-    <Image Include="res\textures\ball_4.png" />
-    <Image Include="res\textures\ball_5.png" />
-    <Image Include="res\textures\ball_6.png" />
-    <Image Include="res\textures\ball_7.png" />
-    <Image Include="res\textures\ball_8.png" />
-    <Image Include="res\textures\ball_9.png" />
-    <Image Include="res\textures\brdf.png" />
-    <Image Include="res\textures\skybox\env.dds" />
-    <Image Include="res\textures\skybox\irr.dds" />
+    <Image Include="res\texture\ball_0.png" />
+    <Image Include="res\texture\ball_1.png" />
+    <Image Include="res\texture\ball_10.png" />
+    <Image Include="res\texture\ball_11.png" />
+    <Image Include="res\texture\ball_12.png" />
+    <Image Include="res\texture\ball_13.png" />
+    <Image Include="res\texture\ball_14.png" />
+    <Image Include="res\texture\ball_15.png" />
+    <Image Include="res\texture\ball_2.png" />
+    <Image Include="res\texture\ball_3.png" />
+    <Image Include="res\texture\ball_4.png" />
+    <Image Include="res\texture\ball_5.png" />
+    <Image Include="res\texture\ball_6.png" />
+    <Image Include="res\texture\ball_7.png" />
+    <Image Include="res\texture\ball_8.png" />
+    <Image Include="res\texture\ball_9.png" />
+    <Image Include="res\texture\brdf.png" />
+    <Image Include="res\texture\skybox\env.dds" />
+    <Image Include="res\texture\skybox\irr.dds" />
     <Image Include="res\texture\container.jpg" />
     <Image Include="res\texture\container2.png" />
     <Image Include="res\texture\container2_specular.png" />
   </ItemGroup>
   <ItemGroup>
-    <Media Include="res\sounds\bgm.mp3" />
-    <Media Include="res\sounds\강.wav" />
-    <Media Include="res\sounds\강하게.wav" />
-    <Media Include="res\sounds\약.wav" />
-    <Media Include="res\sounds\약하게.wav" />
-    <Media Include="res\sounds\중.wav" />
+    <Media Include="res\sound\bgm.mp3" />
+    <Media Include="res\sound\강.wav" />
+    <Media Include="res\sound\강하게.wav" />
+    <Media Include="res\sound\약.wav" />
+    <Media Include="res\sound\약하게.wav" />
+    <Media Include="res\sound\중.wav" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

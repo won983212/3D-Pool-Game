@@ -4,6 +4,7 @@
 #include "gfx/vbo.h"
 #include "gfx/camera.h"
 #include "gfx/skybox.h"
+#include "ui/uiscreen.h"
 #include "model/assetmodel.h"
 #include "model/ball.h"
 #include "pooltable.h"
@@ -54,4 +55,5 @@ private:
     // graphics
     commoncg::Texture brdfLUT;
     commoncg::Texture* ballTextures[BALL_TEXTURE_COUNT];
+    UIScreen ui;
 };
