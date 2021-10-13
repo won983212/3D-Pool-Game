@@ -188,60 +188,63 @@
     <Image Include="res\models\textures\Wheel_metallicRoughness.png">
       <Filter>리소스 파일</Filter>
     </Image>
-    <Image Include="res\texture\ball_10.png">
+    <Image Include="res\texture\ball\ball_10.png">
       <Filter>리소스 파일</Filter>
     </Image>
     <Image Include="res\texture\skybox\env.dds" />
     <Image Include="res\texture\skybox\irr.dds" />
-    <Image Include="res\texture\ball_0.png">
+    <Image Include="res\texture\ball\ball_0.png">
       <Filter>리소스 파일</Filter>
     </Image>
-    <Image Include="res\texture\ball_1.png">
+    <Image Include="res\texture\ball\ball_1.png">
       <Filter>리소스 파일</Filter>
     </Image>
-    <Image Include="res\texture\ball_2.png">
+    <Image Include="res\texture\ball\ball_2.png">
       <Filter>리소스 파일</Filter>
     </Image>
-    <Image Include="res\texture\ball_3.png">
+    <Image Include="res\texture\ball\ball_3.png">
       <Filter>리소스 파일</Filter>
     </Image>
-    <Image Include="res\texture\ball_4.png">
+    <Image Include="res\texture\ball\ball_4.png">
       <Filter>리소스 파일</Filter>
     </Image>
-    <Image Include="res\texture\ball_5.png">
+    <Image Include="res\texture\ball\ball_5.png">
       <Filter>리소스 파일</Filter>
     </Image>
-    <Image Include="res\texture\ball_6.png">
+    <Image Include="res\texture\ball\ball_6.png">
       <Filter>리소스 파일</Filter>
     </Image>
-    <Image Include="res\texture\ball_7.png">
+    <Image Include="res\texture\ball\ball_7.png">
       <Filter>리소스 파일</Filter>
     </Image>
-    <Image Include="res\texture\ball_8.png">
+    <Image Include="res\texture\ball\ball_8.png">
       <Filter>리소스 파일</Filter>
     </Image>
-    <Image Include="res\texture\ball_9.png">
+    <Image Include="res\texture\ball\ball_9.png">
       <Filter>리소스 파일</Filter>
     </Image>
-    <Image Include="res\texture\ball_11.png">
+    <Image Include="res\texture\ball\ball_11.png">
       <Filter>리소스 파일</Filter>
     </Image>
-    <Image Include="res\texture\ball_12.png">
+    <Image Include="res\texture\ball\ball_12.png">
       <Filter>리소스 파일</Filter>
     </Image>
-    <Image Include="res\texture\ball_13.png">
+    <Image Include="res\texture\ball\ball_13.png">
       <Filter>리소스 파일</Filter>
     </Image>
-    <Image Include="res\texture\ball_14.png">
+    <Image Include="res\texture\ball\ball_14.png">
       <Filter>리소스 파일</Filter>
     </Image>
-    <Image Include="res\texture\ball_15.png">
+    <Image Include="res\texture\ball\ball_15.png">
       <Filter>리소스 파일</Filter>
     </Image>
     <Image Include="res\texture\brdf.png">
       <Filter>리소스 파일</Filter>
     </Image>
     <Image Include="res\model\table.png">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\texture\title.png">
       <Filter>리소스 파일</Filter>
     </Image>
   </ItemGroup>
