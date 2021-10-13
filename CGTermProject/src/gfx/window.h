@@ -20,6 +20,7 @@ namespace commoncg
 		void setKeyboardFunc(KeyboardCallback keyEvent) const;
 		void setKeyboardUpFunc(KeyboardCallback keyEvent) const;
 		void setMouseFunc(MouseCallback mouseEvent) const;
+		void setMouseMotionFunc(MouseMotionCallback mouseEvent) const;
 		void setMouseDragFunc(MouseMotionCallback mouseEvent) const;
 		void setMouseWheelFunc(MouseCallback mouseEvent) const;
 		void setIdleFunc(UpdateCallback idle);

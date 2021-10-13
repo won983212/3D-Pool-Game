@@ -41,6 +41,13 @@ void VBO::buffer(GLsizeiptr size, const void* data, GLenum drawingHint) const
 	glBufferData(bufferType, size, data, drawingHint);
 }
 
+void VBO::subBuffer(GLintptr offset, GLsizeiptr size, const void* data) const
+{
+	checkIfCreated("subBuffer");
+	use();
+	glBufferSubData(bufferType, offset, size, data);
+}
+
 void VBO::bindBufferRange(GLuint index, GLintptr offset, GLsizeiptr size) const
 {
 	checkIfCreated("bindBufferRange");

@@ -69,6 +69,15 @@
     <ClInclude Include="src\ui\button.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="src\ui\uielement.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\screenmenu.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\font.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\gfx\shader.cpp">
@@ -117,6 +126,15 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="src\ui\button.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ui\uielement.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ui\screenmenu.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ui\font.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
@@ -244,5 +262,8 @@
     <Media Include="res\sound\약하게.wav">
       <Filter>리소스 파일</Filter>
     </Media>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="res\font.ttf" />
   </ItemGroup>
 </Project>

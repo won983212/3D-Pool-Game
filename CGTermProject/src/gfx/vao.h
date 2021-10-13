@@ -13,7 +13,6 @@ namespace commoncg
 		void create();
 		void destroy();
 		void use() const;
-		void attr(VBO vbo, GLuint index, GLuint size, GLenum type, GLsizei stride, size_t offset) const;
 		void attr(GLuint index, GLuint size, GLenum type, GLsizei stride, size_t offset) const;
 		static void unbind();
 		void checkIfCreated(std::string methodName) const;

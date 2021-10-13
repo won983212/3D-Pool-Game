@@ -78,6 +78,11 @@ void Window::setMouseFunc(MouseCallback mouseEvent) const
 	glutMouseFunc(mouseEvent);
 }
 
+void Window::setMouseMotionFunc(MouseMotionCallback mouseEvent) const
+{
+	glutPassiveMotionFunc(mouseEvent);
+}
+
 void Window::setMouseWheelFunc(MouseCallback mouseEvent) const
 {
 	glutMouseWheelFunc(mouseEvent);

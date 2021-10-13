@@ -4,7 +4,7 @@
 #include "gfx/vbo.h"
 #include "gfx/camera.h"
 #include "gfx/skybox.h"
-#include "ui/uiscreen.h"
+#include "ui/screenmenu.h"
 #include "model/assetmodel.h"
 #include "model/ball.h"
 #include "pooltable.h"
@@ -32,6 +32,10 @@ public:
     void init();
     void update(float partialTime);
     void render();
+    void mouse(int button, int state, int x, int y);
+    void mouseWheel(int button, int state, int x, int y);
+    void mouseMove(int x, int y);
+    void mouseDrag(int x, int y);
 private:
     void updateLight();
     void updateView();
@@ -55,5 +59,5 @@ private:
     // graphics
     commoncg::Texture brdfLUT;
     commoncg::Texture* ballTextures[BALL_TEXTURE_COUNT];
-    UIScreen ui;
+    ScreenMenu ui;
 };

@@ -25,15 +25,6 @@ void VAO::use() const
 	glBindVertexArray(handle);
 }
 
-void VAO::attr(VBO vbo, GLuint index, GLuint size, GLenum type, GLsizei stride, size_t offset) const
-{
-	checkIfCreated("attr");
-	use();
-	vbo.use();
-	glVertexAttribPointer(index, size, type, GL_FALSE, stride, (void*)offset);
-	glEnableVertexAttribArray(index);
-}
-
 void VAO::attr(GLuint index, GLuint size, GLenum type, GLsizei stride, size_t offset) const
 {
 	checkIfCreated("attr");

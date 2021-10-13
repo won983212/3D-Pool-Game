@@ -5,6 +5,7 @@
 #include "gfx/texture.h"
 #include "util/util.h"
 #include "model/quad.h"
+#include "ui/button.h"
 
 using namespace glm;
 using namespace commoncg;
@@ -137,5 +138,25 @@ void Scene::render()
     skybox.render(view.view);
 
     // gui
-    ui.render(view.view);
+    ui.render();
+}
+
+void Scene::mouse(int button, int state, int x, int y)
+{
+    ui.mouse(button, state, x, y);
+}
+
+void Scene::mouseDrag(int x, int y)
+{
+    ui.mouseDrag(x, y);
+}
+
+void Scene::mouseWheel(int button, int state, int x, int y)
+{
+    ui.mouseWheel(button, state, x, y);
+}
+
+void Scene::mouseMove(int x, int y)
+{
+    ui.mouseMove(x, y);
 }

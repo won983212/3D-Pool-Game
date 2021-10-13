@@ -14,6 +14,7 @@ namespace commoncg
 		void destroy() const;
 		void use() const;
 		void buffer(GLsizeiptr size, const void* data, GLenum drawingHint = GL_STATIC_DRAW) const;
+		void subBuffer(GLintptr offset, GLsizeiptr size, const void* data) const;
 		void bindBufferRange(GLuint index, GLintptr offset, GLsizeiptr size) const;
 		void unbind() const;
 	private:
