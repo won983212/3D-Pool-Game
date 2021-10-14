@@ -20,13 +20,17 @@ bool UEButton::render(std::vector<UIVertex>& vertices)
 void UEButton::postRender()
 {
 	FontRenderer* fontRenderer = UIScreen::getFontRenderer();
-	fontRenderer->renderText(text, x + width / 2.0f, y + height / 2.0f, 0xffffffff, (height * textScale) / FONT_HEIGHT, true);
+	fontRenderer->renderText(text, x + width / 2.0f, y + height / 2.0f, 0xffffffff, (height * textScale) / 0.75f, true);
 }
 
-void UEButton::onMouse(int button, int state, int x, int y)
+bool UEButton::onMouse(int button, int state, int x, int y)
 {
 	if (hover && parent && id != -1 && state == GLUT_DOWN)
+	{
 		parent->onButtonClick(id);
+		return true;
+	}
+	return false;
 }
 
 void UEButton::onMouseMove(int x, int y)

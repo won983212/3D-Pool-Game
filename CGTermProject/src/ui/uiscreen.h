@@ -9,20 +9,25 @@ class UIScreen
 {
 public:
 	~UIScreen();
-	virtual void init();
+	void init();
 	void render();
 	void mouse(int button, int state, int x, int y);
 	void mouseWheel(int button, int state, int x, int y);
 	void mouseDrag(int x, int y);
 	void mouseMove(int x, int y);
+	void setScreen(int index);
+	int getCurrentScreen();
+	virtual void screenInit() {};
 	virtual void onButtonClick(int id) {};
 	static FontRenderer* getFontRenderer();
 protected:
-	void add(UIElement* element);
+	void add(UIElement* element, int screenIdx);
+	void addPages(int count = 1);
 	void clear();
 private:
+	int index = 0;
 	commoncg::ShaderProgram uiShader;
 	commoncg::VAO vao;
 	commoncg::VBO vbo;
-	std::vector<UIElement*> elements;
+	std::vector<std::vector<UIElement*>> elements;
 };

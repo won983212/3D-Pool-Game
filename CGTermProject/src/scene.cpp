@@ -78,9 +78,10 @@ void Scene::init()
     updateView();
 }
 
-void Scene::update(float partialTime)
+void Scene::update(float partialTime, int fps)
 {
     table.update(partialTime);
+    ui.fpsLabel->setText(std::wstring(L"FPS: ") + std::to_wstring(fps));
 }
 
 void Scene::updateLight()
@@ -146,13 +147,27 @@ void Scene::mouse(int button, int state, int x, int y)
     ui.mouse(button, state, x, y);
 }
 
-void Scene::mouseDrag(int x, int y)
+void Scene::mouseDrag(int x, int y, int dx, int dy)
 {
+    if (ui.getCurrentScreen() == 2)
+    {
+        cam.yaw += dx / 8.0f;
+        cam.pitch += dy / 8.0f;
+        cam.update();
+    }
     ui.mouseDrag(x, y);
 }
 
 void Scene::mouseWheel(int button, int state, int x, int y)
 {
+    if (ui.getCurrentScreen() == 2)
+    {
+        if (state > 0)
+            cam.zoom -= 0.5f;
+        else
+            cam.zoom += 0.5f;
+        cam.update();
+    }
     ui.mouseWheel(button, state, x, y);
 }
 

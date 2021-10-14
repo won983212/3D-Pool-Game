@@ -72,7 +72,7 @@
     <ClInclude Include="src\ui\uielement.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="src\screenmenu.h">
+    <ClInclude Include="src\guiscreen.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="src\ui\font.h">
@@ -140,7 +140,7 @@
     <ClCompile Include="src\ui\uielement.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="src\screenmenu.cpp">
+    <ClCompile Include="src\guiscreen.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="src\ui\font.cpp">

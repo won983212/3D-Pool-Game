@@ -13,7 +13,7 @@ namespace commoncg
 	class Window
 	{
 	public:
-		Window(const char* title, int* argcp, char** argv);
+		void init(const char* title, int* argcp, char** argv);
 		void create(WindowCallback init, WindowCallback render, bool useMSAA = false);
 		void setDestroyFunc(WindowCallback destory);
 		void setReshapeFunc(ReshapeCallback reshape) const;
@@ -25,6 +25,7 @@ namespace commoncg
 		void setMouseWheelFunc(MouseCallback mouseEvent) const;
 		void setIdleFunc(UpdateCallback idle);
 		float getPartialTime() const;
+		int getFPS() const;
 		void loop() const;
 	private:
 		static void renderWrapper();
@@ -38,6 +39,7 @@ namespace commoncg
 		float partialTime = 0;
 		long lastFrame = 0;
 		long lastFPSCountFrame = 0;
+		int fpsCount = 0;
 		int fps = 0;
 	};
 }

@@ -80,19 +80,21 @@ bool FontRenderer::cacheGlyph(FT_ULong c, Glyph* glyph)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, data);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glGenerateMipmap(GL_TEXTURE_2D);
 
 	glyph->textureID = texture;
 	glyph->size = glm::ivec2(width, height);
 	glyph->bearing = glm::ivec2(offsetX, offsetY);
 	glyph->advance = static_cast<unsigned int>(face->glyph->advance.x);
 
-	glyphCache.insert(std::pair<char, Glyph>(c, *glyph));
+	glyphCache.insert(std::pair<FT_ULong, Glyph>(c, *glyph));
 	return true;
 }
 
-void FontRenderer::renderText(std::wstring text, float x, float y, int color, float scale, bool centered)
+void FontRenderer::renderText(std::wstring text, float x, float y, int color, float pt, bool centered)
 {
 	ShaderProgram::getContextShader()->setUniform("useFont", true);
 	glActiveTexture(GL_TEXTURE0 + PBR_TEXTURE_INDEX_ALBEDO);
@@ -100,12 +102,13 @@ void FontRenderer::renderText(std::wstring text, float x, float y, int color, fl
 
 	if (centered)
 	{
-		const int w = width(text, scale);
-		const FontHeight h = maxHeight(text, scale);
+		const int w = width(text, pt);
+		const FontHeight h = maxHeight(text, pt);
 		x -= w / 2.0f;
 		y -= (h.aboveBase + h.belowBase) / 2.0f - h.aboveBase;
 	}
 
+	float scale = pt * 0.75f / (float) FONT_HEIGHT;
 	std::wstring::const_iterator c;
 	for (c = text.begin(); c != text.end(); c++)
 	{
@@ -148,15 +151,15 @@ void FontRenderer::renderText(std::wstring text, float x, float y, int color, fl
 	ShaderProgram::getContextShader()->setUniform("useFont", false);
 }
 
-void FontRenderer::renderText(ShaderProgram& guiShader, std::wstring text, float x, float y, int color, float scale, bool centered)
+void FontRenderer::renderText(ShaderProgram& guiShader, std::wstring text, float x, float y, int color, float pt, bool centered)
 {
 	ShaderProgram::push();
 	guiShader.use();
-	renderText(text, x, y, color, scale, centered);
+	renderText(text, x, y, color, pt, centered);
 	ShaderProgram::pop();
 }
 
-int FontRenderer::width(std::wstring text, float scale)
+int FontRenderer::width(std::wstring text, float pt)
 {
 	int w = 0;
 	std::wstring::const_iterator c;
@@ -167,10 +170,10 @@ int FontRenderer::width(std::wstring text, float scale)
 			continue;
 		w += glyph.advance >> 6;
 	}
-	return (int)(w * scale);
+	return (int)(w * pt * 0.75f / (float)FONT_HEIGHT);
 }
 
-FontHeight FontRenderer::maxHeight(std::wstring text, float scale)
+FontHeight FontRenderer::maxHeight(std::wstring text, float pt)
 {
 	int topMax = 0;
 	int bottomMax = 0;
@@ -185,5 +188,6 @@ FontHeight FontRenderer::maxHeight(std::wstring text, float scale)
 		if (bottomMax < (glyph.size.y - glyph.bearing.y))
 			bottomMax = (glyph.size.y - glyph.bearing.y);
 	}
+	float scale = pt * 0.75f / (float)FONT_HEIGHT;
 	return { (int)(topMax * scale), (int)(bottomMax * scale) };
 }

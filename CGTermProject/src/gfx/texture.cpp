@@ -193,7 +193,7 @@ void Texture::loadDDSImage(const char* imageFilePath, GLint wrapParam)
 	unsigned int w = width;
 	unsigned int h = height;
 
-	for (unsigned int i = 0; i < mipmapLevels; i++)
+	for (int i = 0; i < mipmapLevels; i++)
 	{
 		if (w == 0 || h == 0)
 		{

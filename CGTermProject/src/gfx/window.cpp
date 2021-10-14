@@ -9,9 +9,9 @@ using namespace commoncg;
 
 Window* Window::inst = NULL;
 
-Window::Window(const char* title, int* argcp, char** argv)
-	:title(title)
+void Window::init(const char* title, int* argcp, char** argv)
 {
+	this->title = title;
 	glutInit(argcp, argv);
 }
 
@@ -112,13 +112,13 @@ void Window::update()
 
 	if (currentTime - lastFPSFrame >= CLOCKS_PER_SEC)
 	{
-		std::cout << "FPS: " << inst->fps << std::endl;
-		inst->fps = 0;
+		inst->fps = inst->fpsCount;
+		inst->fpsCount = 1;
 		inst->lastFPSCountFrame = currentTime;
 	}
 	else
 	{
-		inst->fps++;
+		inst->fpsCount++;
 	}
 
 	inst->partialTime = lastFrame == 0 ? 0 : (float)(currentTime - lastFrame) / CLOCKS_PER_SEC;
@@ -133,4 +133,9 @@ void Window::update()
 float Window::getPartialTime() const
 {
 	return partialTime;
+}
+
+int Window::getFPS() const
+{
+	return fps;
 }

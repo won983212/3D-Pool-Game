@@ -16,7 +16,7 @@ public:
 	// return: use texture?
 	virtual bool render(std::vector<UIVertex>& vertices) = 0;
 	virtual void postRender() {};
-	virtual void onMouse(int button, int state, int x, int y) {};
+	virtual bool onMouse(int button, int state, int x, int y) { return false; };
 	virtual void onMouseWheel(int button, int state, int x, int y) {};
 	virtual void onMouseDrag(int x, int y) {};
 	virtual void onMouseMove(int x, int y) {};

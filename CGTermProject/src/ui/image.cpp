@@ -33,6 +33,6 @@ void UEImage::packSize()
 {
 	if (texture == nullptr)
 		return;
-	width = texture->getWidth();
-	height = texture->getHeight();
+	width = (float) texture->getWidth();
+	height = (float) texture->getHeight();
 }

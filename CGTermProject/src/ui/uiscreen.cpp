@@ -1,3 +1,4 @@
+#include <iostream>
 #include <vector>
 #include "uiscreen.h"
 #include "../util/util.h"
@@ -18,11 +19,13 @@ FontRenderer* UIScreen::getFontRenderer()
 UIScreen::~UIScreen()
 {
 	for (unsigned int i = 0; i < elements.size(); i++)
-		delete elements[i];
+		for (unsigned int j = 0; j < elements[i].size(); j++)
+			delete elements[i][j];
 }
 
 void UIScreen::init()
 {
+	clear();
 	ShaderProgram::push();
 	uiShader.addShader("res/shader/gui.vert", GL_VERTEX_SHADER);
 	uiShader.addShader("res/shader/gui.frag", GL_FRAGMENT_SHADER);
@@ -36,12 +39,35 @@ void UIScreen::init()
 
 	vao.create();
 	vbo.create();
+	screenInit();
 }
 
-void UIScreen::add(UIElement* element)
+void UIScreen::add(UIElement* element, int screenIdx)
 {
 	element->parent = this;
-	elements.push_back(element);
+	elements[screenIdx].push_back(element);
+}
+
+void UIScreen::addPages(int count)
+{
+	for (int i = 0; i < count; i++)
+		elements.push_back(std::vector<UIElement*>());
+}
+
+void UIScreen::setScreen(int index)
+{
+	if (index < 0 || index >= elements.size())
+	{
+		std::cout << "Warning: Invaild index: " << index << std::endl;
+		return;
+	}
+
+	this->index = index;
+}
+
+int UIScreen::getCurrentScreen()
+{
+	return index;
 }
 
 void UIScreen::clear()
@@ -63,17 +89,17 @@ void UIScreen::render()
 	vao.attr(1, 4, GL_FLOAT, sizeof(UIVertex), offsetof(UIVertex, color));
 
 	std::vector<UIVertex> vertices;
-	for (unsigned int i = 0; i < elements.size(); i++)
+	for (unsigned int i = 0; i < elements[index].size(); i++)
 	{
 		vertices.clear();
-		uiShader.setUniform("useTexture", elements[i]->render(vertices));
+		uiShader.setUniform("useTexture", elements[index][i]->render(vertices));
 		if (!vertices.empty())
 		{
 			vao.use();
 			vbo.buffer(vertices.size() * sizeof(UIVertex), &vertices[0]);
 			glDrawArrays(GL_TRIANGLES, 0, vertices.size());
 		}
-		elements[i]->postRender();
+		elements[index][i]->postRender();
 	}
 
 	vbo.unbind();
@@ -84,24 +110,24 @@ void UIScreen::render()
 
 void UIScreen::mouse(int button, int state, int x, int y)
 {
-	for (unsigned int i = 0; i < elements.size(); i++)
-		elements[i]->onMouse(button, state, x, y);
+	for (unsigned int i = 0; i < elements[index].size(); i++)
+		if (elements[index][i]->onMouse(button, state, x, y)) break;
 }
 
 void UIScreen::mouseDrag(int x, int y)
 {
-	for (unsigned int i = 0; i < elements.size(); i++)
-		elements[i]->onMouseDrag(x, y);
+	for (unsigned int i = 0; i < elements[index].size(); i++)
+		elements[index][i]->onMouseDrag(x, y);
 }
 
 void UIScreen::mouseWheel(int button, int state, int x, int y)
 {
-	for (unsigned int i = 0; i < elements.size(); i++)
-		elements[i]->onMouseWheel(button, state, x, y);
+	for (unsigned int i = 0; i < elements[index].size(); i++)
+		elements[index][i]->onMouseWheel(button, state, x, y);
 }
 
 void UIScreen::mouseMove(int x, int y)
 {
-	for (unsigned int i = 0; i < elements.size(); i++)
-		elements[i]->onMouseMove(x, y);
+	for (unsigned int i = 0; i < elements[index].size(); i++)
+		elements[index][i]->onMouseMove(x, y);
 }

@@ -9,10 +9,10 @@ public:
 	void setText(std::wstring text);
 	void setColor(int color);
 	void setUseCentered(bool centered);
-	void setTextScale(float scale);
+	void setTextPoint(float point);
 private:
 	std::wstring text;
 	int color = 0xffffffff;
 	bool centered = false;
-	float scale = 0.5;
+	float fontPoint = 24;
 };

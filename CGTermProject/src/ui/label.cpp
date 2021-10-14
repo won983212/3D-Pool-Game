@@ -6,7 +6,7 @@
 bool Label::render(std::vector<UIVertex>& vertices)
 {
 	FontRenderer* fontRenderer = UIScreen::getFontRenderer();
-	fontRenderer->renderText(text, x, y, color, scale, centered);
+	fontRenderer->renderText(text, x, y, color, fontPoint, centered);
 	return false;
 }
 
@@ -25,7 +25,7 @@ void Label::setUseCentered(bool centered)
 	this->centered = centered;
 }
 
-void Label::setTextScale(float scale)
+void Label::setTextPoint(float point)
 {
-	this->scale = scale;
+	this->fontPoint = point;
 }

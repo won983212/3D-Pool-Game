@@ -7,6 +7,7 @@ using namespace commoncg;
 
 Scene scene;
 glm::vec2 lastMouse(0, 0);
+Window wnd;
 
 void init()
 {
@@ -25,19 +26,14 @@ void render()
 
 void reshape(int w, int h)
 {
-    glViewport(0, 0, w, h);
+    glutReshapeWindow(SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
 void drag(int x, int y)
 {
     glm::vec2 mouse = glm::vec2(x, y);
     glm::vec2 delta = mouse - lastMouse;
-
-    scene.cam.yaw += delta.x / 8.0f;
-    scene.cam.pitch += delta.y / 8.0f;
-    scene.cam.update();
-    scene.mouseDrag(x, y);
-
+    scene.mouseDrag(x, y, delta.x, delta.y);
     lastMouse.x = x;
     lastMouse.y = y;
 }
@@ -59,22 +55,17 @@ void mousemove(int x, int y)
 
 void wheel(int button, int state, int x, int y)
 {
-    if (state > 0)
-        scene.cam.zoom -= 0.5f;
-    else
-        scene.cam.zoom += 0.5f;
-    scene.cam.update();
     scene.mouseWheel(button, state, x, y);
 }
 
 void update(float partialTime)
 {
-    scene.update(partialTime);
+    scene.update(partialTime, wnd.getFPS());
 }
 
 int main(int argc, char* argv[])
 {
-    Window wnd("Pocket ball (CG Term Project)", &argc, argv);
+    wnd.init("Pocket ball (CG Term Project)", &argc, argv);
 	wnd.create(init, render, true);
     wnd.setMouseDragFunc(drag);
     wnd.setMouseFunc(mouse);

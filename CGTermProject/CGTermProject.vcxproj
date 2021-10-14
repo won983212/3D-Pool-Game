@@ -170,7 +170,7 @@
     <ClInclude Include="src\ui\font.h" />
     <ClInclude Include="src\ui\image.h" />
     <ClInclude Include="src\ui\label.h" />
-    <ClInclude Include="src\screenmenu.h" />
+    <ClInclude Include="src\guiscreen.h" />
     <ClInclude Include="src\ui\rectangle.h" />
     <ClInclude Include="src\ui\uielement.h" />
     <ClInclude Include="src\ui\uiscreen.h" />
@@ -195,7 +195,7 @@
     <ClCompile Include="src\ui\font.cpp" />
     <ClCompile Include="src\ui\image.cpp" />
     <ClCompile Include="src\ui\label.cpp" />
-    <ClCompile Include="src\screenmenu.cpp" />
+    <ClCompile Include="src\guiscreen.cpp" />
     <ClCompile Include="src\ui\rectangle.cpp" />
     <ClCompile Include="src\ui\uielement.cpp" />
     <ClCompile Include="src\ui\uiscreen.cpp" />
