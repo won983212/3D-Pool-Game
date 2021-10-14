@@ -8,6 +8,7 @@
 #include "model/assetmodel.h"
 #include "model/ball.h"
 #include "pooltable.h"
+#include "util/util.h"
 
 #define BALL_TEXTURE_COUNT 16
 
@@ -28,6 +29,31 @@ struct MouseRay
 {
     glm::vec3 position;
     glm::vec3 direction;
+};
+
+enum class CueMode
+{
+    INVISIBLE, ROTATION, PUSHING
+};
+
+class CueTransform
+{
+public:
+    glm::mat4 getModelMatrix()
+    {
+        glm::mat4 model(1.0f);
+        model = glm::translate(model, glm::vec3(position.x, 0.16f, position.y)); // location
+        model = glm::rotate(model, rotation, glm::vec3(0, 1, 0)); // rotation
+        model = glm::translate(model, glm::vec3(0.0f, 0.0f, pushAmount)); // push model
+        model = glm::rotate(model, DEGTORAD(90.0f), glm::vec3(1, 0, 0));
+        model = glm::scale(model, glm::vec3(0.05f));
+        return model;
+    }
+public:
+    glm::vec2 position = glm::vec2(0);
+    float rotation = 0;
+    float pushAmount = 0;
+    CueMode mode = CueMode::ROTATION;
 };
 
 class Scene
@@ -56,7 +82,9 @@ private:
     // pool table physics simulator
     PoolTable table;
     // models
+    CueTransform cueTransform;
     model::AssetModel modelPoolTable;
+    model::AssetModel modelCue;
     model::Ball modelBall;
     // graphics
     commoncg::ShaderProgram shader;

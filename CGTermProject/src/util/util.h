@@ -30,3 +30,4 @@
 
 // table size is 2.84m x 1.42m, ball size is 0.06m
 const float BALL_RADIUS = 0.13f;
+const float MAX_CUE_POWER = 1.0f;

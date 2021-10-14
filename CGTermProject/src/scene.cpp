@@ -3,7 +3,6 @@
 #include <glm/gtx/quaternion.hpp>
 #include "scene.h"
 #include "gfx/texture.h"
-#include "util/util.h"
 #include "model/quad.h"
 #include "ui/button.h"
 
@@ -25,29 +24,9 @@ const model::Material BALL_MATERIAL =
     0, -1, -1, -1   // texIndex
 };
 
-// TODO (Debug) Test Beam Shader
-ShaderProgram beamShader;
-VAO beamVao;
-VBO beamVbo;
-
 
 void Scene::init()
 {
-    // TODO (Debug) Test Beam Shader
-    float initialVert[] = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
-    beamVao.create();
-    beamVbo.create();
-    beamVao.use();
-    beamVbo.buffer(SIZEOF(float, 6), initialVert, GL_DYNAMIC_DRAW);
-    beamVao.attr(0, 3, GL_FLOAT, SIZEOF(float, 3), 0);
-    VAO::unbind();
-    beamShader.addShader("res/shader/test.vert", GL_VERTEX_SHADER);
-    beamShader.addShader("res/shader/test.frag", GL_FRAGMENT_SHADER);
-    beamShader.load();
-    beamShader.use();
-    beamShader.setUniform("color", glm::vec3(1.0f, 0.0f, 0.0f));
-
-
     // initalize graphic variables
     brdfLUT.loadImage("res/texture/brdf.png");
     uboLight.create();
@@ -59,6 +38,7 @@ void Scene::init()
 
     // model
     modelPoolTable.loadModel("res/model/pooltable.gltf");
+    modelCue.loadModel("res/model/cue.gltf");
     modelBall.init(BALL_RADIUS);
 
     // shader
@@ -163,18 +143,19 @@ void Scene::render()
     shader.setUniform("model", model);
     modelPoolTable.draw();
 
+    // render cue
+    if (cueTransform.mode != CueMode::INVISIBLE)
+    {
+        cueTransform.position = table.getBalls()[0]->position;
+        shader.setUniform("model", cueTransform.getModelMatrix());
+        modelCue.draw();
+    }
+
     // skybox
     skybox.render(view.view);
 
     // gui
     ui.render();
-
-    // TODO (Debug) Beam rendering
-    beamShader.use();
-    beamVao.use();
-    glDrawArrays(GL_LINES, 0, 2);
-    VAO::unbind();
-    shader.use();
 }
 
 MouseRay Scene::calculateMouseRay(int mouseX, int mouseY)
@@ -197,8 +178,22 @@ MouseRay Scene::calculateMouseRay(int mouseX, int mouseY)
     return ray;
 }
 
+// TODO 게임 시작하면 mode를 rotation으로 설정하자
 void Scene::mouse(int button, int state, int x, int y)
 {
+    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN && ui.getCurrentScreen() == 2)
+    {
+        if (cueTransform.mode == CueMode::ROTATION)
+        {
+            cueTransform.mode = CueMode::PUSHING;
+        }
+        else if (cueTransform.mode == CueMode::PUSHING)
+        {
+            // TODO Cue Pushing!
+            cueTransform.mode = CueMode::ROTATION;
+            cueTransform.pushAmount = -BALL_RADIUS;
+        }
+    }
     ui.mouse(button, state, x, y);
 }
 
@@ -228,11 +223,28 @@ void Scene::mouseWheel(int button, int state, int x, int y)
 
 void Scene::mouseMove(int x, int y)
 {
+    if (ui.getCurrentScreen() == 2 && cueTransform.mode != CueMode::INVISIBLE)
+    {
+        MouseRay ray = calculateMouseRay(x, y);
+
+        // 바닥 면(y=yLevel=0)과 intersect되는 점을 calculate
+        const float yLevel = 0;
+        float t = (yLevel - ray.position.y) / ray.direction.y;
+        vec3 hit = ray.position + ray.direction * t;
+        vec2 diff = cueTransform.position - vec2(hit.x, hit.z);
+
+        if (cueTransform.mode == CueMode::ROTATION)
+        {
+            float angle = atan2(diff.y, diff.x);
+            cueTransform.rotation = -angle + DEGTORAD(90.0f);
+        }
+        else if (cueTransform.mode == CueMode::PUSHING)
+        {
+            vec2 cueVec(sin(cueTransform.rotation), cos(cueTransform.rotation));
+            float power = glm::dot(glm::normalize(cueVec), diff);
+            cueTransform.pushAmount = -clamp(power, BALL_RADIUS, MAX_CUE_POWER);
+        }
+    }
+
     ui.mouseMove(x, y);
-    MouseRay calc = calculateMouseRay(x, y);
-    glm::vec3 verts[] = { calc.position, calc.position + 1000.0f * calc.direction };
-    beamVao.use();
-    beamVbo.buffer(SIZEOF(float, 6), verts, GL_DYNAMIC_DRAW);
-    beamVbo.unbind();
-    VAO::unbind();
 }
