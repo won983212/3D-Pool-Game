@@ -2,13 +2,13 @@
 #include "../gfx/texture.h"
 #include "uielement.h"
 
-class Image : public UIElement
+class UEImage : public UIElement
 {
 public:
-	~Image();
+	~UEImage();
 	virtual bool render(std::vector<UIVertex>& vertices);
 	void setImage(const char* imagePath);
 	void packSize();
 private:
-	 commoncg::Texture* texture = nullptr;
+	commoncg::Texture* texture = nullptr;
 };

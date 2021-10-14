@@ -2,7 +2,7 @@
 #include "uiscreen.h"
 #include "button.h"
 
-bool Button::render(std::vector<UIVertex>& vertices)
+bool UEButton::render(std::vector<UIVertex>& vertices)
 {
 	const float x2 = x + width;
 	const float y2 = y + height;
@@ -17,19 +17,19 @@ bool Button::render(std::vector<UIVertex>& vertices)
 	return false;
 }
 
-void Button::postRender()
+void UEButton::postRender()
 {
 	FontRenderer* fontRenderer = UIScreen::getFontRenderer();
 	fontRenderer->renderText(text, x + width / 2.0f, y + height / 2.0f, 0xffffffff, (height * textScale) / FONT_HEIGHT, true);
 }
 
-void Button::onMouse(int button, int state, int x, int y)
+void UEButton::onMouse(int button, int state, int x, int y)
 {
 	if (hover && parent && id != -1 && state == GLUT_DOWN)
 		parent->onButtonClick(id);
 }
 
-void Button::onMouseMove(int x, int y)
+void UEButton::onMouseMove(int x, int y)
 {
 	if (x > this->x && y > this->y)
 	{
@@ -42,12 +42,12 @@ void Button::onMouseMove(int x, int y)
 	hover = false;
 }
 
-void Button::setText(std::wstring text)
+void UEButton::setText(std::wstring text)
 {
 	this->text = text;
 }
 
-void Button::setTextScale(float scale)
+void UEButton::setTextScale(float scale)
 {
 	this->textScale = scale;
 }

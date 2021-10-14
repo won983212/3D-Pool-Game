@@ -4,7 +4,7 @@
 #include "gfx/vbo.h"
 #include "gfx/camera.h"
 #include "gfx/skybox.h"
-#include "ui/screenmenu.h"
+#include "screenmenu.h"
 #include "model/assetmodel.h"
 #include "model/ball.h"
 #include "pooltable.h"

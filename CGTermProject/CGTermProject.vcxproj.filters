@@ -72,7 +72,7 @@
     <ClInclude Include="src\ui\uielement.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="src\ui\screenmenu.h">
+    <ClInclude Include="src\screenmenu.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="src\ui\font.h">
@@ -82,6 +82,9 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="src\ui\label.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\rectangle.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
@@ -137,7 +140,7 @@
     <ClCompile Include="src\ui\uielement.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="src\ui\screenmenu.cpp">
+    <ClCompile Include="src\screenmenu.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="src\ui\font.cpp">
@@ -147,6 +150,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="src\ui\label.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ui\rectangle.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
@@ -171,6 +177,7 @@
     <None Include="res\model\pooltable.gltf" />
     <None Include="res\shader\gui.vert" />
     <None Include="res\shader\gui.frag" />
+    <None Include="freetype.dll" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\texture\container.jpg">
@@ -280,5 +287,8 @@
   </ItemGroup>
   <ItemGroup>
     <Font Include="res\font.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="freetype.lib" />
   </ItemGroup>
 </Project>

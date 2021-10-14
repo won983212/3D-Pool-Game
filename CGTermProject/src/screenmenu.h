@@ -1,5 +1,5 @@
 #pragma once
-#include "uiscreen.h"
+#include "ui/uiscreen.h"
 
 class ScreenMenu : public UIScreen
 {

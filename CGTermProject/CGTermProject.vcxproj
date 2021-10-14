@@ -170,7 +170,8 @@
     <ClInclude Include="src\ui\font.h" />
     <ClInclude Include="src\ui\image.h" />
     <ClInclude Include="src\ui\label.h" />
-    <ClInclude Include="src\ui\screenmenu.h" />
+    <ClInclude Include="src\screenmenu.h" />
+    <ClInclude Include="src\ui\rectangle.h" />
     <ClInclude Include="src\ui\uielement.h" />
     <ClInclude Include="src\ui\uiscreen.h" />
     <ClInclude Include="src\util\util.h" />
@@ -194,13 +195,15 @@
     <ClCompile Include="src\ui\font.cpp" />
     <ClCompile Include="src\ui\image.cpp" />
     <ClCompile Include="src\ui\label.cpp" />
-    <ClCompile Include="src\ui\screenmenu.cpp" />
+    <ClCompile Include="src\screenmenu.cpp" />
+    <ClCompile Include="src\ui\rectangle.cpp" />
     <ClCompile Include="src\ui\uielement.cpp" />
     <ClCompile Include="src\ui\uiscreen.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp-vc142-mtd.dll" />
     <None Include="freeglut.dll" />
+    <None Include="freetype.dll" />
     <None Include="glew32.dll" />
     <None Include="res\model\pooltable.bin" />
     <None Include="res\model\pooltable.gltf" />
@@ -258,6 +261,9 @@
   </ItemGroup>
   <ItemGroup>
     <Font Include="res\font.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="freetype.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

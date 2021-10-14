@@ -2,7 +2,7 @@
 #include <string>
 #include "uielement.h"
 
-class Button : public UIElement
+class UEButton : public UIElement
 {
 public:
 	virtual bool render(std::vector<UIVertex>& vertices);
@@ -14,5 +14,5 @@ public:
 private:
 	std::wstring text;
 	bool hover = false;
-	float textScale = 0.6f;
+	float textScale = 0.5f;
 };
