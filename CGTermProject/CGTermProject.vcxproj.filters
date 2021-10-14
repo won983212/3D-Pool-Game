@@ -178,6 +178,8 @@
     <None Include="res\shader\gui.vert" />
     <None Include="res\shader\gui.frag" />
     <None Include="freetype.dll" />
+    <None Include="res\shader\test.vert" />
+    <None Include="res\shader\test.frag" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\texture\container.jpg">

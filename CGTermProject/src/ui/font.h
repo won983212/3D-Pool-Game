@@ -7,7 +7,7 @@
 #include "../gfx/vao.h"
 #include "../gfx/shader.h"
 
-#define FONT_HEIGHT 56
+#define FONT_HEIGHT 40
 
 struct Glyph
 {

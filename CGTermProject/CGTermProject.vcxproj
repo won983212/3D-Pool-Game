@@ -217,6 +217,8 @@
     <None Include="res\shader\pbr.vert" />
     <None Include="res\shader\skybox.frag" />
     <None Include="res\shader\skybox.vert" />
+    <None Include="res\shader\test.frag" />
+    <None Include="res\shader\test.vert" />
     <None Include="res\texture\skybox\skybox.hdr" />
   </ItemGroup>
   <ItemGroup>

@@ -10,6 +10,12 @@
 using namespace glm;
 using namespace commoncg;
 
+
+const float PRJ_FOV = DEGTORAD(45.0f);
+const float PRJ_ASPECT = (float)SCREEN_WIDTH / SCREEN_HEIGHT;
+const float PRJ_NEAR = 0.1f;
+const float PRJ_FAR = 100.0f;
+
 const model::Material BALL_MATERIAL = 
 {
     glm::vec4(1.0f, 1.0f, 0.0f, 1.0f),  // albedo
@@ -19,8 +25,29 @@ const model::Material BALL_MATERIAL =
     0, -1, -1, -1   // texIndex
 };
 
+// TODO (Debug) Test Beam Shader
+ShaderProgram beamShader;
+VAO beamVao;
+VBO beamVbo;
+
+
 void Scene::init()
 {
+    // TODO (Debug) Test Beam Shader
+    float initialVert[] = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
+    beamVao.create();
+    beamVbo.create();
+    beamVao.use();
+    beamVbo.buffer(SIZEOF(float, 6), initialVert, GL_DYNAMIC_DRAW);
+    beamVao.attr(0, 3, GL_FLOAT, SIZEOF(float, 3), 0);
+    VAO::unbind();
+    beamShader.addShader("res/shader/test.vert", GL_VERTEX_SHADER);
+    beamShader.addShader("res/shader/test.frag", GL_FRAGMENT_SHADER);
+    beamShader.load();
+    beamShader.use();
+    beamShader.setUniform("color", glm::vec3(1.0f, 0.0f, 0.0f));
+
+
     // initalize graphic variables
     brdfLUT.loadImage("res/texture/brdf.png");
     uboLight.create();
@@ -74,7 +101,7 @@ void Scene::init()
 
     // camera (view)
     cam.getViewMatrix(&view.view);
-    view.projection = perspective(DEGTORAD(45.0f), (float)SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 100.0f);
+    view.projection = perspective(PRJ_FOV, PRJ_ASPECT, PRJ_NEAR, PRJ_FAR);
     updateView();
 }
 
@@ -98,6 +125,7 @@ void Scene::updateView()
     uboView.unbind();
 }
 
+// TODO Back plane이 material적용 없이 rendering됨
 void Scene::render()
 {
     // update only when cam has changed.
@@ -140,6 +168,33 @@ void Scene::render()
 
     // gui
     ui.render();
+
+    // TODO (Debug) Beam rendering
+    beamShader.use();
+    beamVao.use();
+    glDrawArrays(GL_LINES, 0, 2);
+    VAO::unbind();
+    shader.use();
+}
+
+MouseRay Scene::calculateMouseRay(int mouseX, int mouseY)
+{
+    MouseRay ray;
+
+    float sx = mouseX * 2.0f / SCREEN_WIDTH - 1.0f;
+    float sy = mouseY * 2.0f / SCREEN_HEIGHT - 1.0f;
+    float halfHeight = tan(PRJ_FOV / 2) * PRJ_NEAR;
+
+    sx *= PRJ_ASPECT * halfHeight;
+    sy *= halfHeight;
+
+    ray.position = glm::vec3(cam.getEyePosition());
+    ray.direction = -cam.getUp() * sy + cam.getRight() * sx;
+
+    ray.position = ray.position + ray.direction;
+    ray.direction += glm::normalize(cam.getFront()) * PRJ_NEAR;
+
+    return ray;
 }
 
 void Scene::mouse(int button, int state, int x, int y)
@@ -147,9 +202,9 @@ void Scene::mouse(int button, int state, int x, int y)
     ui.mouse(button, state, x, y);
 }
 
-void Scene::mouseDrag(int x, int y, int dx, int dy)
+void Scene::mouseDrag(int button, int x, int y, int dx, int dy)
 {
-    if (ui.getCurrentScreen() == 2)
+    if (button == GLUT_RIGHT_BUTTON && ui.getCurrentScreen() == 2)
     {
         cam.yaw += dx / 8.0f;
         cam.pitch += dy / 8.0f;
@@ -174,4 +229,10 @@ void Scene::mouseWheel(int button, int state, int x, int y)
 void Scene::mouseMove(int x, int y)
 {
     ui.mouseMove(x, y);
+    MouseRay calc = calculateMouseRay(x, y);
+    glm::vec3 verts[] = { calc.position, calc.position + 1000.0f * calc.direction };
+    beamVao.use();
+    beamVbo.buffer(SIZEOF(float, 6), verts, GL_DYNAMIC_DRAW);
+    beamVbo.unbind();
+    VAO::unbind();
 }

@@ -24,6 +24,12 @@ struct ViewMatrixData
     glm::mat4 projection;
 };
 
+struct MouseRay
+{
+    glm::vec3 position;
+    glm::vec3 direction;
+};
+
 class Scene
 {
 public:
@@ -35,10 +41,11 @@ public:
     void mouse(int button, int state, int x, int y);
     void mouseWheel(int button, int state, int x, int y);
     void mouseMove(int x, int y);
-    void mouseDrag(int x, int y, int dx, int dy);
+    void mouseDrag(int button, int x, int y, int dx, int dy);
 private:
     void updateLight();
     void updateView();
+    MouseRay calculateMouseRay(int mouseX, int mouseY);
 private:
     // light
     LightData lights[3];

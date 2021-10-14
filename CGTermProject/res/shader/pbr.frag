@@ -57,8 +57,8 @@ vec3 calculateNormal()
 		return N;
 
     vec3 tangentNorm = texture(texture_normal, texCoord).xyz * 2.0 - 1.0;
-    vec3 T  = normalize(dFdx(worldPos) * dFdx(texCoord).t - dFdy(worldPos) * dFdy(texCoord).t);
-    vec3 B  = -normalize(cross(N, T));
+    vec3 T = normalize(dFdx(worldPos) * dFdx(texCoord).t - dFdy(worldPos) * dFdy(texCoord).t);
+    vec3 B = -normalize(cross(N, T));
     mat3 TBN = mat3(T, B, N);
 
 	// normal space -> tangent space (actual normal direction)

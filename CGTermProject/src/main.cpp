@@ -6,7 +6,8 @@
 using namespace commoncg;
 
 Scene scene;
-glm::vec2 lastMouse(0, 0);
+int lastClick = 0;
+glm::vec2 lastMouse[3]; // left, middle, right mouse
 Window wnd;
 
 void init()
@@ -16,6 +17,9 @@ void init()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    for (int i = 0; i < 3; i++)
+        lastMouse[i] = {0, 0};
 }
 
 void render()
@@ -32,18 +36,18 @@ void reshape(int w, int h)
 void drag(int x, int y)
 {
     glm::vec2 mouse = glm::vec2(x, y);
-    glm::vec2 delta = mouse - lastMouse;
-    scene.mouseDrag(x, y, delta.x, delta.y);
-    lastMouse.x = x;
-    lastMouse.y = y;
+    glm::vec2 delta = mouse - lastMouse[lastClick];
+    scene.mouseDrag(lastClick, x, y, delta.x, delta.y);
+    lastMouse[lastClick] = { x, y };
 }
 
 void mouse(int button, int state, int x, int y)
 {
-    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+    if (state == GLUT_DOWN)
     {
-        lastMouse.x = x;
-        lastMouse.y = y;
+        lastClick = button;
+        lastMouse[button].x = x;
+        lastMouse[button].y = y;
     }
     scene.mouse(button, state, x, y);
 }

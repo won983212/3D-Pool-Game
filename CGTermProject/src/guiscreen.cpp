@@ -48,7 +48,7 @@ void GUIScreen::screenInit()
 	add(btn, 0);
 
 
-	// about screen
+	// TODO howtoplay screen
 	// background panel
 	add(rect, 1);
 
@@ -65,6 +65,7 @@ void GUIScreen::screenInit()
 	fpsLabel = new Label();
 	fpsLabel->setLocation(10, 25);
 	fpsLabel->setTextPoint(24);
+	fpsLabel->setShadowColor(0xff000000);
 	fpsLabel->setText(L"FPS: 60");
 	add(fpsLabel, 2);
 }
