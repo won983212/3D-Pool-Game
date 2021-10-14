@@ -1,10 +1,14 @@
 #include <iostream>
 #include <stdlib.h>
+#include <time.h>
 #include "guiscreen.h"
 #include "ui/rectangle.h"
 #include "ui/button.h"
 #include "ui/image.h"
 #include "util/util.h"
+
+const clock_t MESSAGE_DURATION = 3 * CLOCKS_PER_SEC;
+
 
 void GUIScreen::screenInit()
 {
@@ -33,18 +37,21 @@ void GUIScreen::screenInit()
 	btn->id = 0;
 	btn->setBounds(btnX, btnYBase, 300, 50);
 	btn->setText(L"게임 시작");
+	btn->setButtonEvent(this);
 	add(btn, 0);
 
 	btn = new UEButton();
 	btn->id = 1;
 	btn->setBounds(btnX, btnYBase + 80, 300, 50);
 	btn->setText(L"게임 방법");
+	btn->setButtonEvent(this);
 	add(btn, 0);
 
 	btn = new UEButton();
 	btn->id = 2;
 	btn->setBounds(btnX, btnYBase + 160, 300, 50);
 	btn->setText(L"종료");
+	btn->setButtonEvent(this);
 	add(btn, 0);
 
 
@@ -57,6 +64,7 @@ void GUIScreen::screenInit()
 	btn->id = 3;
 	btn->setBounds(btnX, btnYBase, 300, 50);
 	btn->setText(L"Back");
+	btn->setButtonEvent(this);
 	add(btn, 1);
 
 
@@ -68,6 +76,31 @@ void GUIScreen::screenInit()
 	fpsLabel->setShadowColor(0xff000000);
 	fpsLabel->setText(L"FPS: 60");
 	add(fpsLabel, 2);
+
+	messageLabel = new Label();
+	messageLabel->setLocation(SCREEN_WIDTH / 2, 50);
+	messageLabel->setTextPoint(36);
+	messageLabel->setShadowColor(0xff000000);
+	messageLabel->setColor(0xffffffff);
+	messageLabel->setUseCentered(true);
+	messageLabel->setVisible(false);
+	messageLabel->setText(L"");
+	add(messageLabel, 2);
+}
+
+void GUIScreen::showMessage(std::wstring message)
+{
+	messageLabel->setText(message);
+	lastMessageTick = clock();
+}
+
+void GUIScreen::onRenderTick()
+{
+	if (lastMessageTick != 0)
+	{
+		clock_t t = clock();
+		messageLabel->setVisible(t - lastMessageTick < MESSAGE_DURATION);
+	}
 }
 
 void GUIScreen::onButtonClick(int id)

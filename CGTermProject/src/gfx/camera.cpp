@@ -30,7 +30,7 @@ glm::vec3 Camera::getUp() const
 
 glm::vec3 Camera::getEyePosition() const
 {
-	return eye * zoom;
+	return eye;
 }
 
 void Camera::update()
@@ -47,14 +47,15 @@ void Camera::update()
 	eye.x = cos(DEGTORAD(yaw)) * cos(DEGTORAD(pitch));
 	eye.y = sin(DEGTORAD(pitch));
 	eye.z = sin(DEGTORAD(yaw)) * cos(DEGTORAD(pitch));
-	eye = glm::normalize(eye);
+	eye *= zoom;
 
 	// get front, right, up
-	front = -eye;
+	front = -glm::normalize(eye);
 	right = glm::normalize(glm::cross(front, worldUp));
 	up = glm::normalize(glm::cross(right, front));
 
 	// get view matrix
-	view = glm::lookAt(eye * zoom, center, up);
+	eye += center;
+	view = glm::lookAt(eye, center, up);
 	dirty = true;
 }

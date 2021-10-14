@@ -91,16 +91,21 @@ void UIScreen::render()
 	std::vector<UIVertex> vertices;
 	for (unsigned int i = 0; i < elements[index].size(); i++)
 	{
+		UIElement* element = elements[index][i];
+		if (!element->visible)
+			continue;
+
 		vertices.clear();
-		uiShader.setUniform("useTexture", elements[index][i]->render(vertices));
+		uiShader.setUniform("useTexture", element->render(vertices));
 		if (!vertices.empty())
 		{
 			vao.use();
 			vbo.buffer(vertices.size() * sizeof(UIVertex), &vertices[0]);
 			glDrawArrays(GL_TRIANGLES, 0, vertices.size());
 		}
-		elements[index][i]->postRender();
+		element->postRender();
 	}
+	onRenderTick();
 
 	vbo.unbind();
 	VAO::unbind();

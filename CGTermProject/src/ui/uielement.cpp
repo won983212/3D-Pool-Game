@@ -18,6 +18,11 @@ void UIElement::setSize(float width, float height)
 	this->height = height;
 }
 
+void UIElement::setVisible(bool visible)
+{
+	this->visible = visible;
+}
+
 UIVertex UIElement::makeVertex(float x, float y, int color, float u, float v)
 {
 	float a = ((color >> 24) & 0xff) / 255.0f;

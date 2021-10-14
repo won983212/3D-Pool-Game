@@ -50,6 +50,7 @@ void PoolTable::update(float partialTime) const
 			float penetration_sq = 4 * BALL_RADIUS * BALL_RADIUS - (dx * dx + dy * dy);
 			if (penetration_sq > 0)
 			{
+				// TODO Play hit balls sound
 				// apply impulse
 				glm::vec2 jNorm = glm::normalize(balls[j]->position - balls[i]->position);
 				glm::vec2 impulse = glm::dot(balls[j]->velocity - balls[i]->velocity, jNorm) * jNorm;

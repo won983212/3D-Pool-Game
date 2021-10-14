@@ -27,7 +27,8 @@ bool UEButton::onMouse(int button, int state, int x, int y)
 {
 	if (hover && parent && id != -1 && state == GLUT_DOWN)
 	{
-		parent->onButtonClick(id);
+		if(this->ev != nullptr)
+			this->ev->onButtonClick(id);
 		return true;
 	}
 	return false;
@@ -54,4 +55,9 @@ void UEButton::setText(std::wstring text)
 void UEButton::setTextScale(float scale)
 {
 	this->textScale = scale;
+}
+
+void UEButton::setButtonEvent(IButtonEvent* e)
+{
+	this->ev = e;
 }

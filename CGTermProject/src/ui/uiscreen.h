@@ -18,7 +18,7 @@ public:
 	void setScreen(int index);
 	int getCurrentScreen();
 	virtual void screenInit() {};
-	virtual void onButtonClick(int id) {};
+	virtual void onRenderTick() {};
 	static FontRenderer* getFontRenderer();
 protected:
 	void add(UIElement* element, int screenIdx);

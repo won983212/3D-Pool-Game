@@ -41,19 +41,24 @@ class CueTransform
 public:
     glm::mat4 getModelMatrix()
     {
-        glm::mat4 model(1.0f);
-        model = glm::translate(model, glm::vec3(position.x, 0.16f, position.y)); // location
-        model = glm::rotate(model, rotation, glm::vec3(0, 1, 0)); // rotation
-        model = glm::translate(model, glm::vec3(0.0f, 0.0f, pushAmount)); // push model
-        model = glm::rotate(model, DEGTORAD(90.0f), glm::vec3(1, 0, 0));
-        model = glm::scale(model, glm::vec3(0.05f));
-        return model;
+        return modelMat;
+    }
+    void update()
+    {
+        modelMat = glm::mat4(1.0f);
+        modelMat = glm::translate(modelMat, glm::vec3(position.x, 0.16f, position.y)); // location
+        modelMat = glm::rotate(modelMat, rotation, glm::vec3(0, 1, 0)); // rotation
+        modelMat = glm::translate(modelMat, glm::vec3(0.0f, 0.0f, pushAmount)); // push model
+        modelMat = glm::rotate(modelMat, DEGTORAD(90.0f), glm::vec3(1, 0, 0));
+        modelMat = glm::scale(modelMat, glm::vec3(0.05f));
     }
 public:
     glm::vec2 position = glm::vec2(0);
     float rotation = 0;
     float pushAmount = 0;
     CueMode mode = CueMode::ROTATION;
+private:
+    glm::mat4 modelMat = glm::mat4(1.0f);
 };
 
 class Scene
@@ -72,7 +77,10 @@ private:
     void updateLight();
     void updateView();
     MouseRay calculateMouseRay(int mouseX, int mouseY);
+    void hitWhiteBall();
 private:
+    // camera ball view
+    bool isBallView = false;
     // light
     LightData lights[3];
     commoncg::VBO uboLight;

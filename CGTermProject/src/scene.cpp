@@ -87,6 +87,21 @@ void Scene::init()
 
 void Scene::update(float partialTime, int fps)
 {
+    if (isBallView)
+    {
+        vec2 pos = table.getBalls()[0]->position;
+        if (pos.x != cam.center.x || pos.y != cam.center.z)
+        {
+            cam.center = vec3(pos.x, BALL_RADIUS / 2, pos.y);
+            cam.update();
+        }
+    }
+    else if (cam.center != vec3(0.0f))
+    {
+        cam.center = vec3(0.0f);
+        cam.update();
+    }
+
     table.update(partialTime);
     ui.fpsLabel->setText(std::wstring(L"FPS: ") + std::to_wstring(fps));
 }
@@ -146,7 +161,12 @@ void Scene::render()
     // render cue
     if (cueTransform.mode != CueMode::INVISIBLE)
     {
-        cueTransform.position = table.getBalls()[0]->position;
+        vec2 whiteBallPos = table.getBalls()[0]->position;
+        if (cueTransform.position != whiteBallPos)
+        {
+            cueTransform.position = whiteBallPos;
+            cueTransform.update();
+        }
         shader.setUniform("model", cueTransform.getModelMatrix());
         modelCue.draw();
     }
@@ -162,10 +182,11 @@ MouseRay Scene::calculateMouseRay(int mouseX, int mouseY)
 {
     MouseRay ray;
 
-    float sx = mouseX * 2.0f / SCREEN_WIDTH - 1.0f;
-    float sy = mouseY * 2.0f / SCREEN_HEIGHT - 1.0f;
-    float halfHeight = tan(PRJ_FOV / 2) * PRJ_NEAR;
+    float sx = mouseX * 2.0f / SCREEN_WIDTH - 1.0f; // to -1 ~ 1
+    float sy = mouseY * 2.0f / SCREEN_HEIGHT - 1.0f; // to -1 ~ 1
+    float halfHeight = tan(PRJ_FOV / 2) * PRJ_NEAR; // near rectangle height/2
 
+    // fits to near rectangle
     sx *= PRJ_ASPECT * halfHeight;
     sy *= halfHeight;
 
@@ -174,24 +195,41 @@ MouseRay Scene::calculateMouseRay(int mouseX, int mouseY)
 
     ray.position = ray.position + ray.direction;
     ray.direction += glm::normalize(cam.getFront()) * PRJ_NEAR;
+    ray.direction = glm::normalize(ray.direction);
 
     return ray;
+}
+
+void Scene::hitWhiteBall()
+{
+    Ball* ball = table.getBalls()[0];
+    // TODO Play hit cue sound
+
 }
 
 // TODO 게임 시작하면 mode를 rotation으로 설정하자
 void Scene::mouse(int button, int state, int x, int y)
 {
-    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN && ui.getCurrentScreen() == 2)
+    if (state == GLUT_DOWN)
     {
-        if (cueTransform.mode == CueMode::ROTATION)
+        if (button == GLUT_LEFT_BUTTON && ui.getCurrentScreen() == 2)
         {
-            cueTransform.mode = CueMode::PUSHING;
+            if (cueTransform.mode == CueMode::ROTATION)
+            {
+                cueTransform.mode = CueMode::PUSHING;
+            }
+            else if (cueTransform.mode == CueMode::PUSHING)
+            {
+                // TODO Cue Pushing!
+                cueTransform.mode = CueMode::INVISIBLE;
+                cueTransform.pushAmount = -BALL_RADIUS;
+                cueTransform.update();
+            }
         }
-        else if (cueTransform.mode == CueMode::PUSHING)
+        else if (button == GLUT_MIDDLE_BUTTON)
         {
-            // TODO Cue Pushing!
-            cueTransform.mode = CueMode::ROTATION;
-            cueTransform.pushAmount = -BALL_RADIUS;
+            isBallView = !isBallView;
+            ui.showMessage(isBallView ? L"공을 중심으로 보기" : L"테이블을 중심으로 보기");
         }
     }
     ui.mouse(button, state, x, y);
@@ -227,8 +265,9 @@ void Scene::mouseMove(int x, int y)
     {
         MouseRay ray = calculateMouseRay(x, y);
 
-        // 바닥 면(y=yLevel=0)과 intersect되는 점을 calculate
-        const float yLevel = 0;
+        // 바닥 면(y=yLevel=0.16f)과 intersect되는 점을 calculate
+        // pos + dir * t = 0.16f(y) 인 t를 찾으면 된다.
+        const float yLevel = 0.16f;
         float t = (yLevel - ray.position.y) / ray.direction.y;
         vec3 hit = ray.position + ray.direction * t;
         vec2 diff = cueTransform.position - vec2(hit.x, hit.z);
@@ -244,6 +283,7 @@ void Scene::mouseMove(int x, int y)
             float power = glm::dot(glm::normalize(cueVec), diff);
             cueTransform.pushAmount = -clamp(power, BALL_RADIUS, MAX_CUE_POWER);
         }
+        cueTransform.update();
     }
 
     ui.mouseMove(x, y);
