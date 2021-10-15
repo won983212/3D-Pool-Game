@@ -1,6 +1,11 @@
 #include <iostream>
+#include <string>
 #include "pooltable.h"
 #include "util/util.h"
+#include "util/sound.h"
+
+
+const float FRICTION_MODIFIER = 0.99f;
 
 
 PoolTable::PoolTable(glm::vec2 size)
@@ -26,7 +31,12 @@ void PoolTable::update(float partialTime) const
 		// update velocity
 		float vel = glm::length(ball->velocity);
 		if (vel > 0)
-			ball->velocity *= 0.99; // friction
+			ball->velocity *= FRICTION_MODIFIER; // friction
+		if (vel * FRICTION_MODIFIER < 0.005)
+		{
+			ball->velocity = glm::vec2(0.0f);
+			vel = 0;
+		}
 
 		// update position
 		ball->position += partialTime * ball->velocity;
@@ -50,10 +60,10 @@ void PoolTable::update(float partialTime) const
 			float penetration_sq = 4 * BALL_RADIUS * BALL_RADIUS - (dx * dx + dy * dy);
 			if (penetration_sq > 0)
 			{
-				// TODO Play hit balls sound
 				// apply impulse
 				glm::vec2 jNorm = glm::normalize(balls[j]->position - balls[i]->position);
-				glm::vec2 impulse = glm::dot(balls[j]->velocity - balls[i]->velocity, jNorm) * jNorm;
+				float power = glm::dot(balls[j]->velocity - balls[i]->velocity, jNorm);
+				glm::vec2 impulse = power * jNorm;
 				balls[i]->velocity += impulse;
 				balls[j]->velocity -= impulse;
 
@@ -61,6 +71,13 @@ void PoolTable::update(float partialTime) const
 				float penetration = 2 * BALL_RADIUS - sqrt(dx * dx + dy * dy);
 				balls[i]->position += penetration / 2 * -jNorm;
 				balls[j]->position += penetration / 2 * jNorm;
+
+				// play sound
+				power = std::abs(power);
+				int powerLevel = static_cast<int>(power / 2.0f);
+				irrklang::ISound* sound = getSoundEngine()->play2D(("res/sound/ball_" + std::to_string(std::min(powerLevel, 2)) + ".wav").c_str(), false, false, true);
+				sound->setVolume(glm::clamp((power - powerLevel * 2.0f), 0.3f, 1.0f));
+				sound->drop();
 			}
 		}
 

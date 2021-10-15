@@ -5,11 +5,14 @@
 #include "gfx/texture.h"
 #include "model/quad.h"
 #include "ui/button.h"
+#include "util/sound.h"
 
 using namespace glm;
 using namespace commoncg;
 
 
+const float MAX_CUE_POWER = 1.0f;
+const float CUE_POWER_MODIFIER = 12.0f;
 const float PRJ_FOV = DEGTORAD(45.0f);
 const float PRJ_ASPECT = (float)SCREEN_WIDTH / SCREEN_HEIGHT;
 const float PRJ_NEAR = 0.1f;
@@ -203,33 +206,37 @@ MouseRay Scene::calculateMouseRay(int mouseX, int mouseY)
 void Scene::hitWhiteBall()
 {
     Ball* ball = table.getBalls()[0];
-    // TODO Play hit cue sound
+    float power = -(cueTransform.pushAmount + BALL_RADIUS);
+    int powerLevel = power > MAX_CUE_POWER * 0.5f;
 
+    getSoundEngine()->play2D(("res/sound/cue_" + std::to_string(powerLevel) + ".wav").c_str());
+    ball->velocity = power * CUE_POWER_MODIFIER * cueTransform.getCueDirection();
+}
+
+void Scene::keyboard(unsigned char key, int x, int y)
+{
+    if (key == ' ')
+    {
+        isBallView = !isBallView;
+        ui.showMessage(isBallView ? L"공을 중심으로 보기" : L"테이블을 중심으로 보기");
+    }
 }
 
 // TODO 게임 시작하면 mode를 rotation으로 설정하자
 void Scene::mouse(int button, int state, int x, int y)
 {
-    if (state == GLUT_DOWN)
+    if (state == GLUT_DOWN && button == GLUT_LEFT_BUTTON && ui.getCurrentScreen() == 2)
     {
-        if (button == GLUT_LEFT_BUTTON && ui.getCurrentScreen() == 2)
+        if (cueTransform.mode == CueMode::ROTATION)
         {
-            if (cueTransform.mode == CueMode::ROTATION)
-            {
-                cueTransform.mode = CueMode::PUSHING;
-            }
-            else if (cueTransform.mode == CueMode::PUSHING)
-            {
-                // TODO Cue Pushing!
-                cueTransform.mode = CueMode::INVISIBLE;
-                cueTransform.pushAmount = -BALL_RADIUS;
-                cueTransform.update();
-            }
+            cueTransform.mode = CueMode::PUSHING;
         }
-        else if (button == GLUT_MIDDLE_BUTTON)
+        else if (cueTransform.mode == CueMode::PUSHING)
         {
-            isBallView = !isBallView;
-            ui.showMessage(isBallView ? L"공을 중심으로 보기" : L"테이블을 중심으로 보기");
+            hitWhiteBall();
+            cueTransform.mode = CueMode::ROTATION;
+            cueTransform.pushAmount = -BALL_RADIUS;
+            cueTransform.update();
         }
     }
     ui.mouse(button, state, x, y);
@@ -279,9 +286,8 @@ void Scene::mouseMove(int x, int y)
         }
         else if (cueTransform.mode == CueMode::PUSHING)
         {
-            vec2 cueVec(sin(cueTransform.rotation), cos(cueTransform.rotation));
-            float power = glm::dot(glm::normalize(cueVec), diff);
-            cueTransform.pushAmount = -clamp(power, BALL_RADIUS, MAX_CUE_POWER);
+            float power = glm::dot(cueTransform.getCueDirection(), diff);
+            cueTransform.pushAmount = -clamp(power, BALL_RADIUS, MAX_CUE_POWER + BALL_RADIUS);
         }
         cueTransform.update();
     }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <irrklang/irrKlang.h>
 #include "gfx/gfx.h"
 #include "gfx/vbo.h"
 #include "gfx/camera.h"
@@ -52,6 +53,10 @@ public:
         modelMat = glm::rotate(modelMat, DEGTORAD(90.0f), glm::vec3(1, 0, 0));
         modelMat = glm::scale(modelMat, glm::vec3(0.05f));
     }
+    glm::vec2 getCueDirection()
+    {
+        return glm::vec2(sin(rotation), cos(rotation));
+    }
 public:
     glm::vec2 position = glm::vec2(0);
     float rotation = 0;
@@ -73,6 +78,7 @@ public:
     void mouseWheel(int button, int state, int x, int y);
     void mouseMove(int x, int y);
     void mouseDrag(int button, int x, int y, int dx, int dy);
+    void keyboard(unsigned char key, int x, int y);
 private:
     void updateLight();
     void updateView();

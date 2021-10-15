@@ -2,6 +2,7 @@
 #include <math.h>
 #include "gfx/window.h"
 #include "scene.h"
+#include "util/sound.h"
 
 using namespace commoncg;
 
@@ -12,6 +13,23 @@ Window wnd;
 
 void init()
 {
+    // TODO (Debug) Turn on BGM
+    // initialize sound engine, play bgm
+    getSoundEngine();
+    /*irrklang::ISound* sound = getSoundEngine()->play2D("res/sound/bgm.wav", true, false, true);
+    if (!sound)
+    {
+        std::cout << "Warning: Can't play BGM" << std::endl;
+    }
+    else
+    {
+        sound->setVolume(0.2f);
+        sound->drop();
+    }*/
+
+    // initialize font
+    UIScreen::getFontRenderer();
+
     scene.init();
 	glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
     glEnable(GL_DEPTH_TEST);
@@ -62,6 +80,11 @@ void wheel(int button, int state, int x, int y)
     scene.mouseWheel(button, state, x, y);
 }
 
+void keyboard(unsigned char key, int x, int y)
+{
+    scene.keyboard(key, x, y);
+}
+
 void update(float partialTime)
 {
     scene.update(partialTime, wnd.getFPS());
@@ -73,10 +96,12 @@ int main(int argc, char* argv[])
 	wnd.create(init, render, true);
     wnd.setMouseDragFunc(drag);
     wnd.setMouseFunc(mouse);
+    wnd.setKeyboardFunc(keyboard);
     wnd.setMouseMotionFunc(mousemove);
     wnd.setMouseWheelFunc(wheel);
     wnd.setReshapeFunc(reshape);
     wnd.setIdleFunc(update);
 	wnd.loop();
+    destroySoundEngine();
 	return 0;
 }

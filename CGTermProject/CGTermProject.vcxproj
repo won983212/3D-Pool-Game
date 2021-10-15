@@ -128,7 +128,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>../Linking/lib/x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>freeglut.lib;glew32.lib;glew32s.lib;assimp.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>freeglut.lib;glew32.lib;glew32s.lib;assimp.lib;freetype.lib;irrKlang.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -147,7 +147,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>../Linking/lib/x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>freeglut.lib;glew32.lib;glew32s.lib;assimp.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>freeglut.lib;glew32.lib;glew32s.lib;assimp.lib;freetype.lib;irrKlang.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -175,6 +175,7 @@
     <ClInclude Include="src\ui\rectangle.h" />
     <ClInclude Include="src\ui\uielement.h" />
     <ClInclude Include="src\ui\uiscreen.h" />
+    <ClInclude Include="src\util\sound.h" />
     <ClInclude Include="src\util\util.h" />
   </ItemGroup>
   <ItemGroup>
@@ -200,6 +201,7 @@
     <ClCompile Include="src\ui\rectangle.cpp" />
     <ClCompile Include="src\ui\uielement.cpp" />
     <ClCompile Include="src\ui\uiscreen.cpp" />
+    <ClCompile Include="src\util\sound.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp-vc142-mtd.dll" />
@@ -258,18 +260,18 @@
     <Image Include="res\texture\title.png" />
   </ItemGroup>
   <ItemGroup>
-    <Media Include="res\sound\bgm.mp3" />
-    <Media Include="res\sound\강.wav" />
-    <Media Include="res\sound\강하게.wav" />
-    <Media Include="res\sound\약.wav" />
-    <Media Include="res\sound\약하게.wav" />
-    <Media Include="res\sound\중.wav" />
-  </ItemGroup>
-  <ItemGroup>
     <Font Include="res\font.ttf" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="freetype.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="res\sound\ball_0.wav" />
+    <Media Include="res\sound\ball_1.wav" />
+    <Media Include="res\sound\ball_2.wav" />
+    <Media Include="res\sound\bgm.wav" />
+    <Media Include="res\sound\cue_0.wav" />
+    <Media Include="res\sound\cue_1.wav" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
