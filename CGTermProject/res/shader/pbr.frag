@@ -36,6 +36,7 @@ layout (std140, binding = 2) uniform Light
 };
 
 uniform vec3 camPos;
+uniform vec4 highlightColor;
 
 // textures
 uniform sampler2D texture_albedo;
@@ -53,6 +54,9 @@ uniform sampler2D brdfMap;
 vec3 calculateNormal()
 {
     vec3 N = normalize(normal);
+
+	if(!gl_FrontFacing)
+		N *= -1;
 	if(material.texIndexNormal == -1)
 		return N;
 
@@ -96,6 +100,9 @@ void main()
 	float metallic =	material.texIndexMetallic != -1 ?	texture(texture_metallic, texCoord).r :						material.metallic;
 	float roughness =	material.texIndexRoughness != -1 ?	texture(texture_roughness, texCoord).r :					material.roughness;
 	float ao =			material.ao;
+
+	if (highlightColor.a != 0)
+		albedo = highlightColor.rgb;
 
 	vec3 N = calculateNormal();
 	vec3 V = normalize(camPos - worldPos);

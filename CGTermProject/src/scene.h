@@ -110,4 +110,7 @@ private:
     commoncg::Texture brdfLUT;
     commoncg::Texture* ballTextures[BALL_TEXTURE_COUNT];
     GUIScreen ui;
+    // game variables
+    bool isFoul = false;
+    bool ballPlacing = false;
 };

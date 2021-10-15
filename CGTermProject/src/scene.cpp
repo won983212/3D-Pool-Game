@@ -30,42 +30,8 @@ const model::Material BALL_MATERIAL =
 };
 
 
-struct StaticWall
-{
-	glm::vec2 position;
-	glm::vec2 normal;
-	float size;
-};
-
-const float SQ3 = 1.73205080756f;
-const float INV_SQ2 = 0.70710678118f;
-const float CORNER_REDUCE = TABLE_HOLE_SIZE * INV_SQ2 + TABLE_WALL_THICKNESS;
-const float SIDE_CORNER_REDUCE = CORNER_REDUCE - TABLE_HOLE_SIZE * 0.5f;
-
-// line walls.
-const StaticWall WALLS[] =
-{
-	{{0, TABLE_HEIGHT / 2 - TABLE_WALL_THICKNESS}, {0, -1}, TABLE_WIDTH - 2 * CORNER_REDUCE},
-	{{0, -TABLE_HEIGHT / 2 + TABLE_WALL_THICKNESS}, {0, 1}, TABLE_WIDTH - 2 * CORNER_REDUCE},
-	{{-TABLE_WIDTH / 2 + TABLE_WALL_THICKNESS, TABLE_HEIGHT / 4 - SIDE_CORNER_REDUCE / 2}, {1, 0}, TABLE_HEIGHT / 2 - TABLE_HOLE_SIZE - SIDE_CORNER_REDUCE},
-	{{-TABLE_WIDTH / 2 + TABLE_WALL_THICKNESS, -TABLE_HEIGHT / 4 + SIDE_CORNER_REDUCE / 2}, {1, 0}, TABLE_HEIGHT / 2 - TABLE_HOLE_SIZE - SIDE_CORNER_REDUCE},
-	{{TABLE_WIDTH / 2 - TABLE_WALL_THICKNESS, TABLE_HEIGHT / 4 - SIDE_CORNER_REDUCE / 2}, {-1, 0}, TABLE_HEIGHT / 2 - TABLE_HOLE_SIZE - SIDE_CORNER_REDUCE},
-	{{TABLE_WIDTH / 2 - TABLE_WALL_THICKNESS, -TABLE_HEIGHT / 4 + SIDE_CORNER_REDUCE / 2}, {-1, 0}, TABLE_HEIGHT / 2 - TABLE_HOLE_SIZE - SIDE_CORNER_REDUCE}
-};
-
-LineDebugger line;
 void Scene::init()
 {
-	line.init(6);
-	for (int i = 0; i < 6; i++)
-	{
-		vec3 pos = vec3(WALLS[i].position.x, 0.13f, WALLS[i].position.y);
-		vec3 right = normalize(cross(vec3(WALLS[i].normal.x, 0, WALLS[i].normal.y), vec3(0, 1, 0)));
-		line.points[i * 2] = pos + right * WALLS[i].size * 0.5f;
-		line.points[i * 2 + 1] = pos - right * WALLS[i].size * 0.5f;
-	}
-	line.update();
-
 	// initalize graphic variables
 	brdfLUT.loadImage("res/texture/brdf.png");
 	uboLight.create();
@@ -85,6 +51,7 @@ void Scene::init()
 	shader.addShader("res/shader/pbr.frag", GL_FRAGMENT_SHADER);
 	shader.load();
 	shader.use();
+	shader.setUniform("highlightColor", glm::vec4(0.0f));
 	shader.setUniform("texture_albedo", PBR_TEXTURE_INDEX_ALBEDO);
 	shader.setUniform("texture_metallic", PBR_TEXTURE_INDEX_METALLIC);
 	shader.setUniform("texture_roughness", PBR_TEXTURE_INDEX_ROUGHNESS);
@@ -145,7 +112,8 @@ void Scene::update(float partialTime, int fps)
 		cam.update();
 	}
 
-	table.update(partialTime);
+	if(!ballPlacing)
+		table.update(partialTime);
 	ui.fpsLabel->setText(std::wstring(L"FPS: ") + std::to_wstring(fps));
 }
 
@@ -184,6 +152,9 @@ void Scene::render()
 		if (!balls[i]->visible)
 			continue;
 
+		if (balls[i]->highlight)
+			shader.setUniform("highlightColor", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+
 		vec2 pos = balls[i]->position;
 		mat4 model = mat4(1.0f);
 
@@ -194,6 +165,9 @@ void Scene::render()
 		ballTextures[i]->bind();
 		shader.setUniform("model", model);
 		modelBall.draw();
+
+		if (balls[i]->highlight)
+			shader.setUniform("highlightColor", glm::vec4(0.0f));
 	}
 	Texture::unbind();
 
@@ -222,8 +196,6 @@ void Scene::render()
 
 	// gui
 	ui.render();
-
-	line.draw();
 }
 
 MouseRay Scene::calculateMouseRay(int mouseX, int mouseY)
@@ -261,14 +233,27 @@ void Scene::mouse(int button, int state, int x, int y)
 {
 	if (state == GLUT_DOWN && button == GLUT_LEFT_BUTTON && ui.getCurrentScreen() == 2)
 	{
-		if (cueTransform.mode == CueMode::ROTATION)
+		if (ballPlacing)
+		{
+			if (!table.getBalls()[0]->highlight)
+			{
+				ballPlacing = false;
+				cueTransform.mode = CueMode::ROTATION;
+				ui.showMessage(L"당신 차례입니다!");
+			}
+			else
+			{
+				ui.showMessage(L"그 위치에 배치할 수 없습니다.");
+			}
+		} 
+		else if (cueTransform.mode == CueMode::ROTATION)
 		{
 			cueTransform.mode = CueMode::PUSHING;
 		}
 		else if (cueTransform.mode == CueMode::PUSHING)
 		{
 			hitWhiteBall();
-			cueTransform.mode = CueMode::ROTATION; // TODO (Debug) 계속 칠수있다
+			cueTransform.mode = CueMode::ROTATION; // TODO (Debug) 계속 칠수있다. 원본: INVISIBLE
 			cueTransform.pushAmount = -BALL_RADIUS;
 			cueTransform.update();
 		}
@@ -307,14 +292,21 @@ void Scene::mouseWheel(int button, int state, int x, int y)
 void Scene::mouseMove(int x, int y)
 {
 	ui.mouseMove(x, y);
-
 	if (ui.getCurrentScreen() != 2)
 		return;
 
+	MouseRay ray = calculateMouseRay(x, y);
+
+	if (ballPlacing)
+	{
+		Ball* ball = table.getBalls()[0];
+		vec3 hit = ray.position - ray.direction * (ray.position.y / ray.direction.y);
+		ball->position = vec2(hit.x, hit.z);
+		ball->highlight = !table.canPlaceWhiteBall();
+	}
+
 	if (cueTransform.mode == CueMode::INVISIBLE)
 		return;
-
-	MouseRay ray = calculateMouseRay(x, y);
 
 	// 바닥 면(y=yLevel=0.16f)과 intersect되는 점을 calculate
 	// pos + dir * t = 0.16f(y) 인 t를 찾으면 된다.
@@ -333,6 +325,7 @@ void Scene::mouseMove(int x, int y)
 		float power = dot(cueTransform.getCueDirection(), diff);
 		cueTransform.pushAmount = -clamp(power, BALL_RADIUS, MAX_CUE_POWER + BALL_RADIUS);
 	}
+
 	cueTransform.update();
 }
 
@@ -348,11 +341,19 @@ void Scene::onScreenChanged(int id)
 
 void Scene::onAllBallStopped()
 {
-	if (ui.getCurrentScreen() != 2)
+	if (ui.getCurrentScreen() != 2 || ballPlacing)
 		return;
 
-	cueTransform.mode = CueMode::ROTATION;
-	ui.showMessage(L"당신 차례입니다!");
+	if (isFoul)
+	{
+		foul();
+		isFoul = false;
+	}
+	else
+	{
+		cueTransform.mode = CueMode::ROTATION;
+		ui.showMessage(L"당신 차례입니다!");
+	}
 }
 
 void Scene::onBallHoleIn(int ballId)
@@ -362,9 +363,7 @@ void Scene::onBallHoleIn(int ballId)
 
 	// foul. white ball is in hole.
 	if (ballId == 0)
-	{
-		foul();
-	}
+		isFoul = true;
 }
 
 void Scene::hitWhiteBall()
@@ -380,7 +379,10 @@ void Scene::hitWhiteBall()
 void Scene::foul()
 {
 	ui.showMessage(L"파울입니다. 흰색공을 배치하세요.");
-	// TODO Place white ball.
+	isBallView = false;
+	table.getBalls()[0]->velocity = vec2(0.0f);
 	table.getBalls()[0]->position = vec2(0, -TABLE_HEIGHT / 3);
 	table.getBalls()[0]->visible = true;
+	cueTransform.mode = CueMode::INVISIBLE;
+	ballPlacing = true;
 }

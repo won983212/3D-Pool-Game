@@ -23,6 +23,7 @@ public:
 	glm::vec2 velocity;
 	glm::quat rotation;
 	bool visible = true;
+	bool highlight = false;
 };
 
 class PoolTable
@@ -32,6 +33,7 @@ public:
 	~PoolTable();
 	void resetBallPosition();
 	void update(float partialTime);
+	bool canPlaceWhiteBall();
 
 private:
 	Ball* addBall(float x, float y);

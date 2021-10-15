@@ -199,6 +199,21 @@ void PoolTable::update(float partialTime)
 	}
 }
 
+bool PoolTable::canPlaceWhiteBall()
+{
+	glm::vec2 pos = balls[0]->position;
+	if (std::abs(pos.x) > TABLE_WIDTH / 2 - BALL_RADIUS - CORNER_REDUCE)
+		return false;
+	if (std::abs(pos.y) > TABLE_HEIGHT / 2 - BALL_RADIUS - CORNER_REDUCE)
+		return false;
+	for (int i = 1; i < balls.size(); i++)
+	{
+		if (glm::length2(balls[i]->position - pos) < BALL_RADIUS * BALL_RADIUS * 4)
+			return false;
+	}
+	return true;
+}
+
 Ball* PoolTable::addBall(float x, float y)
 {
 	Ball* ball = new Ball();
