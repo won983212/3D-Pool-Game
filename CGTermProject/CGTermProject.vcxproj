@@ -162,6 +162,7 @@
     <ClInclude Include="src\gfx\vbo.h" />
     <ClInclude Include="src\gfx\window.h" />
     <ClInclude Include="src\model\ball.h" />
+    <ClInclude Include="src\linedebugger.h" />
     <ClInclude Include="src\model\model.h" />
     <ClInclude Include="src\model\quad.h" />
     <ClInclude Include="src\pooltable.h" />
@@ -189,6 +190,7 @@
     <ClCompile Include="src\gfx\window.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\model\ball.cpp" />
+    <ClCompile Include="src\linedebugger.cpp" />
     <ClCompile Include="src\model\model.cpp" />
     <ClCompile Include="src\model\quad.cpp" />
     <ClCompile Include="src\pooltable.cpp" />
@@ -208,6 +210,9 @@
     <None Include="freeglut.dll" />
     <None Include="freetype.dll" />
     <None Include="glew32.dll" />
+    <None Include="ikpFlac.dll" />
+    <None Include="ikpMP3.dll" />
+    <None Include="irrKlang.dll" />
     <None Include="res\model\cue.bin" />
     <None Include="res\model\cue.gltf" />
     <None Include="res\model\pooltable.bin" />

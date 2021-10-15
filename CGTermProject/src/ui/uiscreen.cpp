@@ -42,6 +42,11 @@ void UIScreen::init()
 	screenInit();
 }
 
+void UIScreen::setScreenChangedEvent(IScreenChangedEvent* e)
+{
+	screenChangeEvent = e;
+}
+
 void UIScreen::add(UIElement* element, int screenIdx)
 {
 	element->parent = this;
@@ -63,6 +68,8 @@ void UIScreen::setScreen(int index)
 	}
 
 	this->index = index;
+	if (screenChangeEvent != nullptr)
+		screenChangeEvent->onScreenChanged(index);
 }
 
 int UIScreen::getCurrentScreen()

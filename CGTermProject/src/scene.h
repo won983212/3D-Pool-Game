@@ -61,16 +61,15 @@ public:
     glm::vec2 position = glm::vec2(0);
     float rotation = 0;
     float pushAmount = 0;
-    CueMode mode = CueMode::ROTATION;
+    CueMode mode = CueMode::INVISIBLE;
 private:
     glm::mat4 modelMat = glm::mat4(1.0f);
 };
 
-class Scene
+class Scene : public IBallEvent, IScreenChangedEvent
 {
 public:
-    Scene() : uboLight(GL_UNIFORM_BUFFER), uboView(GL_UNIFORM_BUFFER), 
-            cam(0, 30, 10), table(glm::vec2(5.5f, 10.8f)) {};
+    Scene() : uboLight(GL_UNIFORM_BUFFER), uboView(GL_UNIFORM_BUFFER), cam(0, 30, 10) {};
     void init();
     void update(float partialTime, int fps);
     void render();
@@ -79,11 +78,15 @@ public:
     void mouseMove(int x, int y);
     void mouseDrag(int button, int x, int y, int dx, int dy);
     void keyboard(unsigned char key, int x, int y);
+    virtual void onScreenChanged(int id);
+    virtual void onAllBallStopped();
+    virtual void onBallHoleIn(int ballId);
 private:
     void updateLight();
     void updateView();
     MouseRay calculateMouseRay(int mouseX, int mouseY);
     void hitWhiteBall();
+    void foul();
 private:
     // camera ball view
     bool isBallView = false;

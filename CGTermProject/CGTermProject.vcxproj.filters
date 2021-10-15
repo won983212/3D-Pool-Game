@@ -93,6 +93,9 @@
     <ClInclude Include="src\util\sound.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="src\linedebugger.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\gfx\shader.cpp">
@@ -164,6 +167,9 @@
     <ClCompile Include="src\util\sound.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="src\linedebugger.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shader\pbr.vert" />
@@ -193,6 +199,9 @@
       <Filter>리소스 파일</Filter>
     </None>
     <None Include="res\model\cue.gltf" />
+    <None Include="ikpFlac.dll" />
+    <None Include="ikpMP3.dll" />
+    <None Include="irrKlang.dll" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\texture\container.jpg">

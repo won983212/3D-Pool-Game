@@ -4,6 +4,13 @@
 #include "gfx/gfx.h"
 #include "util/util.h"
 
+class IBallEvent
+{
+public:
+	virtual void onAllBallStopped() = 0;
+	virtual void onBallHoleIn(int ballId) = 0;
+};
+
 class Ball
 {
 public:
@@ -15,18 +22,32 @@ public:
 	glm::vec2 position;
 	glm::vec2 velocity;
 	glm::quat rotation;
+	bool visible = true;
 };
 
 class PoolTable
 {
 public:
-	PoolTable(glm::vec2 size);
+	PoolTable();
 	~PoolTable();
-	void update(float partialTime) const;
-	const std::vector<Ball*>& getBalls() const;
+	void resetBallPosition();
+	void update(float partialTime);
+
 private:
 	Ball* addBall(float x, float y);
+
+public:
+	void setBallEvent(IBallEvent* e)
+	{
+		ballEvent = e;
+	}
+	const std::vector<Ball*>& getBalls() const
+	{
+		return balls;
+	}
+
 private:
 	std::vector<Ball*> balls;
-	glm::vec2 size;
+	IBallEvent* ballEvent = nullptr;
+	bool stopEventCalled = false;
 };

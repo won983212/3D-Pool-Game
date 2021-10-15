@@ -189,10 +189,7 @@ void ShaderProgram::setUniform(const char* name, const int iValue) const
 void ShaderProgram::push()
 {
 	if (lastUses == nullptr)
-	{
-		std::cout << "Warning: Ignore pushing request. Shader is not bound." << std::endl;
 		return;
-	}
 
 	if(shaderStack.size() < MAX_STACK_SIZE)
 		shaderStack.push(lastUses);
@@ -203,10 +200,7 @@ void ShaderProgram::push()
 void ShaderProgram::pop()
 {
 	if (shaderStack.empty())
-	{
-		std::cout << "Warning: Can't pop. No shader to pop" << std::endl;
 		return;
-	}
 
 	shaderStack.top()->use();
 	shaderStack.pop();

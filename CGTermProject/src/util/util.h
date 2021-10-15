@@ -30,3 +30,7 @@
 
 // table size is 2.84m x 1.42m, ball size is 0.06m
 const float BALL_RADIUS = 0.13f;
+const float TABLE_WALL_THICKNESS = 0.17f;
+const float TABLE_HOLE_SIZE = 0.5f;
+const float TABLE_WIDTH = 5.85f;
+const float TABLE_HEIGHT = 11.1f;

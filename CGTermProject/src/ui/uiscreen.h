@@ -2,6 +2,7 @@
 #include <vector>
 #include "uielement.h"
 #include "font.h"
+#include "event.h"
 #include "../gfx/vao.h"
 #include "../gfx/shader.h"
 
@@ -17,6 +18,7 @@ public:
 	void mouseMove(int x, int y);
 	void setScreen(int index);
 	int getCurrentScreen();
+	void setScreenChangedEvent(IScreenChangedEvent* e);
 	virtual void screenInit() {};
 	virtual void onRenderTick() {};
 	static FontRenderer* getFontRenderer();
@@ -30,4 +32,5 @@ private:
 	commoncg::VAO vao;
 	commoncg::VBO vbo;
 	std::vector<std::vector<UIElement*>> elements;
+	IScreenChangedEvent* screenChangeEvent = nullptr;
 };
