@@ -21,5 +21,8 @@ private:
 	commoncg::ShaderProgram beamShader;
 	commoncg::VAO beamVao;
 	commoncg::VBO beamVbo;
+	commoncg::VAO circleVao;
+	commoncg::VBO circleVbo;
+	glm::vec3 hitBallPos;
 	bool visible = false;
 };

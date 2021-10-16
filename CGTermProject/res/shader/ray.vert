@@ -9,9 +9,10 @@ layout (std140, binding = 3) uniform ViewMat {
 	mat4 projection;
 };
 
+uniform mat4 model;
 
 void main()
 {
 	color = aColor;
-	gl_Position = projection * view * vec4(aPosition, 1.0);
+	gl_Position = projection * view * model * vec4(aPosition, 1.0);
 }

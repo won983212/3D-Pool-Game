@@ -23,6 +23,7 @@ void LineDebugger::init(int lines)
     beamShader.addShader("res/shader/ray.frag", GL_FRAGMENT_SHADER);
     beamShader.load();
     beamShader.use();
+    beamShader.setUniform("model", glm::mat4(1.0f));
     ShaderProgram::pop();
 }
 

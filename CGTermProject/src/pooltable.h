@@ -31,6 +31,7 @@ struct RaytraceResult
 	bool hit;
 	Ball* hitTargetBall;
 	glm::vec2 hitTimeBallPos;
+	glm::vec2 normal;
 };
 
 class PoolTable

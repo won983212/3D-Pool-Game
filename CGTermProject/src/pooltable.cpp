@@ -186,15 +186,10 @@ void PoolTable::update(float partialTime)
 			glm::vec2 diff = ball->position - WALLS[j].position;
 			glm::vec2 wallN = glm::normalize(WALLS[j].normal);
 			float dist = glm::dot(diff, wallN);
-			if (dist < BALL_RADIUS)
+			if (dist < BALL_RADIUS && (glm::length2(diff) - dist * dist) * 4 < WALLS[j].size * WALLS[j].size)
 			{
-				glm::vec3 right3 = glm::cross(glm::vec3(wallN.x, 0, wallN.y), glm::vec3(0, 1, 0));
-				glm::vec2 right = glm::normalize(glm::vec2(right3.x, right3.z));
-				if (std::abs(glm::dot(right, diff)) * 2 < WALLS[j].size)
-				{
-					ball->position += (BALL_RADIUS - dist) * wallN;
-					ball->velocity = glm::reflect(ball->velocity, wallN);
-				}
+				ball->position += (BALL_RADIUS - dist) * wallN;
+				ball->velocity = glm::reflect(ball->velocity, wallN);
 			}
 		}
 	}
@@ -235,7 +230,8 @@ RaytraceResult PoolTable::getRaytracedBall(glm::vec2 pos, glm::vec2 dir) const
 	float minDist = 12345678900;
 	glm::vec2 N = glm::normalize(dir);
 	glm::vec3 right = glm::cross(glm::vec3(N.x, 0, N.y), glm::vec3(0, 1, 0));
-
+	
+	// ball collision check
 	for (unsigned int i = 1; i < balls.size(); i++)
 	{
 		glm::vec2 diff = balls[i]->position - pos;
@@ -258,6 +254,27 @@ RaytraceResult PoolTable::getRaytracedBall(glm::vec2 pos, glm::vec2 dir) const
 				result.hitTargetBall = balls[i];
 				minDist = sqlen;
 			}
+		}
+	}
+
+	// if result has ball collision, return
+	if (result.hit)
+		return result;
+
+	// wall collision check
+	const int wallSize = sizeof(WALLS) / sizeof(StaticWall);
+	for (unsigned int i = 0; i < wallSize; i++)
+	{
+		glm::vec2 norm = glm::normalize(WALLS[i].normal);
+		float t = -glm::dot(pos - WALLS[i].position, norm) / glm::dot(dir, norm);
+		glm::vec2 hitPos = pos + t * dir;
+		if (t > 0 && glm::length(hitPos - WALLS[i].position) < WALLS[i].size / 2 + BALL_RADIUS)
+		{
+			result.hit = true;
+			result.hitTargetBall = nullptr;
+			result.hitTimeBallPos = hitPos - BALL_RADIUS * dir;
+			result.normal = WALLS[i].normal;
+			return result;
 		}
 	}
 
