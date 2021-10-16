@@ -13,6 +13,7 @@
 #define randomVal(min, max) ((float)(min + (max - min) * drand48()))
 #endif
 
+#define DEFAULT_LINE_WIDTH 1.0f
 #define SCREEN_WIDTH 1280
 #define SCREEN_HEIGHT 720
 

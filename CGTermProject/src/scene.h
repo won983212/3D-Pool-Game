@@ -87,6 +87,7 @@ private:
     void updateView();
     MouseRay calculateMouseRay(int mouseX, int mouseY);
     void hitWhiteBall();
+    void enableCueControl();
     void foul();
 private:
     // camera ball view

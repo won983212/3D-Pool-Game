@@ -225,7 +225,7 @@ MouseRay Scene::calculateMouseRay(int mouseX, int mouseY)
 
 void Scene::keyboard(unsigned char key, int x, int y)
 {
-	if (key == ' ')
+	if (key == ' ' && !isFoul && !ballPlacing)
 	{
 		isBallView = !isBallView;
 		ui.showMessage(isBallView ? L"공을 중심으로 보기" : L"테이블을 중심으로 보기");
@@ -241,8 +241,7 @@ void Scene::mouse(int button, int state, int x, int y)
 			if (!table.getBalls()[0]->highlight)
 			{
 				ballPlacing = false;
-				cueTransform.mode = CueMode::ROTATION;
-				ui.showMessage(L"당신 차례입니다!");
+				enableCueControl();
 			}
 			else
 			{
@@ -349,7 +348,7 @@ void Scene::onScreenChanged(int id)
 	// onGameStart
 	if (id == 2)
 	{
-		cueTransform.mode = CueMode::ROTATION;
+		enableCueControl();
 		table.resetBallPosition();
 	}
 }
@@ -366,19 +365,29 @@ void Scene::onAllBallStopped()
 	}
 	else
 	{
-		cueTransform.mode = CueMode::ROTATION;
-		ui.showMessage(L"당신 차례입니다!");
+		enableCueControl();
 	}
 }
 
 void Scene::onBallHoleIn(int ballId)
 {
 	// TODO ball goal-in sound
-	getSoundEngine()->play2D("res/sound/cue_1.wav");
+	getSoundEngine()->play2D(SOUND_CUE_PUSH(1));
 
 	// foul. white ball is in hole.
 	if (ballId == 0)
+	{
+		isBallView = false;
 		isFoul = true;
+	}
+}
+
+void Scene::enableCueControl()
+{
+	cueTransform.mode = CueMode::ROTATION;
+	cueTransform.pushAmount = -BALL_RADIUS;
+	cueTransform.update();
+	ui.showMessage(L"당신 차례입니다!");
 }
 
 void Scene::hitWhiteBall()
@@ -387,14 +396,13 @@ void Scene::hitWhiteBall()
 	float power = -(cueTransform.pushAmount + BALL_RADIUS);
 	int powerLevel = power > MAX_CUE_POWER * 0.5f;
 
-	getSoundEngine()->play2D(("res/sound/cue_" + std::to_string(powerLevel) + ".wav").c_str());
+	getSoundEngine()->play2D(SOUND_CUE_PUSH(powerLevel));
 	ball->velocity = power * CUE_POWER_MODIFIER * cueTransform.getCueDirection();
 }
 
 void Scene::foul()
 {
 	ui.showMessage(L"파울입니다. 흰색공을 배치하세요.");
-	isBallView = false;
 	table.getBalls()[0]->velocity = vec2(0.0f);
 	table.getBalls()[0]->position = vec2(0, -TABLE_HEIGHT / 3);
 	table.getBalls()[0]->visible = true;

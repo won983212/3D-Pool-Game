@@ -14,9 +14,9 @@ Window wnd;
 void init()
 {
     // TODO (Debug) Turn on BGM
-    // initialize sound engine, play bgm
-    getSoundEngine();
-    /*irrklang::ISound* sound = getSoundEngine()->play2D("res/sound/bgm.wav", true, false, true);
+    // initialize sound engine
+    initSoundEngine();
+    /*irrklang::ISound* sound = getSoundEngine()->play2D(SOUND_BGM, true, false, true);
     if (!sound)
     {
         std::cout << "Warning: Can't play BGM" << std::endl;
@@ -30,6 +30,7 @@ void init()
     // initialize font
     UIScreen::getFontRenderer();
 
+    glLineWidth(DEFAULT_LINE_WIDTH);
     scene.init();
 	glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
     glEnable(GL_DEPTH_TEST);

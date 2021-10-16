@@ -138,7 +138,7 @@ void PoolTable::update(float partialTime)
 		for (unsigned int j = 0; j < balls.size(); j++)
 		{
 			glm::vec2 delta = balls[j]->position - balls[i]->position;
-			if (i == j || glm::dot(balls[i]->velocity, delta) < 0) // 정방향으로 충돌한 ball만 고려
+			if (i == j || !balls[j]->visible || glm::dot(balls[i]->velocity, delta) < 0) // 정방향으로 충돌한 ball만 고려
 				continue;
 
 			// collision test
@@ -147,13 +147,16 @@ void PoolTable::update(float partialTime)
 			if (penetration_sq > 0.0001f)
 			{
 				// discrete position correction (discrete하게 position을 update하므로 정확한 impulse적용을 위해 보정이 필요함)
-				glm::vec2 vel = glm::normalize(balls[i]->velocity);
-				glm::vec2 dPos = balls[j]->position - prevPos;
-				float ph = glm::dot(vel, dPos);
-				float lh = sqrt(4 * BALL_RADIUS * BALL_RADIUS - glm::length2(dPos) + ph * ph);
+				if (glm::length2(balls[i]->velocity) > 0)
+				{
+					glm::vec2 vel = glm::normalize(balls[i]->velocity);
+					glm::vec2 dPos = balls[j]->position - prevPos;
+					float ph = glm::dot(vel, dPos);
+					float lh = sqrt(4 * BALL_RADIUS * BALL_RADIUS - glm::length2(dPos) + ph * ph);
 
-				balls[i]->position = prevPos + (ph - lh) * vel;
-				delta = balls[j]->position - balls[i]->position;
+					balls[i]->position = prevPos + (ph - lh) * vel;
+					delta = balls[j]->position - balls[i]->position;
+				}
 
 				// apply impulse
 				glm::vec2 jNorm = glm::normalize(delta);
@@ -170,7 +173,7 @@ void PoolTable::update(float partialTime)
 				// play sound
 				power = std::abs(power);
 				int powerLevel = static_cast<int>(power / 2.0f);
-				irrklang::ISound* sound = getSoundEngine()->play2D(("res/sound/ball_" + std::to_string(std::min(powerLevel, 2)) + ".wav").c_str(), false, false, true);
+				irrklang::ISound* sound = getSoundEngine()->play2D(SOUND_BALL_COLLIDE(std::min(powerLevel, 2)), false, false, true);
 				sound->setVolume(glm::clamp((power - powerLevel * 2.0f), 0.3f, 1.0f));
 				sound->drop();
 			}
@@ -236,7 +239,7 @@ RaytraceResult PoolTable::getRaytracedBall(glm::vec2 pos, glm::vec2 dir) const
 	for (unsigned int i = 1; i < balls.size(); i++)
 	{
 		glm::vec2 diff = balls[i]->position - pos;
-		if (glm::dot(diff, dir) < 0)
+		if (glm::dot(diff, dir) < 0 || !balls[i]->visible)
 			continue;
 
 		float dist = std::abs(glm::dot(diff, glm::vec2(right.x, right.z)));
