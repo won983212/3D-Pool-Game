@@ -6,7 +6,6 @@
 #include "model/quad.h"
 #include "ui/button.h"
 #include "util/sound.h"
-#include "linedebugger.h"
 
 using namespace glm;
 using namespace commoncg;
@@ -66,6 +65,7 @@ void Scene::init()
 	// events setup
 	ui.setScreenChangedEvent(this);
 	table.setBallEvent(this);
+	ballTracer.init();
 
 	// skybox
 	skybox.beginLoad();
@@ -131,7 +131,6 @@ void Scene::updateView()
 	uboView.unbind();
 }
 
-// TODO Back plane이 material적용 없이 rendering됨
 void Scene::render()
 {
 	// update only when cam has changed.
@@ -190,6 +189,10 @@ void Scene::render()
 		shader.setUniform("model", cueTransform.getModelMatrix());
 		modelCue.draw();
 	}
+
+	// ball tracer
+	if(cueTransform.mode == CueMode::ROTATION)
+		ballTracer.draw();
 
 	// skybox
 	skybox.render(view.view);
@@ -296,13 +299,14 @@ void Scene::mouseMove(int x, int y)
 		return;
 
 	MouseRay ray = calculateMouseRay(x, y);
+	Ball* ball = table.getBalls()[0];
 
 	if (ballPlacing)
 	{
-		Ball* ball = table.getBalls()[0];
 		vec3 hit = ray.position - ray.direction * (ray.position.y / ray.direction.y);
 		ball->position = vec2(hit.x, hit.z);
 		ball->highlight = !table.canPlaceWhiteBall();
+		return;
 	}
 
 	if (cueTransform.mode == CueMode::INVISIBLE)
@@ -317,7 +321,18 @@ void Scene::mouseMove(int x, int y)
 
 	if (cueTransform.mode == CueMode::ROTATION)
 	{
-		float angle = atan2(diff.y, diff.x);
+		float angle;
+		if (length2(diff) == 0)
+		{
+			angle = 0;
+		}
+		else
+		{
+			angle = atan2(diff.y, diff.x);
+			ballTracer.position = ball->position;
+			ballTracer.direction = normalize(diff);
+			ballTracer.update();
+		}
 		cueTransform.rotation = -angle + DEGTORAD(90.0f);
 	}
 	else if (cueTransform.mode == CueMode::PUSHING)

@@ -26,6 +26,13 @@ public:
 	bool highlight = false;
 };
 
+struct RaytraceResult
+{
+	bool hit;
+	Ball* hitTargetBall;
+	glm::vec2 hitTimeBallPos;
+};
+
 class PoolTable
 {
 public:
@@ -33,7 +40,8 @@ public:
 	~PoolTable();
 	void resetBallPosition();
 	void update(float partialTime);
-	bool canPlaceWhiteBall();
+	bool canPlaceWhiteBall() const;
+	RaytraceResult getRaytracedBall(glm::vec2 pos, glm::vec2 dir) const;
 
 private:
 	Ball* addBall(float x, float y);

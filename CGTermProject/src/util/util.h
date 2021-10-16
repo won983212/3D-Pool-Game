@@ -28,6 +28,8 @@
 #define PBR_TEXTURE_INDEX_SPECULARMAP 5
 #define PBR_TEXTURE_INDEX_BRDFMAP 6
 
+#define BALL_COUNT 16
+
 // table size is 2.84m x 1.42m, ball size is 0.06m
 const float BALL_RADIUS = 0.13f;
 const float TABLE_WALL_THICKNESS = 0.17f;

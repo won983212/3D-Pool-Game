@@ -48,7 +48,7 @@ const int BALL_INDEXES[] = {1, 11, 3, 6, 8, 14, 13, 15, 4, 9, 7, 2, 10, 5, 12};
 PoolTable::PoolTable()
 {
 	const float gap = TABLE_HEIGHT * 0.8f / 15.0f;
-	for (int i = 0; i < 16; i++)
+	for (int i = 0; i < BALL_COUNT; i++)
 		addBall(0.0f, i * gap - TABLE_HEIGHT * 0.8f / 2.0f);
 }
 
@@ -60,7 +60,7 @@ PoolTable::~PoolTable()
 
 void PoolTable::resetBallPosition()
 {
-	// white(0) ball setup
+	/*// white(0) ball setup
 	balls[0]->position = glm::vec2(0.0f, -TABLE_HEIGHT / 3);
 
 	// 1~15 ball setup
@@ -73,7 +73,7 @@ void PoolTable::resetBallPosition()
 			location.y += TABLE_HEIGHT / 4;
 			balls[BALL_INDEXES[i++]]->position = location;
 		}
-	}
+	}*/
 }
 
 void PoolTable::update(float partialTime)
@@ -102,6 +102,7 @@ void PoolTable::update(float partialTime)
 		}
 
 		// update position
+		glm::vec2 prevPos = ball->position;
 		ball->position += partialTime * ball->velocity;
 
 		// update rotation
@@ -134,24 +135,35 @@ void PoolTable::update(float partialTime)
 		}
 
 		// collision check & resolving. 1회만 test하기 위해 범위는 0~i로 설정.
-		for (unsigned int j = 0; j < i; j++)
+		for (unsigned int j = 0; j < balls.size(); j++)
 		{
-			float dx = balls[i]->position.x - balls[j]->position.x;
-			float dy = balls[i]->position.y - balls[j]->position.y;
+			glm::vec2 delta = balls[j]->position - balls[i]->position;
+			if (i == j || glm::dot(balls[i]->velocity, delta) < 0) // 정방향으로 충돌한 ball만 고려
+				continue;
 
-			// collision test success
-			float penetration_sq = 4 * BALL_RADIUS * BALL_RADIUS - (dx * dx + dy * dy);
+			// collision test
+			float deltaSq = glm::length2(delta);
+			float penetration_sq = 4 * BALL_RADIUS * BALL_RADIUS - deltaSq;
 			if (penetration_sq > 0.0001f)
 			{
+				// discrete position correction (discrete하게 position을 update하므로 정확한 impulse적용을 위해 보정이 필요함)
+				glm::vec2 vel = glm::normalize(balls[i]->velocity);
+				glm::vec2 dPos = balls[j]->position - prevPos;
+				float ph = glm::dot(vel, dPos);
+				float lh = sqrt(4 * BALL_RADIUS * BALL_RADIUS - glm::length2(dPos) + ph * ph);
+
+				balls[i]->position = prevPos + (ph - lh) * vel;
+				delta = balls[j]->position - balls[i]->position;
+
 				// apply impulse
-				glm::vec2 jNorm = glm::normalize(balls[j]->position - balls[i]->position);
+				glm::vec2 jNorm = glm::normalize(delta);
 				float power = glm::dot(balls[j]->velocity - balls[i]->velocity, jNorm);
 				glm::vec2 impulse = power * jNorm;
 				balls[i]->velocity += impulse;
 				balls[j]->velocity -= impulse;
 
 				// position correction
-				float penetration = 2 * BALL_RADIUS - sqrt(dx * dx + dy * dy);
+				float penetration = 2.0f * BALL_RADIUS - sqrt(deltaSq);
 				balls[i]->position += penetration / 2 * -jNorm;
 				balls[j]->position += penetration / 2 * jNorm;
 
@@ -199,7 +211,7 @@ void PoolTable::update(float partialTime)
 	}
 }
 
-bool PoolTable::canPlaceWhiteBall()
+bool PoolTable::canPlaceWhiteBall() const
 {
 	glm::vec2 pos = balls[0]->position;
 	if (std::abs(pos.x) > TABLE_WIDTH / 2 - BALL_RADIUS - CORNER_REDUCE)
@@ -214,11 +226,47 @@ bool PoolTable::canPlaceWhiteBall()
 	return true;
 }
 
+RaytraceResult PoolTable::getRaytracedBall(glm::vec2 pos, glm::vec2 dir) const
+{
+	RaytraceResult result = { false, };
+	float minDist = 12345678900;
+	glm::vec2 N = glm::normalize(dir);
+	glm::vec3 right = glm::cross(glm::vec3(N.x, 0, N.y), glm::vec3(0, 1, 0));
+
+	for (unsigned int i = 1; i < balls.size(); i++)
+	{
+		glm::vec2 diff = balls[i]->position - pos;
+		if (glm::dot(diff, dir) < 0)
+			continue;
+
+		float dist = std::abs(glm::dot(diff, glm::vec2(right.x, right.z)));
+		if (dist < 2 * BALL_RADIUS)
+		{
+			float L = sqrt(glm::length2(diff) - dist * dist);
+			float S = sqrt(BALL_RADIUS * BALL_RADIUS * 4 - dist * dist);
+
+			glm::vec2 tHit = pos + N * (L - S);
+			float sqlen = glm::length2(tHit - pos);
+
+			if (sqlen < minDist)
+			{
+				result.hit = true;
+				result.hitTimeBallPos = tHit;
+				result.hitTargetBall = balls[i];
+				minDist = sqlen;
+			}
+		}
+	}
+
+	return result;
+}
+
 Ball* PoolTable::addBall(float x, float y)
 {
 	Ball* ball = new Ball();
 	ball->position.x = x;
 	ball->position.y = y;
+	ball->velocity = { 0, 0 };
 	balls.push_back(ball);
 	return ball;
 }

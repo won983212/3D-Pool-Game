@@ -9,6 +9,7 @@
 #include "model/assetmodel.h"
 #include "model/ball.h"
 #include "pooltable.h"
+#include "balltracer.h"
 #include "util/util.h"
 
 #define BALL_TEXTURE_COUNT 16
@@ -69,7 +70,7 @@ private:
 class Scene : public IBallEvent, IScreenChangedEvent
 {
 public:
-    Scene() : uboLight(GL_UNIFORM_BUFFER), uboView(GL_UNIFORM_BUFFER), cam(0, 30, 10) {};
+    Scene() : uboLight(GL_UNIFORM_BUFFER), uboView(GL_UNIFORM_BUFFER), cam(0, 30, 10), ballTracer(table) {};
     void init();
     void update(float partialTime, int fps);
     void render();
@@ -98,6 +99,7 @@ private:
     commoncg::VBO uboView;
     // pool table physics simulator
     PoolTable table;
+    BallTracer ballTracer;
     // models
     CueTransform cueTransform;
     model::AssetModel modelPoolTable;
