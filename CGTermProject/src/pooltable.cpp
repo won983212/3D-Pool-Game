@@ -60,7 +60,7 @@ PoolTable::~PoolTable()
 
 void PoolTable::resetBallPosition()
 {
-	/*// white(0) ball setup
+	// white(0) ball setup
 	balls[0]->position = glm::vec2(0.0f, -TABLE_HEIGHT / 3);
 
 	// 1~15 ball setup
@@ -73,7 +73,7 @@ void PoolTable::resetBallPosition()
 			location.y += TABLE_HEIGHT / 4;
 			balls[BALL_INDEXES[i++]]->position = location;
 		}
-	}*/
+	}
 }
 
 void PoolTable::update(float partialTime)
@@ -102,7 +102,6 @@ void PoolTable::update(float partialTime)
 		}
 
 		// update position
-		glm::vec2 prevPos = ball->position;
 		ball->position += partialTime * ball->velocity;
 
 		// update rotation
@@ -135,10 +134,14 @@ void PoolTable::update(float partialTime)
 		}
 
 		// collision check & resolving. 1회만 test하기 위해 범위는 0~i로 설정.
+		// add velocity and I after solving all collision.
+		glm::vec2 I(0.0f);
+		glm::vec2 v = balls[i]->velocity;
+		glm::vec2 vN = glm::normalize(v);
 		for (unsigned int j = 0; j < balls.size(); j++)
 		{
 			glm::vec2 delta = balls[j]->position - balls[i]->position;
-			if (i == j || !balls[j]->visible || glm::dot(balls[i]->velocity, delta) < 0) // 정방향으로 충돌한 ball만 고려
+			if (i == j || !balls[j]->visible || glm::dot(v, delta) < 0) // 정방향으로 충돌한 ball만 고려
 				continue;
 
 			// collision test
@@ -147,22 +150,26 @@ void PoolTable::update(float partialTime)
 			if (penetration_sq > 0.0001f)
 			{
 				// discrete position correction (discrete하게 position을 update하므로 정확한 impulse적용을 위해 보정이 필요함)
-				if (glm::length2(balls[i]->velocity) > 0)
+				if (glm::length2(v) > 0)
 				{
-					glm::vec2 vel = glm::normalize(balls[i]->velocity);
+					glm::vec2 prevPos = balls[i]->position - 10.0f * vN;
 					glm::vec2 dPos = balls[j]->position - prevPos;
-					float ph = glm::dot(vel, dPos);
-					float lh = sqrt(4 * BALL_RADIUS * BALL_RADIUS - glm::length2(dPos) + ph * ph);
+					float ph = glm::dot(vN, dPos);
+					float lh = 4 * BALL_RADIUS * BALL_RADIUS - glm::length2(dPos) + ph * ph;
 
-					balls[i]->position = prevPos + (ph - lh) * vel;
-					delta = balls[j]->position - balls[i]->position;
+					// float error problem. 가끔 float error문제로 음수가 나오는데, ignore
+					if (lh >= 0)
+					{
+						balls[i]->position = prevPos + (ph - sqrt(lh)) * vN;
+						delta = balls[j]->position - balls[i]->position;
+					}
 				}
 
 				// apply impulse
 				glm::vec2 jNorm = glm::normalize(delta);
-				float power = glm::dot(balls[j]->velocity - balls[i]->velocity, jNorm);
+				float power = glm::dot(balls[j]->velocity - v, jNorm);
 				glm::vec2 impulse = power * jNorm;
-				balls[i]->velocity += impulse;
+				I += impulse;
 				balls[j]->velocity -= impulse;
 
 				// position correction
@@ -178,6 +185,7 @@ void PoolTable::update(float partialTime)
 				sound->drop();
 			}
 		}
+		balls[i]->velocity += I;
 
 		// wall collision test
 		const int wallSize = sizeof(WALLS) / sizeof(StaticWall);
@@ -227,7 +235,7 @@ bool PoolTable::canPlaceWhiteBall() const
 RaytraceResult PoolTable::getRaytracedBall(glm::vec2 pos, glm::vec2 dir) const
 {
 	RaytraceResult result = { false, };
-	float minDist = 12345678900;
+	float minDist = 1234567890.0f;
 	glm::vec2 N = glm::normalize(dir);
 	glm::vec3 right = glm::cross(glm::vec3(N.x, 0, N.y), glm::vec3(0, 1, 0));
 	

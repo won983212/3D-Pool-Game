@@ -115,7 +115,6 @@ void BallTracer::update()
 	visible = true;
 }
 
-// TODO Draw tracing ball too.
 void BallTracer::draw()
 {
 	if (!visible)
