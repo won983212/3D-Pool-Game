@@ -3,7 +3,7 @@
 #include "font.h"
 
 
-bool Label::render(std::vector<UIVertex>& vertices)
+bool UELabel::render(std::vector<UIVertex>& vertices)
 {
 	FontRenderer* fontRenderer = UIScreen::getFontRenderer();
 	if(shadowColor != 0)
@@ -12,27 +12,27 @@ bool Label::render(std::vector<UIVertex>& vertices)
 	return false;
 }
 
-void Label::setText(std::wstring text)
+void UELabel::setText(std::wstring text)
 {
 	this->text = text;
 }
 
-void Label::setColor(int color)
+void UELabel::setColor(int color)
 {
 	this->color = color;
 }
 
-void Label::setShadowColor(int shadowColor)
+void UELabel::setShadowColor(int shadowColor)
 {
 	this->shadowColor = shadowColor;
 }
 
-void Label::setUseCentered(bool centered)
+void UELabel::setUseCentered(bool centered)
 {
 	this->centered = centered;
 }
 
-void Label::setTextPoint(float point)
+void UELabel::setTextPoint(float point)
 {
 	this->fontPoint = point;
 }

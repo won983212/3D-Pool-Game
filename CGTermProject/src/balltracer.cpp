@@ -2,7 +2,7 @@
 #include "balltracer.h"
 #include "util/util.h"
 
-#define TRACER_Y 0.01f
+#define TRACER_Y 0.16f
 #define LINE_POINTS 4
 #define CIRCLE_POINTS 30
 
@@ -50,7 +50,7 @@ void BallTracer::init()
 	{
 		float x = BALL_RADIUS * cos(i * dt);
 		float y = BALL_RADIUS * sin(i * dt);
-		circleVerts.push_back(makeVertex(x, TRACER_Y, y, 0xaaffffff));
+		circleVerts.push_back(makeVertex(x, 0, y, 0xaaffffff));
 	}
 
 	circleVbo.buffer(sizeof(Vertex) * circleVerts.size(), &circleVerts[0], GL_STATIC_DRAW);
@@ -102,8 +102,8 @@ void BallTracer::update()
 
 	balltracer::Vertex data[] =
 	{
-		makeVertex(position.x, TRACER_Y, position.y, 0xaaffffff),
-		makeVertex(traceRes.hitTimeBallPos.x, TRACER_Y, traceRes.hitTimeBallPos.y, 0xaaffffff),
+		makeVertex(position.x, TRACER_Y, position.y, 0x77ffffff),
+		makeVertex(traceRes.hitTimeBallPos.x, TRACER_Y, traceRes.hitTimeBallPos.y, 0x77ffffff),
 		makeVertex(ballPos.x, TRACER_Y, ballPos.y, 0xaaffffff),
 		makeVertex(collisionVecEnd.x, TRACER_Y, collisionVecEnd.y, 0x00ffffff)
 	};
@@ -125,7 +125,7 @@ void BallTracer::draw()
 	beamShader.use();
 
 	// beams
-	glLineWidth(3.0f);
+	glLineWidth(4.0f);
 	beamShader.setUniform("model", glm::mat4(1.0f));
 	beamVao.use();
 	glDrawArrays(GL_LINES, 0, LINE_POINTS);

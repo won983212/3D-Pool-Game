@@ -2,12 +2,11 @@
 #include <stdlib.h>
 #include <time.h>
 #include "guiscreen.h"
-#include "ui/rectangle.h"
 #include "ui/button.h"
-#include "ui/image.h"
 #include "util/util.h"
 
 const clock_t MESSAGE_DURATION = 3 * CLOCKS_PER_SEC;
+const float turnRectW = 200;
 
 
 void GUIScreen::screenInit()
@@ -70,14 +69,14 @@ void GUIScreen::screenInit()
 
 	// ingame HUD
 	// FPS Indicator
-	fpsLabel = new Label();
+	fpsLabel = new UELabel();
 	fpsLabel->setLocation(10, 25);
 	fpsLabel->setTextPoint(24);
 	fpsLabel->setShadowColor(0xff000000);
 	fpsLabel->setText(L"FPS: 60");
 	add(fpsLabel, 2);
 
-	messageLabel = new Label();
+	messageLabel = new UELabel();
 	messageLabel->setLocation(SCREEN_WIDTH / 2, 50);
 	messageLabel->setTextPoint(36);
 	messageLabel->setShadowColor(0xff000000);
@@ -86,12 +85,53 @@ void GUIScreen::screenInit()
 	messageLabel->setVisible(false);
 	messageLabel->setText(L"");
 	add(messageLabel, 2);
+
+	turnLabel = new UELabel();
+	turnLabel->setLocation(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 50);
+	turnLabel->setTextPoint(24);
+	turnLabel->setShadowColor(0xff000000);
+	turnLabel->setColor(0xffffffff);
+	turnLabel->setUseCentered(true);
+	turnLabel->setText(L"");
+	add(turnLabel, 2);
+
+	UERectangle* turnQuadBG = new UERectangle();
+	turnQuadBG->setBounds((SCREEN_WIDTH - turnRectW) / 2.0f, SCREEN_HEIGHT - 30, turnRectW, 5);
+	turnQuadBG->setColor(0xff666666);
+	add(turnQuadBG, 2);
+
+	turnQuad = new UERectangle();
+	turnQuad->setBounds((SCREEN_WIDTH - turnRectW) / 2.0f, SCREEN_HEIGHT - 30, turnRectW, 5);
+	turnQuad->setColor(0xffE34E46);
+	add(turnQuad, 2);
+
+	turnIcon = new UEImage();
+	turnIcon->setImage("res/texture/ball_icon.png");
+	turnIcon->setBounds(SCREEN_WIDTH / 2.0f - 55, SCREEN_HEIGHT - 56, 12, 12);
+	add(turnIcon, 2);
 }
 
 void GUIScreen::showMessage(std::wstring message)
 {
 	messageLabel->setText(message);
 	lastMessageTick = clock();
+}
+
+void GUIScreen::setTurn(bool turn, BallGroup group, float achieve)
+{
+	turnIcon->setVisible(group != BallGroup::NOT_DECIDED);
+	if (turn)
+	{
+		turnIcon->setUV(group == BallGroup::P1SOLID ? 0 : 24, 0, 24, 24);
+		turnLabel->setText(L"Player 1");
+		turnQuad->width = achieve * turnRectW;
+	}
+	else
+	{
+		turnIcon->setUV(group == BallGroup::P1SOLID ? 24 : 0, 0, 24, 24);
+		turnLabel->setText(L"Player 2");
+		turnQuad->width = achieve * turnRectW;
+	}
 }
 
 void GUIScreen::onRenderTick()

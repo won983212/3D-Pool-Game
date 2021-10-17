@@ -102,6 +102,7 @@ void PoolTable::update(float partialTime)
 		}
 
 		// update position
+		glm::vec2 prevPos = ball->position;
 		ball->position += partialTime * ball->velocity;
 
 		// update rotation
@@ -138,52 +139,59 @@ void PoolTable::update(float partialTime)
 		glm::vec2 I(0.0f);
 		glm::vec2 v = balls[i]->velocity;
 		glm::vec2 vN = glm::normalize(v);
+		float lenV = glm::length(v);
 		for (unsigned int j = 0; j < balls.size(); j++)
 		{
 			glm::vec2 delta = balls[j]->position - balls[i]->position;
 			if (i == j || !balls[j]->visible || glm::dot(v, delta) < 0) // 정방향으로 충돌한 ball만 고려
 				continue;
 
-			// collision test
 			float deltaSq = glm::length2(delta);
-			float penetration_sq = 4 * BALL_RADIUS * BALL_RADIUS - deltaSq;
-			if (penetration_sq > 0.0001f)
+			float dDot = glm::dot(delta, vN);
+			float dist = deltaSq - dDot * dDot;
+
+			// collision test. ray test and radius test
+			bool collide = deltaSq + 0.0001f < 4 * BALL_RADIUS * BALL_RADIUS || (dist < 4 * BALL_RADIUS * BALL_RADIUS && dDot < lenV * partialTime);
+			if (!collide)
+				continue;
+
+			// discrete position correction (discrete하게 position을 update하므로 정확한 impulse적용을 위해 보정이 필요함)
+			if (glm::length2(v) > 0)
 			{
-				// discrete position correction (discrete하게 position을 update하므로 정확한 impulse적용을 위해 보정이 필요함)
-				if (glm::length2(v) > 0)
+				glm::vec2 extendPos = balls[i]->position - 10.0f * vN;
+				glm::vec2 dPos = balls[j]->position - extendPos;
+				float ph = glm::dot(vN, dPos);
+				float lh = 4 * BALL_RADIUS * BALL_RADIUS - glm::length2(dPos) + ph * ph;
+
+				// float error problem. 가끔 float error문제로 음수가 나오는데, ignore
+				if (lh >= 0)
 				{
-					glm::vec2 prevPos = balls[i]->position - 10.0f * vN;
-					glm::vec2 dPos = balls[j]->position - prevPos;
-					float ph = glm::dot(vN, dPos);
-					float lh = 4 * BALL_RADIUS * BALL_RADIUS - glm::length2(dPos) + ph * ph;
-
-					// float error problem. 가끔 float error문제로 음수가 나오는데, ignore
-					if (lh >= 0)
-					{
-						balls[i]->position = prevPos + (ph - sqrt(lh)) * vN;
-						delta = balls[j]->position - balls[i]->position;
-					}
+					balls[i]->position = extendPos + (ph - sqrt(lh)) * vN;
+					delta = balls[j]->position - balls[i]->position;
 				}
-
-				// apply impulse
-				glm::vec2 jNorm = glm::normalize(delta);
-				float power = glm::dot(balls[j]->velocity - v, jNorm);
-				glm::vec2 impulse = power * jNorm;
-				I += impulse;
-				balls[j]->velocity -= impulse;
-
-				// position correction
-				float penetration = 2.0f * BALL_RADIUS - sqrt(deltaSq);
-				balls[i]->position += penetration / 2 * -jNorm;
-				balls[j]->position += penetration / 2 * jNorm;
-
-				// play sound
-				power = std::abs(power);
-				int powerLevel = static_cast<int>(power / 2.0f);
-				irrklang::ISound* sound = getSoundEngine()->play2D(SOUND_BALL_COLLIDE(std::min(powerLevel, 2)), false, false, true);
-				sound->setVolume(glm::clamp((power - powerLevel * 2.0f), 0.3f, 1.0f));
-				sound->drop();
 			}
+
+			// apply impulse
+			glm::vec2 jNorm = glm::normalize(delta);
+			float power = glm::dot(balls[j]->velocity - v, jNorm);
+			glm::vec2 impulse = power * jNorm;
+			I += impulse;
+			balls[j]->velocity -= impulse;
+
+			// position correction
+			float penetration = 2.0f * BALL_RADIUS - sqrt(deltaSq);
+			balls[i]->position += penetration / 2 * -jNorm;
+			balls[j]->position += penetration / 2 * jNorm;
+
+			// play sound
+			power = std::abs(power);
+			int powerLevel = static_cast<int>(power / 2.0f);
+			irrklang::ISound* sound = getSoundEngine()->play2D(SOUND_BALL_COLLIDE(std::min(powerLevel, 2)), false, false, true);
+			sound->setVolume(glm::clamp((power - powerLevel * 2.0f), 0.3f, 1.0f));
+			sound->drop();
+
+			if (i == 0 && ballEvent != nullptr)
+				ballEvent->onWhiteBallCollide(j);
 		}
 		balls[i]->velocity += I;
 

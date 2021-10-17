@@ -242,6 +242,7 @@ void Scene::mouse(int button, int state, int x, int y)
 			{
 				ballPlacing = false;
 				enableCueControl();
+				ui.showMessage((turn ? L"Player 1" : L"Player 2") + std::wstring(L" 차례입니다!"));
 			}
 			else
 			{
@@ -255,7 +256,7 @@ void Scene::mouse(int button, int state, int x, int y)
 		else if (cueTransform.mode == CueMode::PUSHING)
 		{
 			hitWhiteBall();
-			cueTransform.mode = CueMode::ROTATION; // TODO (Debug) 계속 칠수있다. 원본: INVISIBLE
+			cueTransform.mode = CueMode::INVISIBLE;
 			cueTransform.pushAmount = -BALL_RADIUS;
 			cueTransform.update();
 		}
@@ -348,6 +349,7 @@ void Scene::onScreenChanged(int id)
 	// onGameStart
 	if (id == 2)
 	{
+		setTurn(true);
 		enableCueControl();
 		table.resetBallPosition();
 	}
@@ -358,6 +360,26 @@ void Scene::onAllBallStopped()
 	if (ui.getCurrentScreen() != 2 || ballPlacing)
 		return;
 
+	// set foul when first touch is not my ball or none;
+	bool isSolid = firstTouchBall >= 1 && firstTouchBall <= 7;
+	if (firstTouchBall == 0 || (group != BallGroup::NOT_DECIDED && !isFirstGroupSet && (isSolid == (group == BallGroup::P1SOLID)) != turn))
+	{
+		isFoul = true;
+		isTurnOut = true;
+	}
+
+	// turn change
+	if (isTurnOut || (!isFirstGroupSet && myBallCount == 0))
+	{
+		setTurn(!turn);
+		isTurnOut = false;
+	}
+
+	myBallCount = 0;
+	isFirstGroupSet = false;
+	firstTouchBall = 0;
+
+	// foul
 	if (isFoul)
 	{
 		foul();
@@ -380,6 +402,63 @@ void Scene::onBallHoleIn(int ballId)
 		isBallView = false;
 		isFoul = true;
 	}
+
+	if (ballId == 8)
+	{
+		if (ballGoals[turn == (group == BallGroup::P1STRIP)] == 7)
+			// TODO game win
+			std::cout << "Game win" << std::endl;
+		else
+			// TODO game lose
+			std::cout << "Game lose" << std::endl;
+		return;
+	}
+
+	bool isSolid = ballId >= 1 && ballId <= 7;
+	if (group == BallGroup::NOT_DECIDED)
+	{
+		std::wstring message = turn ? L"Player 1" : L"Player 2";
+		group = turn == isSolid ? BallGroup::P1SOLID : BallGroup::P1STRIP;
+		ui.showMessage(message + L" 은(는) 앞으로 " + (isSolid ? L"단색" : L"줄무늬") + L"공을 넣어야합니다.");
+		isFirstGroupSet = true;
+	}
+	else
+	{
+		if ((isSolid == (group == BallGroup::P1SOLID)) != turn)
+		{
+			isTurnOut = true;
+		}
+		else
+		{
+			myBallCount++;
+		}
+	}
+
+	ballGoals[!isSolid]++;
+	setTurn(turn); // update progress
+}
+
+void Scene::onWhiteBallCollide(int ballId)
+{
+	if (firstTouchBall == 0)
+	{
+		firstTouchBall = ballId;
+	}
+}
+
+void Scene::setTurn(bool turn)
+{
+	// get percent of ball goal count
+	float percent = 0.0f;
+	if(group != BallGroup::NOT_DECIDED)
+		percent = ballGoals[turn == (group == BallGroup::P1STRIP)] / 8.0f;
+
+	ui.setTurn(turn, group, percent);
+	if (this->turn != turn)
+	{
+		ui.showMessage((turn ? L"Player 1" : L"Player 2") + std::wstring(L" 차례입니다!"));
+		this->turn = turn;
+	}
 }
 
 void Scene::enableCueControl()
@@ -387,7 +466,8 @@ void Scene::enableCueControl()
 	cueTransform.mode = CueMode::ROTATION;
 	cueTransform.pushAmount = -BALL_RADIUS;
 	cueTransform.update();
-	ui.showMessage(L"당신 차례입니다!");
+	ballTracer.position = table.getBalls()[0]->position;
+	ballTracer.update();
 }
 
 void Scene::hitWhiteBall()

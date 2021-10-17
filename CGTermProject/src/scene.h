@@ -11,6 +11,7 @@
 #include "pooltable.h"
 #include "balltracer.h"
 #include "util/util.h"
+#include "gameenum.h"
 
 #define BALL_TEXTURE_COUNT 16
 
@@ -31,11 +32,6 @@ struct MouseRay
 {
     glm::vec3 position;
     glm::vec3 direction;
-};
-
-enum class CueMode
-{
-    INVISIBLE, ROTATION, PUSHING
 };
 
 class CueTransform
@@ -82,6 +78,7 @@ public:
     virtual void onScreenChanged(int id);
     virtual void onAllBallStopped();
     virtual void onBallHoleIn(int ballId);
+    virtual void onWhiteBallCollide(int ballId);
 private:
     void updateLight();
     void updateView();
@@ -89,6 +86,7 @@ private:
     void hitWhiteBall();
     void enableCueControl();
     void foul();
+    void setTurn(bool turn);
 private:
     // camera ball view
     bool isBallView = false;
@@ -114,6 +112,13 @@ private:
     commoncg::Texture* ballTextures[BALL_TEXTURE_COUNT];
     GUIScreen ui;
     // game variables
+    bool turn = true; // true = player1
+    int ballGoals[2] = { 0, 0 }; // remaining solid, strip count
+    int myBallCount = 0;
+    int firstTouchBall = 0;
+    BallGroup group = BallGroup::NOT_DECIDED;
+    bool isFirstGroupSet = false;
     bool isFoul = false;
+    bool isTurnOut = false;
     bool ballPlacing = false;
 };

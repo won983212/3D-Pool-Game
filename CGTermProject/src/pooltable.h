@@ -9,6 +9,7 @@ class IBallEvent
 public:
 	virtual void onAllBallStopped() = 0;
 	virtual void onBallHoleIn(int ballId) = 0;
+	virtual void onWhiteBallCollide(int ballId) = 0;
 };
 
 class Ball

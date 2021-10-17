@@ -2,7 +2,7 @@
 #include <string>
 #include "uielement.h"
 
-class Label : public UIElement
+class UELabel : public UIElement
 {
 public:
 	virtual bool render(std::vector<UIVertex>& vertices);
