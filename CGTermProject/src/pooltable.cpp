@@ -60,8 +60,12 @@ PoolTable::~PoolTable()
 
 void PoolTable::resetBallPosition()
 {
+	stopEventCalled = true;
+
 	// white(0) ball setup
 	balls[0]->position = glm::vec2(0.0f, -TABLE_HEIGHT / 3);
+	balls[0]->velocity = glm::vec2(0.0f);
+	balls[0]->visible = true;
 
 	// 1~15 ball setup
 	int i = 0;
@@ -71,7 +75,9 @@ void PoolTable::resetBallPosition()
 		{
 			glm::vec2 location = glm::vec2(2 * column - row, row * SQ3) * BALL_RADIUS;
 			location.y += TABLE_HEIGHT / 4;
-			balls[BALL_INDEXES[i++]]->position = location;
+			balls[BALL_INDEXES[i]]->position = location;
+			balls[BALL_INDEXES[i]]->velocity = glm::vec2(0.0f);
+			balls[BALL_INDEXES[i++]]->visible = true;
 		}
 	}
 }

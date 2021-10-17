@@ -112,7 +112,7 @@ void Scene::update(float partialTime, int fps)
 		cam.update();
 	}
 
-	if(!ballPlacing)
+	if(!ballPlacing && ui.getCurrentScreen() == 2)
 		table.update(partialTime);
 	ui.fpsLabel->setText(std::wstring(L"FPS: ") + std::to_wstring(fps));
 }
@@ -129,6 +129,20 @@ void Scene::updateView()
 	uboView.bindBufferRange(UNIFORM_BINDING_VIEWMAT, 0, sizeof(view));
 	uboView.buffer(sizeof(view), &view);
 	uboView.unbind();
+}
+
+void Scene::resetGame()
+{
+	turn = true;
+	ballGoals[0] = 0;
+	ballGoals[1] = 0;
+	myBallCount = 0;
+	firstTouchBall = 0;
+	group = BallGroup::NOT_DECIDED;
+	isFirstGroupSet = false;
+	isFoul = false;
+	isTurnOut = false;
+	ballPlacing = false;
 }
 
 void Scene::render()
@@ -346,9 +360,9 @@ void Scene::mouseMove(int x, int y)
 
 void Scene::onScreenChanged(int id)
 {
-	// onGameStart
 	if (id == 2)
 	{
+		resetGame();
 		setTurn(true);
 		enableCueControl();
 		table.resetBallPosition();
@@ -405,21 +419,17 @@ void Scene::onBallHoleIn(int ballId)
 
 	if (ballId == 8)
 	{
-		if (ballGoals[turn == (group == BallGroup::P1STRIP)] == 7)
-			// TODO game win
-			std::cout << "Game win" << std::endl;
-		else
-			// TODO game lose
-			std::cout << "Game lose" << std::endl;
+		bool win = ballGoals[turn == (group == BallGroup::P1STRIP)] == 7;
+		ui.goGameEnd((turn == win ? L"Player 1이" : L"Player 2가") + std::wstring(L" 이겼습니다."));
 		return;
 	}
 
 	bool isSolid = ballId >= 1 && ballId <= 7;
 	if (group == BallGroup::NOT_DECIDED)
 	{
-		std::wstring message = turn ? L"Player 1" : L"Player 2";
+		std::wstring message = turn ? L"Player 1은" : L"Player 2는";
 		group = turn == isSolid ? BallGroup::P1SOLID : BallGroup::P1STRIP;
-		ui.showMessage(message + L" 은(는) 앞으로 " + (isSolid ? L"단색" : L"줄무늬") + L"공을 넣어야합니다.");
+		ui.showMessage(message + L"  앞으로 " + (isSolid ? L"단색" : L"줄무늬") + L"공을 넣어야합니다.");
 		isFirstGroupSet = true;
 	}
 	else

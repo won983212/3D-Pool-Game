@@ -15,11 +15,13 @@ public:
 	virtual void onRenderTick();
 	void showMessage(std::wstring message);
 	void setTurn(bool turn, BallGroup group, float achieve);
+	void goGameEnd(std::wstring message);
 public:
 	UELabel* fpsLabel;
 	UELabel* messageLabel;
 	UELabel* turnLabel;
 	UERectangle* turnQuad;
 	UEImage* turnIcon;
+	UELabel* gameEndLabel;
 	clock_t lastMessageTick = 0;
 };

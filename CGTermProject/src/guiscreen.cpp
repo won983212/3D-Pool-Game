@@ -14,8 +14,8 @@ void GUIScreen::screenInit()
 	const int btnYBase = 380;
 	const int btnX = (int)((SCREEN_WIDTH - 300) / 2.0f);
 
-	// 3 screens (menu, about, ingameHUD)
-	addPages(3);
+	// 3 screens (menu, about, ingameHUD, game end)
+	addPages(4);
 
 	// menu screen
 	// background panel
@@ -109,6 +109,33 @@ void GUIScreen::screenInit()
 	turnIcon->setImage("res/texture/ball_icon.png");
 	turnIcon->setBounds(SCREEN_WIDTH / 2.0f - 55, SCREEN_HEIGHT - 56, 12, 12);
 	add(turnIcon, 2);
+
+
+	// game end screen
+	// background panel
+	add(rect, 3);
+
+	gameEndLabel = new UELabel();
+	gameEndLabel->setLocation(SCREEN_WIDTH / 2, btnYBase - 80);
+	gameEndLabel->setTextPoint(36);
+	gameEndLabel->setShadowColor(0xff000000);
+	gameEndLabel->setColor(0xffffffff);
+	gameEndLabel->setUseCentered(true);
+	add(gameEndLabel, 3);
+
+	// main menu button
+	btn = new UEButton();
+	btn->id = 3;
+	btn->setBounds(btnX, btnYBase, 300, 50);
+	btn->setText(L"메인 메뉴로");
+	btn->setButtonEvent(this);
+	add(btn, 3);
+}
+
+void GUIScreen::goGameEnd(std::wstring message)
+{
+	gameEndLabel->setText(message);
+	setScreen(3);
 }
 
 void GUIScreen::showMessage(std::wstring message)

@@ -61,5 +61,5 @@ public:
 private:
 	std::vector<Ball*> balls;
 	IBallEvent* ballEvent = nullptr;
-	bool stopEventCalled = false;
+	bool stopEventCalled = true;
 };
