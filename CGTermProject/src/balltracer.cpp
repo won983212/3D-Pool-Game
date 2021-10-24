@@ -6,7 +6,7 @@
 #define LINE_POINTS 4
 #define CIRCLE_POINTS 30
 
-namespace balltracer
+namespace __balltracer__
 {
 	struct Vertex
 	{
@@ -26,7 +26,7 @@ namespace balltracer
 }
 
 using namespace commoncg;
-using namespace balltracer;
+using namespace __balltracer__;
 
 
 void BallTracer::init()
@@ -83,28 +83,28 @@ void BallTracer::update()
 		return;
 	}
 
-	glm::vec2 ballPos;
+	glm::vec2 targetBallPos;
 	glm::vec2 collisionVecEnd;
 
 	if (traceRes.hitTargetBall == nullptr)
 	{
-		ballPos = traceRes.hitTimeBallPos;
-		collisionVecEnd = ballPos + 0.5f * glm::normalize(glm::reflect(ballPos - position, traceRes.normal));
+		targetBallPos = traceRes.hitBallPos;
+		collisionVecEnd = targetBallPos + 0.5f * glm::normalize(glm::reflect(targetBallPos - position, traceRes.normal));
 	} 
 	else
 	{
-		ballPos = traceRes.hitTargetBall->position;
-		collisionVecEnd = ballPos + 0.5f * glm::normalize(ballPos - traceRes.hitTimeBallPos);
+		targetBallPos = traceRes.hitTargetBall->position;
+		collisionVecEnd = targetBallPos + 0.5f * glm::normalize(targetBallPos - traceRes.hitBallPos);
 	}
 
-	hitBallPos = glm::vec3(traceRes.hitTimeBallPos.x, TRACER_Y, traceRes.hitTimeBallPos.y);
-	traceRes.hitTimeBallPos -= BALL_RADIUS * glm::normalize(traceRes.hitTimeBallPos - position);
+	hitBallPos = glm::vec3(traceRes.hitBallPos.x, TRACER_Y, traceRes.hitBallPos.y);
+	traceRes.hitBallPos -= BALL_RADIUS * glm::normalize(traceRes.hitBallPos - position);
 
-	balltracer::Vertex data[] =
+	Vertex data[] =
 	{
 		makeVertex(position.x, TRACER_Y, position.y, 0x77ffffff),
-		makeVertex(traceRes.hitTimeBallPos.x, TRACER_Y, traceRes.hitTimeBallPos.y, 0x77ffffff),
-		makeVertex(ballPos.x, TRACER_Y, ballPos.y, 0xaaffffff),
+		makeVertex(traceRes.hitBallPos.x, TRACER_Y, traceRes.hitBallPos.y, 0x77ffffff),
+		makeVertex(targetBallPos.x, TRACER_Y, targetBallPos.y, 0xaaffffff),
 		makeVertex(collisionVecEnd.x, TRACER_Y, collisionVecEnd.y, 0x00ffffff)
 	};
 

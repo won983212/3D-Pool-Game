@@ -31,7 +31,7 @@ struct RaytraceResult
 {
 	bool hit;
 	Ball* hitTargetBall;
-	glm::vec2 hitTimeBallPos;
+	glm::vec2 hitBallPos;
 	glm::vec2 normal;
 };
 

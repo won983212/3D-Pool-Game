@@ -110,7 +110,6 @@ void GUIScreen::screenInit()
 	turnIcon->setBounds(SCREEN_WIDTH / 2.0f - 55, SCREEN_HEIGHT - 56, 12, 12);
 	add(turnIcon, 2);
 
-
 	// game end screen
 	// background panel
 	add(rect, 3);

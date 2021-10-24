@@ -272,7 +272,7 @@ RaytraceResult PoolTable::getRaytracedBall(glm::vec2 pos, glm::vec2 dir) const
 			if (sqlen < minDist)
 			{
 				result.hit = true;
-				result.hitTimeBallPos = tHit;
+				result.hitBallPos = tHit;
 				result.hitTargetBall = balls[i];
 				minDist = sqlen;
 			}
@@ -294,7 +294,7 @@ RaytraceResult PoolTable::getRaytracedBall(glm::vec2 pos, glm::vec2 dir) const
 		{
 			result.hit = true;
 			result.hitTargetBall = nullptr;
-			result.hitTimeBallPos = hitPos - BALL_RADIUS * dir;
+			result.hitBallPos = hitPos - BALL_RADIUS * dir;
 			result.normal = WALLS[i].normal;
 			return result;
 		}
