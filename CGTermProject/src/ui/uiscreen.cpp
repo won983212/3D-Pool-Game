@@ -18,8 +18,8 @@ FontRenderer* UIScreen::GetFontRenderer()
 
 UIScreen::~UIScreen()
 {
-	for (auto& element : elements_)
-		for (auto& j : element)
+	for (const auto& element : elements_)
+		for (const auto& j : element)
 			delete j;
 }
 

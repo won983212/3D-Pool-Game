@@ -135,17 +135,17 @@ GLuint Skybox::LoadEquirectangularMap(const char* texture_path, int width, int h
 	return cubemap_texture_id;
 }
 
-void Skybox::LoadHdrSkybox(const char* hdr_texture_path)
+void Skybox::LoadHDRSkybox(const char* hdr_texture_path)
 {
 	texture_id_ = LoadEquirectangularMap(hdr_texture_path, SkyboxTexSize, SkyboxTexSize, false);
 }
 
-void Skybox::LoadDdsIrradianceMap(const char* dds_texture_path)
+void Skybox::LoadDDSIrradianceMap(const char* dds_texture_path)
 {
 	irr_texture_id_ = LoadEquirectangularMap(dds_texture_path, IrradianceTexSize, IrradianceTexSize, true);
 }
 
-void Skybox::LoadDdsSpecularMap(const char* dds_texture_path)
+void Skybox::LoadDDSSpecularMap(const char* dds_texture_path)
 {
 	specular_texture_id_ = LoadEquirectangularMap(dds_texture_path, SpecularTexSize, SpecularTexSize, true);
 }

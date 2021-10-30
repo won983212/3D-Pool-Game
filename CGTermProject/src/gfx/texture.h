@@ -9,7 +9,7 @@ namespace commoncg
 		~Texture();
 		void LoadTextureImage(const char* image_file_path, GLint wrap_param = GL_CLAMP_TO_EDGE, bool use_mipmap = false);
 		void Bind(GLenum target = GL_TEXTURE_2D) const;
-		void Destroy();
+		void Destroy() const;
 		GLuint GetTextureId() const;
 		int GetWidth() const;
 		int GetHeight() const;
@@ -19,7 +19,7 @@ namespace commoncg
 		static void Unbind(GLenum target = GL_TEXTURE_2D);
 
 	private:
-		void LoadDdsImage(const char* image_file_path, GLint wrap_param = GL_REPEAT);
+		void LoadDDSImage(const char* image_file_path, GLint wrap_param = GL_REPEAT);
 
 	private:
 		GLuint texture_id_ = 0;

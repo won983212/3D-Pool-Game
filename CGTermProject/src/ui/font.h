@@ -8,7 +8,7 @@
 #include "../gfx/vbo.h"
 #include "../gfx/shader.h"
 
-#define FONT_HEIGHT 40
+constexpr int FullFontHeight = 40;
 
 struct Glyph
 {
@@ -29,8 +29,8 @@ class FontRenderer
 public:
 	~FontRenderer();
 	void Init(const char* font_path);
-	void RenderText(std::wstring text, float x, float y, int color = 0xffffffff, float pt = 24, bool centered = false);
-	void RenderText(const commoncg::ShaderProgram& gui_shader, std::wstring text, float x, float y, int color = 0xffffffff, float pt = 24, bool centered = false);
+	void RenderText(std::wstring text, float x, float y, unsigned int color = 0xffffffff, float pt = 24, bool centered = false);
+	void RenderText(const commoncg::ShaderProgram& gui_shader, std::wstring text, float x, float y, unsigned int color = 0xffffffff, float pt = 24, bool centered = false);
 	int Width(std::wstring text, float pt = 1);
 	FontHeight MaxHeight(std::wstring text, float pt = 1);
 

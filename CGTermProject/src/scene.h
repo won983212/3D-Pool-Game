@@ -61,9 +61,7 @@ private:
 class Scene : public IBallEvent, IScreenChangedEvent
 {
 public:
-	Scene() : ubo_light_(GL_UNIFORM_BUFFER), ubo_view_(GL_UNIFORM_BUFFER), ball_tracer_(table_), cam_(0, 30, 10)
-	{
-	};
+	Scene() : ubo_light_(GL_UNIFORM_BUFFER), ubo_view_(GL_UNIFORM_BUFFER), ball_tracer_(table_), cam_(0, 30, 10) {}
 	void Init();
 	void Update(float partial_time, int fps);
 	void Render();

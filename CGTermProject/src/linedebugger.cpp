@@ -4,6 +4,11 @@
 
 using namespace commoncg;
 
+LineDebugger::~LineDebugger()
+{
+	delete[] points_;
+}
+
 void LineDebugger::Init(int lines)
 {
 	points_ = new linedebugger::Vertex[lines * 2];
@@ -27,17 +32,17 @@ void LineDebugger::Init(int lines)
 	ShaderProgram::Pop();
 }
 
-void LineDebugger::clear()
+void LineDebugger::Clear()
 {
 	len_ = 0;
 }
 
-void LineDebugger::add(float x, float y, float z)
+void LineDebugger::Add(float x, float y, float z)
 {
-	add(x, y, z, color_);
+	Add(x, y, z, color_);
 }
 
-void LineDebugger::add(float x, float y, float z, int color)
+void LineDebugger::Add(float x, float y, float z, int color)
 {
 	if (len_ >= point_size_)
 	{
@@ -54,7 +59,7 @@ void LineDebugger::add(float x, float y, float z, int color)
 	points_[len_++] = v;
 }
 
-void LineDebugger::update()
+void LineDebugger::Update() const
 {
 	beam_vao_.Use();
 	beam_vbo_.Buffer(SIZEOF(linedebugger::Vertex, point_size_), points_, GL_DYNAMIC_DRAW);
@@ -62,7 +67,7 @@ void LineDebugger::update()
 	VAO::Unbind();
 }
 
-void LineDebugger::draw()
+void LineDebugger::Draw() const
 {
 	ShaderProgram::Push();
 	beam_shader_.Use();

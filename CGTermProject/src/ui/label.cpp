@@ -1,7 +1,5 @@
 #include "uiscreen.h"
 #include "label.h"
-
-#include <utility>
 #include "font.h"
 
 
@@ -19,12 +17,12 @@ void UELabel::SetText(std::wstring text)
 	this->text_ = std::move(text);
 }
 
-void UELabel::SetColor(int color)
+void UELabel::SetColor(unsigned int color)
 {
 	this->color_ = color;
 }
 
-void UELabel::SetShadowColor(const int shadow_color)
+void UELabel::SetShadowColor(unsigned int shadow_color)
 {
 	this->shadow_color_ = shadow_color;
 }

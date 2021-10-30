@@ -19,13 +19,13 @@ void GuiScreen::ScreenInit()
 
 	// menu screen
 	// background panel
-	auto rect = new UERectangle();
+	const auto rect = new UERectangle();
 	rect->SetBounds(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 	rect->SetColor(0x66ffffff);
 	Add(rect, 0);
 
 	// title banner
-	auto img = new UEImage();
+	const auto img = new UEImage();
 	img->SetImage("res/texture/title.png");
 	img->PackSize();
 	img->SetLocation((SCREEN_WIDTH - img->width_) / 2.0f, 80);
@@ -184,6 +184,9 @@ void GuiScreen::OnButtonClick(int id)
 		break;
 	case 3:
 		SetScreen(0);
+		break;
+	default:
+		std::cout << "Error: Invaild Button id: " << id << std::endl;
 		break;
 	}
 }

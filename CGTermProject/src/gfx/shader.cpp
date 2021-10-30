@@ -59,13 +59,13 @@ ShaderProgram::~ShaderProgram()
 
 void ShaderProgram::AddShader(const GLchar* path, GLenum type)
 {
-	if (shader_index_ >= SHADER_MAX_COUNT)
+	if (shader_index_ >= MaxShaderCount)
 	{
 		std::cout << "Error: shader is full: " << path << std::endl;
 		return;
 	}
 
-	shaders_[shader_index_++] = {path, type};
+	shaders_[shader_index_++] = {path, type, 0};
 }
 
 void ShaderProgram::Load()
@@ -113,14 +113,14 @@ GLuint ShaderProgram::GetProgramId() const
 }
 
 // Setting floats
-void ShaderProgram::SetUniform(const char* name, float* values, int count) const
+void ShaderProgram::SetUniform(const char* name, const float* values, int count) const
 {
 	glUniform1fv(glGetUniformLocation(handle_, name), count, values);
 }
 
-void ShaderProgram::SetUniform(const char* name, const float f_value) const
+void ShaderProgram::SetUniform(const char* name, const float value) const
 {
-	glUniform1fv(glGetUniformLocation(handle_, name), 1, &f_value);
+	glUniform1fv(glGetUniformLocation(handle_, name), 1, &value);
 }
 
 // Setting vectors
@@ -177,7 +177,7 @@ void ShaderProgram::SetUniform(const char* name, const glm::mat4& matrix) const
 }
 
 // Setting integers
-void ShaderProgram::SetUniform(const char* name, int* values, int count) const
+void ShaderProgram::SetUniform(const char* name, const int* values, int count) const
 {
 	glUniform1iv(glGetUniformLocation(handle_, name), count, values);
 }

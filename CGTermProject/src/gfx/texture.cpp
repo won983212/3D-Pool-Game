@@ -43,7 +43,7 @@ void Texture::LoadTextureImage(const char* image_file_path, const GLint wrap_par
 
 	if (ext == "dds")
 	{
-		LoadDdsImage(image_file_path, wrap_param);
+		LoadDDSImage(image_file_path, wrap_param);
 		return;
 	}
 	if (ext == "hdr")
@@ -104,7 +104,7 @@ static void HandleError(const std::string& message, void* header, void* buffer, 
 }
 
 // Reference: https://gist.github.com/tilkinsc/13191c0c1e5d6b25fbe79bbd2288a673
-void Texture::LoadDdsImage(const char* image_file_path, GLint wrap_param)
+void Texture::LoadDDSImage(const char* image_file_path, GLint wrap_param)
 {
 	unsigned char* header;
 	unsigned int block_size, format;
@@ -223,7 +223,7 @@ void Texture::Bind(GLenum target) const
 	glBindTexture(target, texture_id_);
 }
 
-void Texture::Destroy()
+void Texture::Destroy() const
 {
 	if (texture_id_ == 0)
 	{

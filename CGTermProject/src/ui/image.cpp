@@ -2,8 +2,7 @@
 
 UEImage::~UEImage()
 {
-	if (texture_ != nullptr)
-		delete texture_;
+	delete texture_;
 }
 
 bool UEImage::Render(std::vector<UIVertex>& vertices)

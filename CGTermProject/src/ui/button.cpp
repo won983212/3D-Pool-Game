@@ -1,5 +1,4 @@
 #include <iostream>
-#include <utility>
 #include "uiscreen.h"
 #include "button.h"
 
@@ -7,7 +6,7 @@ bool UEButton::Render(std::vector<UIVertex>& vertices)
 {
 	const float x2 = x_ + width_;
 	const float y2 = y_ + height_;
-	const int color = hover_ ? 0xaa999999 : 0xaa000000;
+	const unsigned int color = hover_ ? 0xaa999999 : 0xaa000000;
 
 	vertices.push_back(MakeVertex(x_, y_, color));
 	vertices.push_back(MakeVertex(x2, y_, color));

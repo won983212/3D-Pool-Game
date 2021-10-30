@@ -1,5 +1,5 @@
 #include <iostream>
-#include <time.h>
+#include <ctime>
 #include <functional>
 #include "gfx.h"
 #include "window.h"
@@ -15,7 +15,7 @@ void Window::Init(const char* title, int* argcp, char** argv)
 	glutInit(argcp, argv);
 }
 
-void Window::Create(WindowCallback init, WindowCallback display, bool use_msaa)
+void Window::Create(WindowCallback init, WindowCallback render, bool use_msaa)
 {
 	if (use_msaa)
 	{
@@ -39,7 +39,7 @@ void Window::Create(WindowCallback init, WindowCallback display, bool use_msaa)
 	}
 
 	init();
-	this->render_ = display;
+	this->render_ = render;
 	inst_ = this;
 
 	glutDisplayFunc(RenderWrapper);
@@ -55,7 +55,7 @@ void Window::Loop() const
 
 void Window::SetDestroyFunc(WindowCallback destory)
 {
-	this->destroy_ = destroy_;
+	this->destroy_ = destory;
 }
 
 void Window::SetReshapeFunc(ReshapeCallback reshape) const

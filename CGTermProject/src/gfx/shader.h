@@ -2,7 +2,7 @@
 
 #include "gfx.h"
 
-#define SHADER_MAX_COUNT 5
+constexpr int MaxShaderCount = 5;
 
 namespace commoncg
 {
@@ -32,7 +32,7 @@ namespace commoncg
 		void SetUniform(const char* name, const glm::vec4& vector) const;
 
 		// Setting floats
-		void SetUniform(const char* name, float* values, int count = 1) const;
+		void SetUniform(const char* name, const float* values, int count = 1) const;
 		void SetUniform(const char* name, float value) const;
 
 		// Setting 3x3 matrices
@@ -44,7 +44,7 @@ namespace commoncg
 		void SetUniform(const char* name, const glm::mat4& matrix) const;
 
 		// Setting integers
-		void SetUniform(const char* name, int* values, int count = 1) const;
+		void SetUniform(const char* name, const int* values, int count = 1) const;
 		void SetUniform(const char* name, int value) const;
 
 		static void Push();
@@ -53,7 +53,7 @@ namespace commoncg
 
 	private:
 		GLuint handle_ = 0;
-		Shader shaders_[SHADER_MAX_COUNT] = {};
+		Shader shaders_[MaxShaderCount] = {};
 		int shader_index_ = 0;
 	};
 }

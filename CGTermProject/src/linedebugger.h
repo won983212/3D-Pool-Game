@@ -16,21 +16,18 @@ namespace linedebugger
 class LineDebugger
 {
 public:
-	~LineDebugger()
-	{
-		delete[] points_;
-	}
+	~LineDebugger();
 
 public:
 	void Init(int lines = 1);
-	void clear();
-	void add(float x, float y, float z);
-	void add(float x, float y, float z, int color);
-	void update();
-	void draw();
+	void Clear();
+	void Add(float x, float y, float z);
+	void Add(float x, float y, float z, int color);
+	void Update() const;
+	void Draw() const;
 
 public:
-	int color_ = 0xffff0000;
+	unsigned int color_ = 0xffff0000;
 
 private:
 	int len_ = 0;

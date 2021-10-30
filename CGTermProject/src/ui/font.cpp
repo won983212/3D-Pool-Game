@@ -1,5 +1,4 @@
 #include <iostream>
-#include <utility>
 #include "font.h"
 #include "../util/util.h"
 #include "uielement.h"
@@ -32,7 +31,7 @@ void FontRenderer::Init(const char* font_path)
 		}
 
 		// Use width as 0: auto width (fits to height)
-		FT_Set_Pixel_Sizes(face_, 0, FONT_HEIGHT);
+		FT_Set_Pixel_Sizes(face_, 0, FullFontHeight);
 		// set alignment 4 to 1 (because r채널 하나만 사용하므로)
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 		lib_need_initialize_ = false;
@@ -40,7 +39,7 @@ void FontRenderer::Init(const char* font_path)
 
 	vao_.Create();
 	vbo_.Create();
-	vbo_.Buffer(SIZEOF(UIVertex, 6), NULL, GL_DYNAMIC_DRAW); // 6 vertices * (vec4(pos-2 + tex-2) + vec4-color)
+	vbo_.Buffer(SIZEOF(UIVertex, 6), nullptr, GL_DYNAMIC_DRAW); // 6 vertices * (vec4(pos-2 + tex-2) + vec4-color)
 	vao_.Attrib(0, 4, GL_FLOAT, sizeof(UIVertex), 0);
 	vao_.Attrib(1, 4, GL_FLOAT, sizeof(UIVertex), offsetof(UIVertex, color));
 	vbo_.Unbind();
@@ -93,7 +92,7 @@ bool FontRenderer::CacheGlyph(FT_ULong c, Glyph* glyph)
 	return true;
 }
 
-void FontRenderer::RenderText(std::wstring text, float x, float y, int color, float pt, bool centered)
+void FontRenderer::RenderText(std::wstring text, float x, float y, unsigned int color, float pt, bool centered)
 {
 	ShaderProgram::GetContextShader()->SetUniform("useFont", true);
 	glActiveTexture(GL_TEXTURE0 + PBR_TEXTURE_INDEX_ALBEDO);
@@ -107,9 +106,8 @@ void FontRenderer::RenderText(std::wstring text, float x, float y, int color, fl
 		y -= (h.above_base + h.below_base) / 2.0f - h.above_base;
 	}
 
-	float scale = pt * 0.75f / static_cast<float>(FONT_HEIGHT);
-	std::wstring::const_iterator c;
-	for (c = text.begin(); c != text.end(); ++c)
+	const float scale = pt * 0.75f / static_cast<float>(FullFontHeight);
+	for (std::wstring::const_iterator c = text.begin(); c != text.end(); ++c)
 	{
 		Glyph glyph;
 		if (!CacheGlyph(*c, &glyph))
@@ -150,7 +148,7 @@ void FontRenderer::RenderText(std::wstring text, float x, float y, int color, fl
 	ShaderProgram::GetContextShader()->SetUniform("useFont", false);
 }
 
-void FontRenderer::RenderText(const ShaderProgram& gui_shader, std::wstring text, float x, float y, int color, float pt, bool centered)
+void FontRenderer::RenderText(const ShaderProgram& gui_shader, std::wstring text, float x, float y, unsigned int color, float pt, bool centered)
 {
 	ShaderProgram::Push();
 	gui_shader.Use();
@@ -168,7 +166,7 @@ int FontRenderer::Width(std::wstring text, float pt)
 			continue;
 		w += glyph.advance >> 6;
 	}
-	return static_cast<int>(w * pt * 0.75f / static_cast<float>(FONT_HEIGHT));
+	return static_cast<int>(w * pt * 0.75f / static_cast<float>(FullFontHeight));
 }
 
 FontHeight FontRenderer::MaxHeight(std::wstring text, float pt)
@@ -186,6 +184,6 @@ FontHeight FontRenderer::MaxHeight(std::wstring text, float pt)
 			bottom_max = glyph.size.y - glyph.bearing.y;
 	}
 
-	const float scale = pt * 0.75f / static_cast<float>(FONT_HEIGHT);
+	const float scale = pt * 0.75f / static_cast<float>(FullFontHeight);
 	return {static_cast<int>(top_max * scale), static_cast<int>(bottom_max * scale)};
 }

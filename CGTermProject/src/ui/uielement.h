@@ -16,11 +16,11 @@ class UIElement
 public:
 	// return: Use texture?
 	virtual bool Render(std::vector<UIVertex>& vertices) = 0;
-	virtual void PostRender() { };
-	virtual bool OnMouse(int button, int state, int x, int y) { return false; };
-	virtual void OnMouseWheel(int button, int state, int x, int y) { };
-	virtual void OnMouseDrag(int x, int y) { };
-	virtual void OnMouseMove(int x, int y) { };
+	virtual void PostRender() { }
+	virtual bool OnMouse(int button, int state, int x, int y) { return false; }
+	virtual void OnMouseWheel(int button, int state, int x, int y) { }
+	virtual void OnMouseDrag(int x, int y) { }
+	virtual void OnMouseMove(int x, int y) { }
 
 public:
 	void SetBounds(float x, float y, float width, float height);

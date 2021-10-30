@@ -47,7 +47,7 @@ constexpr int BallIndexes[] = {1, 11, 3, 6, 8, 14, 13, 15, 4, 9, 7, 2, 10, 5, 12
 
 PoolTable::PoolTable()
 {
-	const float gap = TableHeight * 0.8f / 15.0f;
+	constexpr float gap = TableHeight * 0.8f / 15.0f;
 	for (int i = 0; i < BallCount; i++)
 		AddBall(0.0f, i * gap - TableHeight * 0.8f / 2.0f);
 }
@@ -82,7 +82,7 @@ void PoolTable::ResetBallPosition()
 	}
 }
 
-void PoolTable::update(float partial_time)
+void PoolTable::Update(float partial_time)
 {
 	bool is_all_stop = true;
 	for (unsigned int i = 0; i < balls_.size(); i++)
@@ -146,7 +146,7 @@ void PoolTable::update(float partial_time)
 		glm::vec2 v = balls_[i]->velocity_;
 		glm::vec2 v_norm = normalize(v);
 		float len_v = length(v);
-		for (unsigned int j = 0; j < balls_.size(); j++)
+		for (j = 0; j < balls_.size(); j++)
 		{
 			glm::vec2 delta = balls_[j]->position_ - balls_[i]->position_;
 			if (i == j || !balls_[j]->visible_ || dot(v, delta) < 0) // 정방향으로 충돌한 ball만 고려
@@ -232,7 +232,7 @@ void PoolTable::update(float partial_time)
 
 bool PoolTable::CanPlaceWhiteBall() const
 {
-	glm::vec2 pos = balls_[0]->position_;
+	const glm::vec2 pos = balls_[0]->position_;
 	if (std::abs(pos.x) > TableWidth / 2 - BallRadius - CornerReduce)
 		return false;
 	if (std::abs(pos.y) > TableHeight / 2 - BallRadius - CornerReduce)

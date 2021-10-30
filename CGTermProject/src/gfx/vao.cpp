@@ -13,7 +13,7 @@ void VAO::Create()
 	glGenVertexArrays(1, &handle_);
 }
 
-void VAO::Destroy()
+void VAO::Destroy() const
 {
 	CheckIfCreated("Destroy");
 	glDeleteVertexArrays(1, &handle_);

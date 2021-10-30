@@ -14,7 +14,10 @@ public:
 class Ball
 {
 public:
-	Ball() : position_(0.0f), velocity_(0.0f) { rotation_ = angleAxis(90.0f, glm::vec3(0, 1, 0)); };
+	Ball() : position_(0.0f), velocity_(0.0f)
+	{
+		rotation_ = angleAxis(90.0f, glm::vec3(0, 1, 0));
+	}
 
 public:
 	glm::vec2 position_;
@@ -38,7 +41,7 @@ public:
 	PoolTable();
 	~PoolTable();
 	void ResetBallPosition();
-	void update(float partial_time);
+	void Update(float partial_time);
 	bool CanPlaceWhiteBall() const;
 	RaytraceResult GetRaytracedBall(glm::vec2 pos, glm::vec2 dir) const;
 

@@ -11,9 +11,9 @@ namespace commoncg
 	{
 	public:
 		void BeginLoad();
-		void LoadHdrSkybox(const char* hdr_texture_path);
-		void LoadDdsIrradianceMap(const char* dds_texture_path);
-		void LoadDdsSpecularMap(const char* dds_texture_path);
+		void LoadHDRSkybox(const char* hdr_texture_path);
+		void LoadDDSIrradianceMap(const char* dds_texture_path);
+		void LoadDDSSpecularMap(const char* dds_texture_path);
 		void EndLoad() const;
 		void Render(glm::mat4 view) const;
 		void BindEnvironmentTextures() const;

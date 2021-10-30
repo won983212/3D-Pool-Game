@@ -7,6 +7,7 @@
 #include "model.h"
 #include "../gfx/vao.h"
 #include "../gfx/vbo.h"
+#include "../gfx/texture.h"
 
 
 namespace model
@@ -25,23 +26,21 @@ namespace model
 		commoncg::VAO vao_;
 		commoncg::VBO vbo_, ebo_;
 		int material_index_;
-		int indice_size_;
+		unsigned int indice_size_;
 		const AssetModel* parent_;
 
 	public:
-		Mesh(const AssetModel* parent, aiMesh* mesh);
-		void Draw();
+		Mesh(const AssetModel* parent, const aiMesh* mesh);
+		void Draw() const;
 	};
 
 	class AssetModel
 	{
 	public:
-		AssetModel()
-		{
-		};
+		AssetModel() = default;
 		~AssetModel();
 		void Draw();
-		void LoadModel(std::string path);
+		void LoadModel(const std::string& path);
 
 	private:
 		void LoadTexture(const aiScene* scene, const std::string& tex_path, Material* u_mat, int id);

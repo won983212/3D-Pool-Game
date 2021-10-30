@@ -11,6 +11,7 @@ using namespace glm;
 using namespace commoncg;
 
 // cue constants
+constexpr float MinCuePower = 0.05f;
 constexpr float MaxCuePower = 1.0f;
 constexpr float CuePowerModifier = 12.0f;
 
@@ -20,13 +21,13 @@ constexpr float PrjAspect = static_cast<float>(SCREEN_WIDTH) / SCREEN_HEIGHT;
 constexpr float PrjNear = 0.1f;
 constexpr float PrjFar = 100.0f;
 
-const model::Material BallMaterial =
+constexpr model::Material BallMaterial =
 {
 	vec4(1.0f, 1.0f, 0.0f, 1.0f), // albedo
 	0.1f, // metallic
 	0.1f, // roughness
 	DefaultAo, // ao
-	0, -1, -1, -1 // texIndex
+	{0, -1, -1, -1} // texIndex
 };
 
 
@@ -70,9 +71,9 @@ void Scene::Init()
 
 	// skybox
 	skybox_.BeginLoad();
-	skybox_.LoadHdrSkybox("res/texture/skybox/skybox.hdr");
-	skybox_.LoadDdsIrradianceMap("res/texture/skybox/irr.dds");
-	skybox_.LoadDdsSpecularMap("res/texture/skybox/env.dds");
+	skybox_.LoadHDRSkybox("res/texture/skybox/skybox.hdr");
+	skybox_.LoadDDSIrradianceMap("res/texture/skybox/irr.dds");
+	skybox_.LoadDDSSpecularMap("res/texture/skybox/env.dds");
 	skybox_.EndLoad();
 
 	// lights
@@ -114,7 +115,7 @@ void Scene::Update(float partial_time, int fps)
 	}
 
 	if (!ball_placing_ && ui_.GetCurrentScreen() == 2)
-		table_.update(partial_time);
+		table_.Update(partial_time);
 	ui_.fps_label_->SetText(std::wstring(L"FPS: ") + std::to_wstring(fps));
 }
 
@@ -337,7 +338,7 @@ void Scene::MouseMove(int x, int y)
 	if (cue_transform_.mode_ == CueMode::Rotation)
 	{
 		float angle;
-		if (length2(diff) == 0)
+		if (length2(diff) == 0.0f)
 		{
 			angle = 0;
 		}
@@ -352,8 +353,8 @@ void Scene::MouseMove(int x, int y)
 	}
 	else if (cue_transform_.mode_ == CueMode::Pushing)
 	{
-		float power = dot(cue_transform_.GetCueDirection(), diff);
-		cue_transform_.push_amount_ = -clamp(power, BallRadius, MaxCuePower + BallRadius);
+		const float power = dot(cue_transform_.GetCueDirection(), diff);
+		cue_transform_.push_amount_ = -clamp(power, BallRadius + MinCuePower, BallRadius + MaxCuePower);
 	}
 
 	cue_transform_.Update();

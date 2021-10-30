@@ -1,8 +1,8 @@
+#include "assetmodel.h"
 #include <iostream>
 #include "../gfx/shader.h"
 #include "../gfx/texture.h"
 #include "assimp/postprocess.h"
-#include "assetmodel.h"
 #include "assimp/pbrmaterial.h"
 
 
@@ -11,7 +11,7 @@ using namespace commoncg;
 using namespace std;
 
 
-static string GetTexPathAssimp(aiMaterial* material, aiTextureType type, unsigned int index)
+static string GetTexPathAssimp(const aiMaterial* material, aiTextureType type, unsigned index)
 {
 	if (material->GetTextureCount(type) > 0)
 	{
@@ -22,7 +22,7 @@ static string GetTexPathAssimp(aiMaterial* material, aiTextureType type, unsigne
 	return "";
 }
 
-static glm::vec4 GetVecAssimp(aiMaterial* material, glm::vec4 default_value, const char* key, unsigned int type, unsigned int index)
+static glm::vec4 GetVecAssimp(const aiMaterial* material, glm::vec4 default_value, const char* key, unsigned type, unsigned index)
 {
 	aiColor4D ai_color;
 	if (material->Get(key, type, index, ai_color) == AI_SUCCESS)
@@ -30,7 +30,7 @@ static glm::vec4 GetVecAssimp(aiMaterial* material, glm::vec4 default_value, con
 	return default_value;
 }
 
-static float GetFloatAssimp(aiMaterial* material, float default_value, const char* key, unsigned int type, unsigned int index)
+static float GetFloatAssimp(const aiMaterial* material, float default_value, const char* key, unsigned type, unsigned index)
 {
 	float data;
 	if (material->Get(key, type, index, data) == AI_SUCCESS)
@@ -38,7 +38,7 @@ static float GetFloatAssimp(aiMaterial* material, float default_value, const cha
 	return default_value;
 }
 
-Mesh::Mesh(const AssetModel* parent, aiMesh* mesh)
+Mesh::Mesh(const AssetModel* parent, const aiMesh* mesh)
 	: ebo_(GL_ELEMENT_ARRAY_BUFFER), material_index_(-1), indice_size_(0), parent_(parent)
 {
 	vector<Vertex> vertices;
@@ -83,8 +83,7 @@ Mesh::Mesh(const AssetModel* parent, aiMesh* mesh)
 	indice_size_ = indices.size();
 
 	// materials
-	if (mesh->mMaterialIndex >= 0)
-		material_index_ = mesh->mMaterialIndex;
+	material_index_ = mesh->mMaterialIndex;
 
 	// allocate at VAO
 	vao_.Create();
@@ -102,9 +101,9 @@ Mesh::Mesh(const AssetModel* parent, aiMesh* mesh)
 	VAO::Unbind();
 }
 
-void Mesh::Draw()
+void Mesh::Draw() const
 {
-	Material* u_mat = parent_->materials_[material_index_];
+	const Material* u_mat = parent_->materials_[material_index_];
 	for (unsigned int i = 0; i < MeshTextureTypeSize; i++)
 	{
 		glActiveTexture(GL_TEXTURE0 + TexturePbrIndexes[i]);
@@ -150,7 +149,7 @@ void AssetModel::Draw()
 void AssetModel::LoadTexture(const aiScene* scene, const string& tex_path, Material* u_mat, int id)
 {
 	// load texture
-	auto tex = new ModelTexture();
+	const auto tex = new ModelTexture();
 	tex->texture = Texture::CacheImage((directory_ + '/' + tex_path).c_str(), GL_REPEAT, true);
 	tex->type = static_cast<TextureType>(id);
 
@@ -159,7 +158,7 @@ void AssetModel::LoadTexture(const aiScene* scene, const string& tex_path, Mater
 	textures_.push_back(tex);
 }
 
-void AssetModel::LoadModel(string path)
+void AssetModel::LoadModel(const string& path)
 {
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs);
@@ -176,7 +175,7 @@ void AssetModel::LoadModel(string path)
 	// load all materials
 	for (unsigned int i = 0; i < scene->mNumMaterials; i++)
 	{
-		aiMaterial* material = scene->mMaterials[i];
+		const aiMaterial* material = scene->mMaterials[i];
 		auto u_mat = new Material();
 
 		for (int& j : u_mat->tex_index)
@@ -220,7 +219,7 @@ void AssetModel::LoadModel(string path)
 	// load all meshes
 	for (unsigned int i = 0; i < scene->mNumMeshes; i++)
 	{
-		aiMesh* mesh = scene->mMeshes[i];
+		const aiMesh* mesh = scene->mMeshes[i];
 		meshes_.push_back(new Mesh(this, mesh));
 	}
 }

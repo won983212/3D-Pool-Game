@@ -16,8 +16,8 @@ static void AddSphereVertex(vector<Vertex>& vertices, int i_pitch, int i_yaw, in
 	const float tex_step = 1.0f / step;
 
 	vec3 normal;
-	float pitch = pitch_step * (i_pitch - step / 2);
-	float yaw = yaw_step * i_yaw;
+	const float pitch = pitch_step * (i_pitch - step / 2);
+	const float yaw = yaw_step * i_yaw;
 
 	normal.x = cos(pitch) * cos(yaw);
 	normal.y = sin(pitch);
@@ -72,7 +72,7 @@ void Ball::Init(float radius, int step)
 	VAO::Unbind();
 }
 
-void Ball::Draw()
+void Ball::Draw() const
 {
 	vao_.Use();
 	glDrawArrays(GL_TRIANGLES, 0, vertices_size_);

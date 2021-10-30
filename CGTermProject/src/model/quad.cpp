@@ -8,7 +8,7 @@ using namespace model;
 using namespace glm;
 using namespace commoncg;
 
-void Quad::init(float width, float height, vec3 normal)
+void Quad::Init(float width, float height, vec3 normal)
 {
 	float half_w = width / 2;
 	float half_h = height / 2;
@@ -67,7 +67,7 @@ void Quad::init(float width, float height, vec3 normal)
 	VAO::Unbind();
 }
 
-void Quad::draw()
+void Quad::Draw() const
 {
 	vao_.Use();
 	glDrawArrays(GL_TRIANGLES, 0, vertices_size_);

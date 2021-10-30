@@ -8,8 +8,8 @@ namespace model
 	class Quad
 	{
 	public:
-		void init(float width, float height, glm::vec3 normal);
-		void draw();
+		void Init(float width, float height, glm::vec3 normal);
+		void Draw() const;
 
 	private:
 		commoncg::VAO vao_;

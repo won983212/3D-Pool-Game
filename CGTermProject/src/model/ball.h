@@ -8,7 +8,7 @@ namespace model
 	{
 	public:
 		void Init(float radius, int step = 30);
-		void Draw();
+		void Draw() const;
 
 	private:
 		commoncg::VAO vao_;
