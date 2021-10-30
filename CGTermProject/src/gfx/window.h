@@ -1,45 +1,46 @@
 #pragma once
-#include <cstddef>
 
 namespace commoncg
 {
-	typedef void (*WindowCallback)();
-	typedef void (*UpdateCallback)(float partialTime);
-	typedef void (*ReshapeCallback)(int w, int h);
-	typedef void (*KeyboardCallback)(unsigned char key, int x, int y);
-	typedef void (*MouseCallback)(int button, int state, int x, int y);
-	typedef void (*MouseMotionCallback)(int x, int y);
+	using WindowCallback = void(*)();
+	using UpdateCallback = void(*)(float partial_time);
+	using ReshapeCallback = void(*)(int w, int h);
+	using KeyboardCallback = void(*)(unsigned char key, int x, int y);
+	using MouseCallback = void(*)(int button, int state, int x, int y);
+	using MouseMotionCallback = void(*)(int x, int y);
 
 	class Window
 	{
 	public:
-		void init(const char* title, int* argcp, char** argv);
-		void create(WindowCallback init, WindowCallback render, bool useMSAA = false);
-		void setDestroyFunc(WindowCallback destory);
-		void setReshapeFunc(ReshapeCallback reshape) const;
-		void setKeyboardFunc(KeyboardCallback keyEvent) const;
-		void setKeyboardUpFunc(KeyboardCallback keyEvent) const;
-		void setMouseFunc(MouseCallback mouseEvent) const;
-		void setMouseMotionFunc(MouseMotionCallback mouseEvent) const;
-		void setMouseDragFunc(MouseMotionCallback mouseEvent) const;
-		void setMouseWheelFunc(MouseCallback mouseEvent) const;
-		void setIdleFunc(UpdateCallback idle);
-		float getPartialTime() const;
-		int getFPS() const;
-		void loop() const;
+		void Init(const char* title, int* argcp, char** argv);
+		void Create(WindowCallback init, WindowCallback render, bool use_msaa = false);
+		void SetDestroyFunc(WindowCallback destory);
+		void SetReshapeFunc(ReshapeCallback reshape) const;
+		void SetKeyboardFunc(KeyboardCallback key_event) const;
+		void SetKeyboardUpFunc(KeyboardCallback key_event) const;
+		void SetMouseFunc(MouseCallback mouse_event) const;
+		void SetMouseMotionFunc(MouseMotionCallback mouse_event) const;
+		void SetMouseDragFunc(MouseMotionCallback mouse_event) const;
+		void SetMouseWheelFunc(MouseCallback mouse_event) const;
+		void SetIdleFunc(UpdateCallback idle);
+		float GetPartialTime() const;
+		int GetFps() const;
+		void Loop() const;
+
 	private:
-		static void renderWrapper();
-		static void update();
+		static void RenderWrapper();
+		static void Update();
+
 	private:
-		static Window* inst;
-		WindowCallback destroy = NULL;
-		WindowCallback render = NULL;
-		UpdateCallback idle = NULL;
-		const char* title;
-		float partialTime = 0;
-		long lastFrame = 0;
-		long lastFPSCountFrame = 0;
-		int fpsCount = 0;
-		int fps = 0;
+		static Window* inst_;
+		WindowCallback destroy_ = nullptr;
+		WindowCallback render_ = nullptr;
+		UpdateCallback idle_ = nullptr;
+		const char* title_ = "";
+		float partial_time_ = 0;
+		long last_frame_ = 0;
+		long last_fps_count_frame_ = 0;
+		int fps_count_ = 0;
+		int fps_ = 0;
 	};
 }

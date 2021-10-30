@@ -13,113 +13,112 @@
 #include "util/util.h"
 #include "gameenum.h"
 
-#define BALL_TEXTURE_COUNT 16
-
 
 struct LightData
 {
-    glm::vec4 position;
-    glm::vec4 color;
+	glm::vec4 position;
+	glm::vec4 color;
 };
 
 struct ViewMatrixData
 {
-    glm::mat4 view;
-    glm::mat4 projection;
+	glm::mat4 view;
+	glm::mat4 projection;
 };
 
 struct MouseRay
 {
-    glm::vec3 position;
-    glm::vec3 direction;
+	glm::vec3 position;
+	glm::vec3 direction;
 };
 
 class CueTransform
 {
 public:
-    glm::mat4 getModelMatrix()
-    {
-        return modelMat;
-    }
-    void update()
-    {
-        modelMat = glm::mat4(1.0f);
-        modelMat = glm::translate(modelMat, glm::vec3(position.x, 0.16f, position.y)); // location
-        modelMat = glm::rotate(modelMat, rotation, glm::vec3(0, 1, 0)); // rotation
-        modelMat = glm::translate(modelMat, glm::vec3(0.0f, 0.0f, pushAmount)); // push model
-        modelMat = glm::rotate(modelMat, DEGTORAD(90.0f), glm::vec3(1, 0, 0));
-        modelMat = glm::scale(modelMat, glm::vec3(0.05f));
-    }
-    glm::vec2 getCueDirection()
-    {
-        return glm::vec2(sin(rotation), cos(rotation));
-    }
+	glm::mat4 GetModelMatrix() const { return model_mat_; }
+	glm::vec2 GetCueDirection() const { return glm::vec2(sin(rotation_), cos(rotation_)); }
+
+	void Update()
+	{
+		model_mat_ = glm::mat4(1.0f);
+		model_mat_ = translate(model_mat_, glm::vec3(position_.x, 0.16f, position_.y)); // location
+		model_mat_ = rotate(model_mat_, rotation_, glm::vec3(0, 1, 0)); // rotation
+		model_mat_ = translate(model_mat_, glm::vec3(0.0f, 0.0f, push_amount_)); // Push model
+		model_mat_ = rotate(model_mat_, DEGTORAD(90.0f), glm::vec3(1, 0, 0));
+		model_mat_ = scale(model_mat_, glm::vec3(0.05f));
+	}
+
 public:
-    glm::vec2 position = glm::vec2(0);
-    float rotation = 0;
-    float pushAmount = 0;
-    CueMode mode = CueMode::INVISIBLE;
+	glm::vec2 position_ = glm::vec2(0);
+	float rotation_ = 0;
+	float push_amount_ = 0;
+	CueMode mode_ = CueMode::Invisible;
+
 private:
-    glm::mat4 modelMat = glm::mat4(1.0f);
+	glm::mat4 model_mat_ = glm::mat4(1.0f);
 };
 
 class Scene : public IBallEvent, IScreenChangedEvent
 {
 public:
-    Scene() : uboLight(GL_UNIFORM_BUFFER), uboView(GL_UNIFORM_BUFFER), cam(0, 30, 10), ballTracer(table) {};
-    void init();
-    void update(float partialTime, int fps);
-    void render();
-    void mouse(int button, int state, int x, int y);
-    void mouseWheel(int button, int state, int x, int y);
-    void mouseMove(int x, int y);
-    void mouseDrag(int button, int x, int y, int dx, int dy);
-    void keyboard(unsigned char key, int x, int y);
-    void resetGame();
-    virtual void onScreenChanged(int id);
-    virtual void onAllBallStopped();
-    virtual void onBallHoleIn(int ballId);
-    virtual void onWhiteBallCollide(int ballId);
+	Scene() : ubo_light_(GL_UNIFORM_BUFFER), ubo_view_(GL_UNIFORM_BUFFER), ball_tracer_(table_), cam_(0, 30, 10)
+	{
+	};
+	void Init();
+	void Update(float partial_time, int fps);
+	void Render();
+	void Mouse(int button, int state, int x, int y);
+	void MouseWheel(int button, int state, int x, int y);
+	void MouseMove(int x, int y);
+	void MouseDrag(int button, int x, int y, int dx, int dy);
+	void Keyboard(unsigned char key, int x, int y);
+	void ResetGame();
+	void OnScreenChanged(int id) override;
+	void OnAllBallStopped() override;
+	void OnBallHoleIn(int ball_id) override;
+	void OnWhiteBallCollide(int ball_id) override;
+
 private:
-    void updateLight();
-    void updateView();
-    MouseRay calculateMouseRay(int mouseX, int mouseY);
-    void hitWhiteBall();
-    void enableCueControl();
-    void foul();
-    void setTurn(bool turn);
+	void UpdateLight() const;
+	void UpdateView() const;
+	MouseRay CalculateMouseRay(int mouse_x, int mouse_y) const;
+	void HitWhiteBall();
+	void EnableCueControl();
+	void ProcessFoul();
+	void SetTurn(bool turn);
+
 private:
-    // camera ball view
-    bool isBallView = false;
-    // light
-    LightData lights[3];
-    commoncg::VBO uboLight;
-    // view
-    ViewMatrixData view;
-    commoncg::VBO uboView;
-    // pool table physics simulator
-    PoolTable table;
-    BallTracer ballTracer;
-    // models
-    CueTransform cueTransform;
-    model::AssetModel modelPoolTable;
-    model::AssetModel modelCue;
-    model::Ball modelBall;
-    // graphics
-    commoncg::ShaderProgram shader;
-    commoncg::Skybox skybox;
-    commoncg::Camera cam;
-    commoncg::Texture brdfLUT;
-    commoncg::Texture* ballTextures[BALL_TEXTURE_COUNT];
-    GUIScreen ui;
-    // game variables
-    bool turn; // true = player1
-    int ballGoals[2]; // remaining solid, strip count
-    int myBallCount;
-    int firstTouchBall;
-    BallGroup group;
-    bool isFirstGroupSet;
-    bool isFoul;
-    bool isTurnOut;
-    bool ballPlacing;
+	// camera ball view
+	bool is_ball_view_ = false;
+	// light
+	LightData lights_[3];
+	commoncg::VBO ubo_light_;
+	// view
+	ViewMatrixData view_;
+	commoncg::VBO ubo_view_;
+	// pool table physics simulator
+	PoolTable table_;
+	BallTracer ball_tracer_;
+	// models
+	CueTransform cue_transform_;
+	model::AssetModel model_pool_table_;
+	model::AssetModel model_cue_;
+	model::Ball model_ball_;
+	// graphics
+	commoncg::ShaderProgram shader_;
+	commoncg::Skybox skybox_;
+	commoncg::Camera cam_;
+	commoncg::Texture brdf_lut_;
+	commoncg::Texture* ball_textures_[BallCount];
+	GuiScreen ui_;
+	// game variables
+	bool turn_; // true = player1
+	int ball_goals_[2]; // remaining solid, strip count
+	int my_ball_count_;
+	int first_touch_ball_;
+	BallGroup group_;
+	bool is_first_group_set_;
+	bool is_foul_;
+	bool is_turn_out_;
+	bool ball_placing_;
 };

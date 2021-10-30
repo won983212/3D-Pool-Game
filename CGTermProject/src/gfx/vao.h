@@ -1,23 +1,25 @@
 #pragma once
 #include <string>
 #include "gfx.h"
-#include "vbo.h"
 
 namespace commoncg
 {
 	class VAO
 	{
 	public:
-		VAO() : handle(-1) {};
+		VAO() : handle_(0)
+		{
+		};
 		~VAO();
-		void create();
-		void destroy();
-		void use() const;
-		void attr(GLuint index, GLuint size, GLenum type, GLsizei stride, size_t offset) const;
-		static void unbind();
-		void checkIfCreated(std::string methodName) const;
-		bool isCreated() const;
+		void Create();
+		void Destroy();
+		void Use() const;
+		void Attrib(GLuint index, GLuint size, GLenum type, GLsizei stride, size_t offset) const;
+		static void Unbind();
+		void CheckIfCreated(const std::string& method_name) const;
+		bool IsCreated() const;
+
 	private:
-		GLuint handle;
+		GLuint handle_;
 	};
 }

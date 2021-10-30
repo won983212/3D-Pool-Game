@@ -7,11 +7,12 @@ namespace model
 	class Ball
 	{
 	public:
-		void init(float radius, int step = 30);
-		void draw();
+		void Init(float radius, int step = 30);
+		void Draw();
+
 	private:
-		commoncg::VAO vao;
-		commoncg::VBO vbo;
-		int verticesSize;
+		commoncg::VAO vao_;
+		commoncg::VBO vbo_;
+		int vertices_size_ = 0;
 	};
 }

@@ -170,6 +170,7 @@
     <ClInclude Include="src\pooltable.h" />
     <ClInclude Include="src\scene.h" />
     <ClInclude Include="src\ui\button.h" />
+    <ClInclude Include="src\ui\BtnEvent.h" />
     <ClInclude Include="src\ui\event.h" />
     <ClInclude Include="src\ui\font.h" />
     <ClInclude Include="src\ui\image.h" />

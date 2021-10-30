@@ -2,16 +2,15 @@
 #include <string>
 #include <unordered_map>
 #include "../gfx/gfx.h"
-#include "../gfx/texture.h"
 #include "../util/util.h"
 
-#define MESH_TEXTURE_TYPE_SIZE 4
-#define MESH_MATERIAL_TYPE_SIZE 4
-#define DEFAULT_AO 0.3f
+constexpr int MeshTextureTypeSize = 4;
+constexpr int MeshMaterialTypeSize = 4;
+constexpr float DefaultAo = 0.3f;
 
 namespace model
 {
-	const std::string textureUniformNames[MESH_TEXTURE_TYPE_SIZE] =
+	const std::string TextureUniformNames[MeshTextureTypeSize] =
 	{
 		"texture_albedo",
 		"texture_metallic",
@@ -19,7 +18,7 @@ namespace model
 		"texture_normal"
 	};
 
-	const int texturePBRIndexes[MESH_TEXTURE_TYPE_SIZE] =
+	constexpr int TexturePbrIndexes[MeshTextureTypeSize] =
 	{
 		PBR_TEXTURE_INDEX_ALBEDO,
 		PBR_TEXTURE_INDEX_METALLIC,
@@ -29,14 +28,17 @@ namespace model
 
 	enum class TextureType
 	{
-		ALBEDO, METALLIC, ROUGHNESS, NORMAL
+		ALBEDO,
+		METALLIC,
+		ROUGHNESS,
+		NORMAL
 	};
 
 	struct Vertex
 	{
 		glm::vec3 position;
 		glm::vec3 normal;
-		glm::vec2 texCoord;
+		glm::vec2 tex_coord;
 	};
 
 	struct Material
@@ -45,8 +47,8 @@ namespace model
 		float metallic;
 		float roughness;
 		float ao;
-		int texIndex[MESH_TEXTURE_TYPE_SIZE];
+		int tex_index[MeshTextureTypeSize];
 	};
 
-	void bindMaterial(const struct Material* materials);
+	void BindMaterial(const struct Material* materials);
 }

@@ -6,46 +6,46 @@
 
 using namespace commoncg;
 
-const int MAX_STACK_SIZE = 1000;
+constexpr int MaxStackSize = 1000;
 
-std::stack<const ShaderProgram*> shaderStack;
-const ShaderProgram* lastUses = nullptr;
+std::stack<const ShaderProgram*> shader_stack;
+const ShaderProgram* last_uses = nullptr;
 
-static GLuint _compileShaderSource(const char* filePath, GLenum shaderType)
+static GLuint CompileShaderSource(const char* file_path, const GLenum shader_type)
 {
 	// read file (cpp stream style)
 	std::string code;
-	std::ifstream fileStream;
+	std::ifstream file_stream;
 
-	fileStream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+	file_stream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 	try
 	{
-		std::stringstream strStream;
-		fileStream.open(filePath);
-		strStream << fileStream.rdbuf();
-		fileStream.close();
-		code = strStream.str();
+		std::stringstream str_stream;
+		file_stream.open(file_path);
+		str_stream << file_stream.rdbuf();
+		file_stream.close();
+		code = str_stream.str();
 	}
 	catch (std::ifstream::failure e)
 	{
-		std::cout << "Error: Can't read file: " << filePath << std::endl;
-		throw e;
+		std::cout << "Error: Can't read file: " << file_path << std::endl;
+		throw;
 	}
 
 
 	// compile shader
 	const char* data = code.c_str();
-	GLuint shader = glCreateShader(shaderType);
-	glShaderSource(shader, 1, &data, NULL);
+	const GLuint shader = glCreateShader(shader_type);
+	glShaderSource(shader, 1, &data, nullptr);
 	glCompileShader(shader);
 
 	int success;
-	char infoLog[512];
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
 	if (!success)
 	{
-		glGetShaderInfoLog(shader, 512, NULL, infoLog);
-		std::cout << "Error: compile shader: (" << filePath << ")" << infoLog << std::endl;
+		char info_log[512];
+		glGetShaderInfoLog(shader, 512, nullptr, info_log);
+		std::cout << "Error: compile shader: (" << file_path << ")" << info_log << std::endl;
 		throw "Error: compile shader";
 	}
 
@@ -54,161 +54,162 @@ static GLuint _compileShaderSource(const char* filePath, GLenum shaderType)
 
 ShaderProgram::~ShaderProgram()
 {
-	destroy();
+	Destroy();
 }
 
-void ShaderProgram::addShader(const GLchar* path, GLenum type)
+void ShaderProgram::AddShader(const GLchar* path, GLenum type)
 {
-	if (shader_index >= SHADER_MAX_COUNT)
+	if (shader_index_ >= SHADER_MAX_COUNT)
 	{
 		std::cout << "Error: shader is full: " << path << std::endl;
 		return;
 	}
 
-	shaders[shader_index++] = { path, type };
+	shaders_[shader_index_++] = {path, type};
 }
 
-void ShaderProgram::load()
+void ShaderProgram::Load()
 {
 	int success;
-	char infoLog[512];
 
-	handle = glCreateProgram();
-	for (int i = 0; i < shader_index; i++)
+	handle_ = glCreateProgram();
+	for (int i = 0; i < shader_index_; i++)
 	{
-		GLuint shader = _compileShaderSource(shaders[i].path, shaders[i].type);
-		shaders[i].id = shader;
-		glAttachShader(handle, shader);
+		const GLuint shader = CompileShaderSource(shaders_[i].path, shaders_[i].type);
+		shaders_[i].id = shader;
+		glAttachShader(handle_, shader);
 	}
-	glLinkProgram(handle);
 
-	glGetShaderiv(handle, GL_LINK_STATUS, &success);
+	glLinkProgram(handle_);
+	glGetShaderiv(handle_, GL_LINK_STATUS, &success);
+
 	if (!success)
 	{
-		glGetShaderInfoLog(handle, 512, NULL, infoLog);
-		std::cout << "Error: link shader program: " << infoLog << std::endl;
-		throw "Error: link shader program";
+		char info_log[512];
+		glGetShaderInfoLog(handle_, 512, nullptr, info_log);
+		std::cout << "Error: link shader program: " << info_log << std::endl;
+		return;
 	}
 
-	for (int i = 0; i < shader_index; i++)
-		glDeleteShader(shaders[i].id);
-	shader_index = 0;
+	for (int i = 0; i < shader_index_; i++)
+		glDeleteShader(shaders_[i].id);
+	shader_index_ = 0;
 }
 
-void ShaderProgram::use() const
+void ShaderProgram::Use() const
 {
-	lastUses = this;
-	glUseProgram(handle);
+	last_uses = this;
+	glUseProgram(handle_);
 }
 
-void ShaderProgram::destroy() const
+void ShaderProgram::Destroy() const
 {
-	glDeleteProgram(handle);
+	glDeleteProgram(handle_);
 }
 
-GLuint ShaderProgram::getProgramID() const
+GLuint ShaderProgram::GetProgramId() const
 {
-	return handle;
+	return handle_;
 }
 
 // Setting floats
-void ShaderProgram::setUniform(const char* name, float* values, int count) const
+void ShaderProgram::SetUniform(const char* name, float* values, int count) const
 {
-	glUniform1fv(glGetUniformLocation(handle, name), count, values);
+	glUniform1fv(glGetUniformLocation(handle_, name), count, values);
 }
 
-void ShaderProgram::setUniform(const char* name, const float fValue) const
+void ShaderProgram::SetUniform(const char* name, const float f_value) const
 {
-	glUniform1fv(glGetUniformLocation(handle, name), 1, &fValue);
+	glUniform1fv(glGetUniformLocation(handle_, name), 1, &f_value);
 }
 
 // Setting vectors
-void ShaderProgram::setUniform(const char* name, glm::vec2* vectors, int count) const
+void ShaderProgram::SetUniform(const char* name, glm::vec2* vectors, int count) const
 {
-	glUniform2fv(glGetUniformLocation(handle, name), count, (GLfloat*)vectors);
+	glUniform2fv(glGetUniformLocation(handle_, name), count, (GLfloat*)vectors);
 }
 
-void ShaderProgram::setUniform(const char* name, const glm::vec2 vector) const
+void ShaderProgram::SetUniform(const char* name, const glm::vec2 vector) const
 {
-	glUniform2fv(glGetUniformLocation(handle, name), 1, (GLfloat*)&vector);
+	glUniform2fv(glGetUniformLocation(handle_, name), 1, (GLfloat*)&vector);
 }
 
-void ShaderProgram::setUniform(const char* name, glm::vec3* vectors, int count) const
+void ShaderProgram::SetUniform(const char* name, glm::vec3* vectors, int count) const
 {
-	glUniform3fv(glGetUniformLocation(handle, name), count, (GLfloat*)vectors);
+	glUniform3fv(glGetUniformLocation(handle_, name), count, (GLfloat*)vectors);
 }
 
-void ShaderProgram::setUniform(const char* name, const glm::vec3 vector) const
+void ShaderProgram::SetUniform(const char* name, const glm::vec3 vector) const
 {
-	glUniform3fv(glGetUniformLocation(handle, name), 1, (GLfloat*)&vector);
+	glUniform3fv(glGetUniformLocation(handle_, name), 1, (GLfloat*)&vector);
 }
 
-void ShaderProgram::setUniform(const char* name, glm::vec4* vectors, int count) const
+void ShaderProgram::SetUniform(const char* name, glm::vec4* vectors, int count) const
 {
-	glUniform4fv(glGetUniformLocation(handle, name), count, (GLfloat*)vectors);
+	glUniform4fv(glGetUniformLocation(handle_, name), count, (GLfloat*)vectors);
 }
 
-void ShaderProgram::setUniform(const char* name, const glm::vec4& vector) const
+void ShaderProgram::SetUniform(const char* name, const glm::vec4& vector) const
 {
-	glUniform4fv(glGetUniformLocation(handle, name), 1, (GLfloat*)&vector);
+	glUniform4fv(glGetUniformLocation(handle_, name), 1, (GLfloat*)&vector);
 }
 
 // Setting 3x3 matrices
-void ShaderProgram::setUniform(const char* name, glm::mat3* matrices, int count) const
+void ShaderProgram::SetUniform(const char* name, glm::mat3* matrices, int count) const
 {
-	glUniformMatrix3fv(glGetUniformLocation(handle, name), count, FALSE, (GLfloat*)matrices);
+	glUniformMatrix3fv(glGetUniformLocation(handle_, name), count, FALSE, (GLfloat*)matrices);
 }
 
-void ShaderProgram::setUniform(const char* name, const glm::mat3 matrix) const
+void ShaderProgram::SetUniform(const char* name, const glm::mat3 matrix) const
 {
-	glUniformMatrix3fv(glGetUniformLocation(handle, name), 1, FALSE, (GLfloat*)&matrix);
+	glUniformMatrix3fv(glGetUniformLocation(handle_, name), 1, FALSE, (GLfloat*)&matrix);
 }
 
 // Setting 4x4 matrices
-void ShaderProgram::setUniform(const char* name, glm::mat4* matrices, int count) const
+void ShaderProgram::SetUniform(const char* name, glm::mat4* matrices, int count) const
 {
-	glUniformMatrix4fv(glGetUniformLocation(handle, name), count, FALSE, (GLfloat*)matrices);
+	glUniformMatrix4fv(glGetUniformLocation(handle_, name), count, FALSE, (GLfloat*)matrices);
 }
 
-void ShaderProgram::setUniform(const char* name, const glm::mat4& matrix) const
+void ShaderProgram::SetUniform(const char* name, const glm::mat4& matrix) const
 {
-	glUniformMatrix4fv(glGetUniformLocation(handle, name), 1, FALSE, (GLfloat*)&matrix);
+	glUniformMatrix4fv(glGetUniformLocation(handle_, name), 1, FALSE, (GLfloat*)&matrix);
 }
 
 // Setting integers
-void ShaderProgram::setUniform(const char* name, int* values, int count) const
+void ShaderProgram::SetUniform(const char* name, int* values, int count) const
 {
-	glUniform1iv(glGetUniformLocation(handle, name), count, values);
+	glUniform1iv(glGetUniformLocation(handle_, name), count, values);
 }
 
-void ShaderProgram::setUniform(const char* name, const int iValue) const
+void ShaderProgram::SetUniform(const char* name, const int value) const
 {
-	glUniform1i(glGetUniformLocation(handle, name), iValue);
+	glUniform1i(glGetUniformLocation(handle_, name), value);
 }
 
-void ShaderProgram::push()
+void ShaderProgram::Push()
 {
-	if (lastUses == nullptr)
+	if (last_uses == nullptr)
 		return;
 
-	if(shaderStack.size() < MAX_STACK_SIZE)
-		shaderStack.push(lastUses);
+	if (shader_stack.size() < MaxStackSize)
+		shader_stack.push(last_uses);
 	else
 		std::cout << "Error: Shader stack overflow" << std::endl;
 }
 
-void ShaderProgram::pop()
+void ShaderProgram::Pop()
 {
-	if (shaderStack.empty())
+	if (shader_stack.empty())
 		return;
 
-	shaderStack.top()->use();
-	shaderStack.pop();
+	shader_stack.top()->Use();
+	shader_stack.pop();
 }
 
-const ShaderProgram* ShaderProgram::getContextShader()
+const ShaderProgram* ShaderProgram::GetContextShader()
 {
-	if (lastUses == nullptr)
+	if (last_uses == nullptr)
 		std::cout << "Warning: Current context has not shader." << std::endl;
-	return lastUses;
+	return last_uses;
 }

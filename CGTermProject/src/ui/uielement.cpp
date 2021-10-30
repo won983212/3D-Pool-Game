@@ -1,43 +1,43 @@
 #include "uielement.h"
 
-void UIElement::setBounds(float x, float y, float width, float height)
+void UIElement::SetBounds(float x, float y, float width, float height)
 {
-	setLocation(x, y);
-	setSize(width, height);
+	SetLocation(x, y);
+	SetSize(width, height);
 }
 
-void UIElement::setLocation(float x, float y)
+void UIElement::SetLocation(float x, float y)
 {
-	this->x = x;
-	this->y = y;
+	this->x_ = x;
+	this->y_ = y;
 }
 
-void UIElement::setSize(float width, float height)
+void UIElement::SetSize(float width, float height)
 {
-	this->width = width;
-	this->height = height;
+	this->width_ = width;
+	this->height_ = height;
 }
 
-void UIElement::setVisible(bool visible)
+void UIElement::SetVisible(bool visible)
 {
-	this->visible = visible;
+	this->visible_ = visible;
 }
 
-UIVertex UIElement::makeVertex(float x, float y, int color, float u, float v)
+UIVertex UIElement::MakeVertex(float x, float y, unsigned int color, float u, float v)
 {
-	float a = ((color >> 24) & 0xff) / 255.0f;
-	float r = ((color >> 16) & 0xff) / 255.0f;
-	float g = ((color >> 8) & 0xff) / 255.0f;
+	float a = (color >> 24 & 0xff) / 255.0f;
+	float r = (color >> 16 & 0xff) / 255.0f;
+	float g = (color >> 8 & 0xff) / 255.0f;
 	float b = (color & 0xff) / 255.0f;
-	return { {x, y}, {u, v}, {r, g, b, a} };
+	return {{x, y}, {u, v}, {r, g, b, a}};
 }
 
-UIVertex UIElement::makeVertex(float x, float y, int color)
+UIVertex UIElement::MakeVertex(float x, float y, unsigned int color)
 {
-	return makeVertex(x, y, color, 0, 0);
+	return MakeVertex(x, y, color, 0, 0);
 }
 
-UIVertex UIElement::makeVertex(float x, float y, float u, float v)
+UIVertex UIElement::MakeVertex(float x, float y, float u, float v)
 {
-	return makeVertex(x, y, 0xffffffff, u, v);
+	return MakeVertex(x, y, 0xffffffff, u, v);
 }

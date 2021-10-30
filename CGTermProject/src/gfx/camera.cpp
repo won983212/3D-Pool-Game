@@ -1,61 +1,62 @@
-#include <math.h>
+#include <cmath>
 #include "camera.h"
 #include "../util/util.h"
 
-const float errorTolerance = 0.01f;
+constexpr float ErrorTolerance = 0.01f;
+
 using namespace commoncg;
 
-bool Camera::getViewMatrix(glm::mat4* view)
+bool Camera::GetViewMatrix(glm::mat4* view)
 {
-	bool ret = dirty;
-	*view = this->view;
-	dirty = false;
+	const bool ret = dirty_;
+	*view = this->view_;
+	dirty_ = false;
 	return ret;
 }
 
-glm::vec3 Camera::getFront() const
+glm::vec3 Camera::GetFront() const
 {
-	return front;
+	return front_;
 }
 
-glm::vec3 Camera::getRight() const
+glm::vec3 Camera::GetRight() const
 {
-	return right;
+	return right_;
 }
 
-glm::vec3 Camera::getUp() const
+glm::vec3 Camera::GetUp() const
 {
-	return up;
+	return up_;
 }
 
-glm::vec3 Camera::getEyePosition() const
+glm::vec3 Camera::GetEyePosition() const
 {
-	return eye;
+	return eye_;
 }
 
-void Camera::update()
+void Camera::Update()
 {
 	// adjust pitch
-	if (pitch > 90 - errorTolerance)
-		pitch = 90 - errorTolerance;
-	if (pitch < errorTolerance - 90)
-		pitch = errorTolerance - 90;
-	if (zoom < 2.0f)
-		zoom = 2.0f;
+	if (pitch_ > 90 - ErrorTolerance)
+		pitch_ = 90 - ErrorTolerance;
+	if (pitch_ < ErrorTolerance - 90)
+		pitch_ = ErrorTolerance - 90;
+	if (zoom_ < 2.0f)
+		zoom_ = 2.0f;
 
 	// calculate eye position
-	eye.x = cos(DEGTORAD(yaw)) * cos(DEGTORAD(pitch));
-	eye.y = sin(DEGTORAD(pitch));
-	eye.z = sin(DEGTORAD(yaw)) * cos(DEGTORAD(pitch));
-	eye *= zoom;
+	eye_.x = cos(DEGTORAD(yaw_)) * cos(DEGTORAD(pitch_));
+	eye_.y = sin(DEGTORAD(pitch_));
+	eye_.z = sin(DEGTORAD(yaw_)) * cos(DEGTORAD(pitch_));
+	eye_ *= zoom_;
 
 	// get front, right, up
-	front = -glm::normalize(eye);
-	right = glm::normalize(glm::cross(front, worldUp));
-	up = glm::normalize(glm::cross(right, front));
+	front_ = -normalize(eye_);
+	right_ = normalize(cross(front_, world_up_));
+	up_ = normalize(cross(right_, front_));
 
 	// get view matrix
-	eye += center;
-	view = glm::lookAt(eye, center, up);
-	dirty = true;
+	eye_ += center_;
+	view_ = lookAt(eye_, center_, up_);
+	dirty_ = true;
 }

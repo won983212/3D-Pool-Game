@@ -5,50 +5,50 @@ using namespace commoncg;
 
 VAO::~VAO()
 {
-	destroy();
+	Destroy();
 }
 
-void VAO::create()
+void VAO::Create()
 {
-	glGenVertexArrays(1, &handle);
+	glGenVertexArrays(1, &handle_);
 }
 
-void VAO::destroy()
+void VAO::Destroy()
 {
-	checkIfCreated("destroy");
-	glDeleteVertexArrays(1, &handle);
+	CheckIfCreated("Destroy");
+	glDeleteVertexArrays(1, &handle_);
 }
 
-void VAO::use() const
+void VAO::Use() const
 {
-	checkIfCreated("bind");
-	glBindVertexArray(handle);
+	CheckIfCreated("Use");
+	glBindVertexArray(handle_);
 }
 
-void VAO::attr(GLuint index, GLuint size, GLenum type, GLsizei stride, size_t offset) const
+void VAO::Attrib(GLuint index, GLuint size, GLenum type, GLsizei stride, size_t offset) const
 {
-	checkIfCreated("attr");
-	use();
+	CheckIfCreated("Attrib");
+	Use();
 	glVertexAttribPointer(index, size, type, GL_FALSE, stride, (void*)offset);
 	glEnableVertexAttribArray(index);
 }
 
-void VAO::unbind()
+void VAO::Unbind()
 {
 	glBindVertexArray(0);
 }
 
-void VAO::checkIfCreated(std::string methodName) const
+void VAO::CheckIfCreated(const std::string& method_name) const
 {
-	if (handle == -1)
+	if (handle_ == 0)
 	{
-		std::string message = "Error: Called " + methodName + "() before creating.";
+		std::string message = "Error: Called " + method_name + "() before creating.";
 		std::cout << message << std::endl;
 		throw message;
 	}
 }
 
-bool VAO::isCreated() const
+bool VAO::IsCreated() const
 {
-	return handle != -1;
+	return handle_ != 0;
 }

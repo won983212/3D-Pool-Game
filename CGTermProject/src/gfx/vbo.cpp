@@ -3,67 +3,68 @@
 
 using namespace commoncg;
 
-VBO::VBO(int bufferType)
-	:bufferType(bufferType), handle(-1)
-{ }
+VBO::VBO(int buffer_type)
+	: handle_(0), buffer_type_(buffer_type)
+{
+}
 
 VBO::~VBO()
 {
-	destroy();
+	Destroy();
 }
 
-void VBO::create()
+void VBO::Create()
 {
-	glGenBuffers(1, &handle);
+	glGenBuffers(1, &handle_);
 }
 
-bool VBO::isCreated() const
+bool VBO::IsCreated() const
 {
-	return handle != -1;
+	return handle_ != 0;
 }
 
-void VBO::destroy() const
+void VBO::Destroy() const
 {
-	checkIfCreated("destroy");
-	glDeleteBuffers(1, &handle);
+	CheckIfCreated("Destroy");
+	glDeleteBuffers(1, &handle_);
 }
 
-void VBO::use() const
+void VBO::Use() const
 {
-	checkIfCreated("bind");
-	glBindBuffer(bufferType, handle);
+	CheckIfCreated("Use");
+	glBindBuffer(buffer_type_, handle_);
 }
 
-void VBO::buffer(GLsizeiptr size, const void* data, GLenum drawingHint) const
+void VBO::Buffer(GLsizeiptr size, const void* data, GLenum drawing_hint) const
 {
-	checkIfCreated("buffer");
-	use();
-	glBufferData(bufferType, size, data, drawingHint);
+	CheckIfCreated("Buffer");
+	Use();
+	glBufferData(buffer_type_, size, data, drawing_hint);
 }
 
-void VBO::subBuffer(GLintptr offset, GLsizeiptr size, const void* data) const
+void VBO::SubBuffer(GLintptr offset, GLsizeiptr size, const void* data) const
 {
-	checkIfCreated("subBuffer");
-	use();
-	glBufferSubData(bufferType, offset, size, data);
+	CheckIfCreated("SubBuffer");
+	Use();
+	glBufferSubData(buffer_type_, offset, size, data);
 }
 
-void VBO::bindBufferRange(GLuint index, GLintptr offset, GLsizeiptr size) const
+void VBO::BindBufferRange(GLuint index, GLintptr offset, GLsizeiptr size) const
 {
-	checkIfCreated("bindBufferRange");
-	glBindBufferRange(bufferType, index, handle, offset, size);
+	CheckIfCreated("BindBufferRange");
+	glBindBufferRange(buffer_type_, index, handle_, offset, size);
 }
 
-void VBO::unbind() const
+void VBO::Unbind() const
 {
-	glBindBuffer(bufferType, 0);
+	glBindBuffer(buffer_type_, 0);
 }
 
-void VBO::checkIfCreated(std::string methodName) const
+void VBO::CheckIfCreated(const std::string& method_name) const
 {
-	if (!isCreated())
+	if (!IsCreated())
 	{
-		std::string message = "Error: Called " + methodName + "() before creating.";
+		std::string message = "Error: Called " + method_name + "() before creating.";
 		std::cout << message << std::endl;
 		throw message;
 	}

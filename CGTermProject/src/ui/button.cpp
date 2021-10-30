@@ -1,63 +1,64 @@
 #include <iostream>
+#include <utility>
 #include "uiscreen.h"
 #include "button.h"
 
-bool UEButton::render(std::vector<UIVertex>& vertices)
+bool UEButton::Render(std::vector<UIVertex>& vertices)
 {
-	const float x2 = x + width;
-	const float y2 = y + height;
-	const int color = hover ? 0xaa999999 : 0xaa000000;
+	const float x2 = x_ + width_;
+	const float y2 = y_ + height_;
+	const int color = hover_ ? 0xaa999999 : 0xaa000000;
 
-	vertices.push_back(makeVertex(x, y, color));
-	vertices.push_back(makeVertex(x2, y, color));
-	vertices.push_back(makeVertex(x, y2, color));
-	vertices.push_back(makeVertex(x2, y, color));
-	vertices.push_back(makeVertex(x2, y2, color));
-	vertices.push_back(makeVertex(x, y2, color));
+	vertices.push_back(MakeVertex(x_, y_, color));
+	vertices.push_back(MakeVertex(x2, y_, color));
+	vertices.push_back(MakeVertex(x_, y2, color));
+	vertices.push_back(MakeVertex(x2, y_, color));
+	vertices.push_back(MakeVertex(x2, y2, color));
+	vertices.push_back(MakeVertex(x_, y2, color));
 	return false;
 }
 
-void UEButton::postRender()
+void UEButton::PostRender()
 {
-	FontRenderer* fontRenderer = UIScreen::getFontRenderer();
-	fontRenderer->renderText(text, x + width / 2.0f, y + height / 2.0f, 0xffffffff, (height * textScale) / 0.75f, true);
+	FontRenderer* font_renderer = UIScreen::GetFontRenderer();
+	font_renderer->RenderText(text_, x_ + width_ / 2.0f, y_ + height_ / 2.0f, 0xffffffff, height_ * text_scale_ / 0.75f, true);
 }
 
-bool UEButton::onMouse(int button, int state, int x, int y)
+bool UEButton::OnMouse(int button, int state, int x, int y)
 {
-	if (hover && parent && id != -1 && state == GLUT_DOWN)
+	if (hover_ && parent_ && id_ != -1 && state == GLUT_DOWN)
 	{
-		if(this->ev != nullptr)
-			this->ev->onButtonClick(id);
+		if (this->btn_event_ != nullptr)
+			this->btn_event_->OnButtonClick(id_);
 		return true;
 	}
 	return false;
 }
 
-void UEButton::onMouseMove(int x, int y)
+void UEButton::OnMouseMove(int x, int y)
 {
-	if (x > this->x && y > this->y)
+	if (x > this->x_ && y > this->y_)
 	{
-		if (x < this->x + this->width && y < this->y + this->height)
+		if (x < this->x_ + this->width_ && y < this->y_ + this->height_)
 		{
-			hover = true;
+			hover_ = true;
 			return;
 		}
 	}
-	hover = false;
+	hover_ = false;
 }
 
-void UEButton::setText(std::wstring text)
+void UEButton::SetText(std::wstring text)
 {
-	this->text = text;
+	this->text_ = std::move(text);
 }
 
-void UEButton::setTextScale(float scale)
+void UEButton::SetTextScale(float scale)
 {
-	this->textScale = scale;
+	this->text_scale_ = scale;
 }
 
-void UEButton::setButtonEvent(IButtonEvent* e)
+void UEButton::SetButtonEvent(IButtonEvent* e)
 {
-	this->ev = e;
+	this->btn_event_ = e;
 }

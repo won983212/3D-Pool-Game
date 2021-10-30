@@ -2,10 +2,14 @@
 
 enum class CueMode
 {
-    INVISIBLE, ROTATION, PUSHING
+	Invisible,
+	Rotation,
+	Pushing
 };
 
 enum class BallGroup
 {
-    NOT_DECIDED, P1SOLID, P1STRIP
+	NotDecided,
+	P1Solid,
+	P1Strip
 };

@@ -1,189 +1,189 @@
 #include <iostream>
-#include <stdlib.h>
-#include <time.h>
+#include <utility>
+#include <ctime>
 #include "guiscreen.h"
 #include "ui/button.h"
 #include "util/util.h"
 
-const clock_t MESSAGE_DURATION = 3 * CLOCKS_PER_SEC;
-const float turnRectW = 200;
+constexpr clock_t MessageDuration = 3 * CLOCKS_PER_SEC;
+constexpr float TurnRectW = 200;
 
 
-void GUIScreen::screenInit()
+void GuiScreen::ScreenInit()
 {
-	const int btnYBase = 380;
-	const int btnX = (int)((SCREEN_WIDTH - 300) / 2.0f);
+	constexpr int btn_y_base = 380;
+	constexpr int btn_x = static_cast<int>((SCREEN_WIDTH - 300) / 2.0f);
 
 	// 3 screens (menu, about, ingameHUD, game end)
-	addPages(4);
+	AddPages(4);
 
 	// menu screen
 	// background panel
-	UERectangle* rect = new UERectangle();
-	rect->setBounds(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-	rect->setColor(0x66ffffff);
-	add(rect, 0);
+	auto rect = new UERectangle();
+	rect->SetBounds(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+	rect->SetColor(0x66ffffff);
+	Add(rect, 0);
 
 	// title banner
-	UEImage* img = new UEImage();
-	img->setImage("res/texture/title.png");
-	img->packSize();
-	img->setLocation((SCREEN_WIDTH - img->width) / 2.0f, 80);
-	add(img, 0);
+	auto img = new UEImage();
+	img->SetImage("res/texture/title.png");
+	img->PackSize();
+	img->SetLocation((SCREEN_WIDTH - img->width_) / 2.0f, 80);
+	Add(img, 0);
 
 	// buttons
-	UEButton* btn = new UEButton();
-	btn->id = 0;
-	btn->setBounds(btnX, btnYBase, 300, 50);
-	btn->setText(L"게임 시작");
-	btn->setButtonEvent(this);
-	add(btn, 0);
+	auto btn = new UEButton();
+	btn->id_ = 0;
+	btn->SetBounds(btn_x, btn_y_base, 300, 50);
+	btn->SetText(L"게임 시작");
+	btn->SetButtonEvent(this);
+	Add(btn, 0);
 
 	btn = new UEButton();
-	btn->id = 1;
-	btn->setBounds(btnX, btnYBase + 80, 300, 50);
-	btn->setText(L"게임 방법");
-	btn->setButtonEvent(this);
-	add(btn, 0);
+	btn->id_ = 1;
+	btn->SetBounds(btn_x, btn_y_base + 80, 300, 50);
+	btn->SetText(L"게임 방법");
+	btn->SetButtonEvent(this);
+	Add(btn, 0);
 
 	btn = new UEButton();
-	btn->id = 2;
-	btn->setBounds(btnX, btnYBase + 160, 300, 50);
-	btn->setText(L"종료");
-	btn->setButtonEvent(this);
-	add(btn, 0);
+	btn->id_ = 2;
+	btn->SetBounds(btn_x, btn_y_base + 160, 300, 50);
+	btn->SetText(L"종료");
+	btn->SetButtonEvent(this);
+	Add(btn, 0);
 
 
 	// TODO howtoplay screen
 	// background panel
-	add(rect, 1);
+	Add(rect, 1);
 
 	// Back button
 	btn = new UEButton();
-	btn->id = 3;
-	btn->setBounds(btnX, btnYBase, 300, 50);
-	btn->setText(L"Back");
-	btn->setButtonEvent(this);
-	add(btn, 1);
+	btn->id_ = 3;
+	btn->SetBounds(btn_x, btn_y_base, 300, 50);
+	btn->SetText(L"Back");
+	btn->SetButtonEvent(this);
+	Add(btn, 1);
 
 
 	// ingame HUD
 	// FPS Indicator
-	fpsLabel = new UELabel();
-	fpsLabel->setLocation(10, 25);
-	fpsLabel->setTextPoint(24);
-	fpsLabel->setShadowColor(0xff000000);
-	fpsLabel->setText(L"FPS: 60");
-	add(fpsLabel, 2);
+	fps_label_ = new UELabel();
+	fps_label_->SetLocation(10, 25);
+	fps_label_->SetTextPoint(24);
+	fps_label_->SetShadowColor(0xff000000);
+	fps_label_->SetText(L"FPS: 60");
+	Add(fps_label_, 2);
 
-	messageLabel = new UELabel();
-	messageLabel->setLocation(SCREEN_WIDTH / 2, 50);
-	messageLabel->setTextPoint(36);
-	messageLabel->setShadowColor(0xff000000);
-	messageLabel->setColor(0xffffffff);
-	messageLabel->setUseCentered(true);
-	messageLabel->setVisible(false);
-	messageLabel->setText(L"");
-	add(messageLabel, 2);
+	message_label_ = new UELabel();
+	message_label_->SetLocation(SCREEN_WIDTH / 2, 50);
+	message_label_->SetTextPoint(36);
+	message_label_->SetShadowColor(0xff000000);
+	message_label_->SetColor(0xffffffff);
+	message_label_->SetUseCentered(true);
+	message_label_->SetVisible(false);
+	message_label_->SetText(L"");
+	Add(message_label_, 2);
 
-	turnLabel = new UELabel();
-	turnLabel->setLocation(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 50);
-	turnLabel->setTextPoint(24);
-	turnLabel->setShadowColor(0xff000000);
-	turnLabel->setColor(0xffffffff);
-	turnLabel->setUseCentered(true);
-	turnLabel->setText(L"");
-	add(turnLabel, 2);
+	turn_label_ = new UELabel();
+	turn_label_->SetLocation(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 50);
+	turn_label_->SetTextPoint(24);
+	turn_label_->SetShadowColor(0xff000000);
+	turn_label_->SetColor(0xffffffff);
+	turn_label_->SetUseCentered(true);
+	turn_label_->SetText(L"");
+	Add(turn_label_, 2);
 
-	UERectangle* turnQuadBG = new UERectangle();
-	turnQuadBG->setBounds((SCREEN_WIDTH - turnRectW) / 2.0f, SCREEN_HEIGHT - 30, turnRectW, 5);
-	turnQuadBG->setColor(0xff666666);
-	add(turnQuadBG, 2);
+	const auto turn_quad_bg = new UERectangle();
+	turn_quad_bg->SetBounds((SCREEN_WIDTH - TurnRectW) / 2.0f, SCREEN_HEIGHT - 30, TurnRectW, 5);
+	turn_quad_bg->SetColor(0xff666666);
+	Add(turn_quad_bg, 2);
 
-	turnQuad = new UERectangle();
-	turnQuad->setBounds((SCREEN_WIDTH - turnRectW) / 2.0f, SCREEN_HEIGHT - 30, turnRectW, 5);
-	turnQuad->setColor(0xffE34E46);
-	add(turnQuad, 2);
+	turn_quad_ = new UERectangle();
+	turn_quad_->SetBounds((SCREEN_WIDTH - TurnRectW) / 2.0f, SCREEN_HEIGHT - 30, TurnRectW, 5);
+	turn_quad_->SetColor(0xffE34E46);
+	Add(turn_quad_, 2);
 
-	turnIcon = new UEImage();
-	turnIcon->setImage("res/texture/ball_icon.png");
-	turnIcon->setBounds(SCREEN_WIDTH / 2.0f - 55, SCREEN_HEIGHT - 56, 12, 12);
-	add(turnIcon, 2);
+	turn_icon_ = new UEImage();
+	turn_icon_->SetImage("res/texture/ball_icon.png");
+	turn_icon_->SetBounds(SCREEN_WIDTH / 2.0f - 55, SCREEN_HEIGHT - 56, 12, 12);
+	Add(turn_icon_, 2);
 
 	// game end screen
 	// background panel
-	add(rect, 3);
+	Add(rect, 3);
 
-	gameEndLabel = new UELabel();
-	gameEndLabel->setLocation(SCREEN_WIDTH / 2, btnYBase - 80);
-	gameEndLabel->setTextPoint(36);
-	gameEndLabel->setShadowColor(0xff000000);
-	gameEndLabel->setColor(0xffffffff);
-	gameEndLabel->setUseCentered(true);
-	add(gameEndLabel, 3);
+	game_end_label_ = new UELabel();
+	game_end_label_->SetLocation(SCREEN_WIDTH / 2, btn_y_base - 80);
+	game_end_label_->SetTextPoint(36);
+	game_end_label_->SetShadowColor(0xff000000);
+	game_end_label_->SetColor(0xffffffff);
+	game_end_label_->SetUseCentered(true);
+	Add(game_end_label_, 3);
 
 	// main menu button
 	btn = new UEButton();
-	btn->id = 3;
-	btn->setBounds(btnX, btnYBase, 300, 50);
-	btn->setText(L"메인 메뉴로");
-	btn->setButtonEvent(this);
-	add(btn, 3);
+	btn->id_ = 3;
+	btn->SetBounds(btn_x, btn_y_base, 300, 50);
+	btn->SetText(L"메인 메뉴로");
+	btn->SetButtonEvent(this);
+	Add(btn, 3);
 }
 
-void GUIScreen::goGameEnd(std::wstring message)
+void GuiScreen::GoGameEnd(std::wstring message)
 {
-	gameEndLabel->setText(message);
-	setScreen(3);
+	game_end_label_->SetText(std::move(message));
+	SetScreen(3);
 }
 
-void GUIScreen::showMessage(std::wstring message)
+void GuiScreen::ShowMessage(std::wstring message)
 {
-	messageLabel->setText(message);
-	lastMessageTick = clock();
+	message_label_->SetText(std::move(message));
+	last_message_tick_ = clock();
 }
 
-void GUIScreen::setTurn(bool turn, BallGroup group, float achieve)
+void GuiScreen::SetTurn(bool turn, BallGroup group, float achieve) const
 {
-	turnIcon->setVisible(group != BallGroup::NOT_DECIDED);
+	turn_icon_->SetVisible(group != BallGroup::NotDecided);
 	if (turn)
 	{
-		turnIcon->setUV(group == BallGroup::P1SOLID ? 0 : 24, 0, 24, 24);
-		turnLabel->setText(L"Player 1");
-		turnQuad->width = achieve * turnRectW;
+		turn_icon_->SetUV(group == BallGroup::P1Solid ? 0 : 24, 0, 24, 24);
+		turn_label_->SetText(L"Player 1");
+		turn_quad_->width_ = achieve * TurnRectW;
 	}
 	else
 	{
-		turnIcon->setUV(group == BallGroup::P1SOLID ? 24 : 0, 0, 24, 24);
-		turnLabel->setText(L"Player 2");
-		turnQuad->width = achieve * turnRectW;
+		turn_icon_->SetUV(group == BallGroup::P1Solid ? 24 : 0, 0, 24, 24);
+		turn_label_->SetText(L"Player 2");
+		turn_quad_->width_ = achieve * TurnRectW;
 	}
 }
 
-void GUIScreen::onRenderTick()
+void GuiScreen::OnRenderTick()
 {
-	if (lastMessageTick != 0)
+	if (last_message_tick_ != 0)
 	{
 		clock_t t = clock();
-		messageLabel->setVisible(t - lastMessageTick < MESSAGE_DURATION);
+		message_label_->SetVisible(t - last_message_tick_ < MessageDuration);
 	}
 }
 
-void GUIScreen::onButtonClick(int id)
+void GuiScreen::OnButtonClick(int id)
 {
 	switch (id)
 	{
 	case 0:
-		setScreen(2);
+		SetScreen(2);
 		break;
 	case 1:
-		setScreen(1);
+		SetScreen(1);
 		break;
 	case 2:
 		glutLeaveMainLoop();
 		break;
 	case 3:
-		setScreen(0);
+		SetScreen(0);
 		break;
 	}
 }

@@ -2,45 +2,44 @@
 
 UEImage::~UEImage()
 {
-	if (texture != nullptr)
-		delete texture;
+	if (texture_ != nullptr)
+		delete texture_;
 }
 
-bool UEImage::render(std::vector<UIVertex>& vertices)
+bool UEImage::Render(std::vector<UIVertex>& vertices)
 {
-	if (texture == nullptr)
+	if (texture_ == nullptr)
 		return false;
 
-	vertices.push_back(makeVertex(x, y, u1, v1));
-	vertices.push_back(makeVertex(x + width, y, u2, v1));
-	vertices.push_back(makeVertex(x, y + height, u1, v2));
-	vertices.push_back(makeVertex(x + width, y, u2, v1));
-	vertices.push_back(makeVertex(x + width, y + height, u2, v2));
-	vertices.push_back(makeVertex(x, y + height, u1, v2));
+	vertices.push_back(MakeVertex(x_, y_, u1_, v1_));
+	vertices.push_back(MakeVertex(x_ + width_, y_, u2_, v1_));
+	vertices.push_back(MakeVertex(x_, y_ + height_, u1_, v2_));
+	vertices.push_back(MakeVertex(x_ + width_, y_, u2_, v1_));
+	vertices.push_back(MakeVertex(x_ + width_, y_ + height_, u2_, v2_));
+	vertices.push_back(MakeVertex(x_, y_ + height_, u1_, v2_));
 
-	texture->bind();
+	texture_->Bind();
 	return true;
 }
 
-void UEImage::setImage(const char* imagePath)
+void UEImage::SetImage(const char* image_path)
 {
-	if (texture != nullptr)
-		delete texture;
-	texture = commoncg::Texture::cacheImage(imagePath);
+	delete texture_;
+	texture_ = commoncg::Texture::CacheImage(image_path);
 }
 
-void UEImage::setUV(int x, int y, int w, int h)
+void UEImage::SetUV(int x, int y, int w, int h)
 {
-	u1 = (float)x / texture->getWidth();
-	v1 = (float)y / texture->getHeight();
-	u2 = (float)(x + w) / texture->getWidth();
-	v2 = (float)(y + h) / texture->getHeight();
+	u1_ = static_cast<float>(x) / texture_->GetWidth();
+	v1_ = static_cast<float>(y) / texture_->GetHeight();
+	u2_ = static_cast<float>(x + w) / texture_->GetWidth();
+	v2_ = static_cast<float>(y + h) / texture_->GetHeight();
 }
 
-void UEImage::packSize()
+void UEImage::PackSize()
 {
-	if (texture == nullptr)
+	if (texture_ == nullptr)
 		return;
-	width = (float) texture->getWidth();
-	height = (float) texture->getHeight();
+	width_ = static_cast<float>(texture_->GetWidth());
+	height_ = static_cast<float>(texture_->GetHeight());
 }

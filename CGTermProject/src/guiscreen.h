@@ -7,21 +7,22 @@
 #include "ui/image.h"
 #include "gameenum.h"
 
-class GUIScreen : public UIScreen, IButtonEvent
+class GuiScreen : public UIScreen, IButtonEvent
 {
 public:
-	virtual void screenInit();
-	virtual void onButtonClick(int id);
-	virtual void onRenderTick();
-	void showMessage(std::wstring message);
-	void setTurn(bool turn, BallGroup group, float achieve);
-	void goGameEnd(std::wstring message);
+	void ScreenInit() override;
+	void OnButtonClick(int id) override;
+	void OnRenderTick() override;
+	void ShowMessage(std::wstring message);
+	void SetTurn(bool turn, BallGroup group, float achieve) const;
+	void GoGameEnd(std::wstring message);
+
 public:
-	UELabel* fpsLabel;
-	UELabel* messageLabel;
-	UELabel* turnLabel;
-	UERectangle* turnQuad;
-	UEImage* turnIcon;
-	UELabel* gameEndLabel;
-	clock_t lastMessageTick = 0;
+	UELabel* fps_label_;
+	UELabel* message_label_;
+	UELabel* turn_label_;
+	UERectangle* turn_quad_;
+	UEImage* turn_icon_;
+	UELabel* game_end_label_;
+	clock_t last_message_tick_ = 0;
 };

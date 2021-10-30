@@ -1,17 +1,17 @@
 #include "rectangle.h"
 
-bool UERectangle::render(std::vector<UIVertex>& vertices)
+bool UERectangle::Render(std::vector<UIVertex>& vertices)
 {
-	vertices.push_back(makeVertex(x, y, color));
-	vertices.push_back(makeVertex(x + width, y, color));
-	vertices.push_back(makeVertex(x, y + height, color));
-	vertices.push_back(makeVertex(x + width, y, color));
-	vertices.push_back(makeVertex(x + width, y + height, color));
-	vertices.push_back(makeVertex(x, y + height, color));
+	vertices.push_back(MakeVertex(x_, y_, color_));
+	vertices.push_back(MakeVertex(x_ + width_, y_, color_));
+	vertices.push_back(MakeVertex(x_, y_ + height_, color_));
+	vertices.push_back(MakeVertex(x_ + width_, y_, color_));
+	vertices.push_back(MakeVertex(x_ + width_, y_ + height_, color_));
+	vertices.push_back(MakeVertex(x_, y_ + height_, color_));
 	return false;
 }
 
-void UERectangle::setColor(int color)
+void UERectangle::SetColor(int color)
 {
-	this->color = color;
+	this->color_ = color;
 }

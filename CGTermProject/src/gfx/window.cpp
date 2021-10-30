@@ -7,17 +7,17 @@
 
 using namespace commoncg;
 
-Window* Window::inst = NULL;
+Window* Window::inst_ = nullptr;
 
-void Window::init(const char* title, int* argcp, char** argv)
+void Window::Init(const char* title, int* argcp, char** argv)
 {
-	this->title = title;
+	this->title_ = title;
 	glutInit(argcp, argv);
 }
 
-void Window::create(WindowCallback init, WindowCallback display, bool useMSAA)
+void Window::Create(WindowCallback init, WindowCallback display, bool use_msaa)
 {
-	if (useMSAA)
+	if (use_msaa)
 	{
 		glutSetOption(GLUT_MULTISAMPLE, 4);
 		glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_MULTISAMPLE);
@@ -28,114 +28,114 @@ void Window::create(WindowCallback init, WindowCallback display, bool useMSAA)
 	}
 
 	glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
-	glutCreateWindow(title);
+	glutCreateWindow(title_);
 	glewInit();
 	glutIgnoreKeyRepeat(1);
 
-	if (useMSAA)
+	if (use_msaa)
 	{
 		glEnable(GL_MULTISAMPLE);
 		glHint(GL_MULTISAMPLE_FILTER_HINT_NV, GL_NICEST);
 	}
 
 	init();
-	this->render = display;
-	inst = this;
+	this->render_ = display;
+	inst_ = this;
 
-	glutDisplayFunc(renderWrapper);
-	glutIdleFunc(update);
+	glutDisplayFunc(RenderWrapper);
+	glutIdleFunc(Update);
 }
 
-void Window::loop() const
+void Window::Loop() const
 {
 	glutMainLoop();
-	if (destroy != NULL)
-		destroy();
+	if (destroy_ != nullptr)
+		destroy_();
 }
 
-void Window::setDestroyFunc(WindowCallback destory)
+void Window::SetDestroyFunc(WindowCallback destory)
 {
-	this->destroy = destroy;
+	this->destroy_ = destroy_;
 }
 
-void Window::setReshapeFunc(ReshapeCallback reshape) const
+void Window::SetReshapeFunc(ReshapeCallback reshape) const
 {
 	glutReshapeFunc(reshape);
 }
 
-void Window::setKeyboardFunc(KeyboardCallback keyEvent) const
+void Window::SetKeyboardFunc(KeyboardCallback key_event) const
 {
-	glutKeyboardFunc(keyEvent);
+	glutKeyboardFunc(key_event);
 }
 
-void Window::setKeyboardUpFunc(KeyboardCallback keyEvent) const
+void Window::SetKeyboardUpFunc(KeyboardCallback key_event) const
 {
-	glutKeyboardUpFunc(keyEvent);
+	glutKeyboardUpFunc(key_event);
 }
 
-void Window::setMouseFunc(MouseCallback mouseEvent) const
+void Window::SetMouseFunc(MouseCallback mouse_event) const
 {
-	glutMouseFunc(mouseEvent);
+	glutMouseFunc(mouse_event);
 }
 
-void Window::setMouseMotionFunc(MouseMotionCallback mouseEvent) const
+void Window::SetMouseMotionFunc(MouseMotionCallback mouse_event) const
 {
-	glutPassiveMotionFunc(mouseEvent);
+	glutPassiveMotionFunc(mouse_event);
 }
 
-void Window::setMouseWheelFunc(MouseCallback mouseEvent) const
+void Window::SetMouseWheelFunc(MouseCallback mouse_event) const
 {
-	glutMouseWheelFunc(mouseEvent);
+	glutMouseWheelFunc(mouse_event);
 }
 
-void Window::setMouseDragFunc(MouseMotionCallback mouseEvent) const
+void Window::SetMouseDragFunc(MouseMotionCallback mouse_event) const
 {
-	glutMotionFunc(mouseEvent);
+	glutMotionFunc(mouse_event);
 }
 
-void Window::setIdleFunc(UpdateCallback idle)
+void Window::SetIdleFunc(UpdateCallback idle)
 {
-	this->idle = idle;
+	this->idle_ = idle;
 }
 
-void Window::renderWrapper()
+void Window::RenderWrapper()
 {
-	inst->render();
+	inst_->render_();
 	glutSwapBuffers();
 }
 
-void Window::update()
+void Window::Update()
 {
-	long lastFrame = inst->lastFrame;
-	long lastFPSFrame = inst->lastFPSCountFrame;
-	long currentTime = clock();
+	const long last_frame = inst_->last_frame_;
+	const long last_fps_frame = inst_->last_fps_count_frame_;
+	const long current_time = clock();
 
-	if (currentTime - lastFPSFrame >= CLOCKS_PER_SEC)
+	if (current_time - last_fps_frame >= CLOCKS_PER_SEC)
 	{
-		inst->fps = inst->fpsCount;
-		inst->fpsCount = 1;
-		inst->lastFPSCountFrame = currentTime;
+		inst_->fps_ = inst_->fps_count_;
+		inst_->fps_count_ = 1;
+		inst_->last_fps_count_frame_ = current_time;
 	}
 	else
 	{
-		inst->fpsCount++;
+		inst_->fps_count_++;
 	}
 
-	inst->partialTime = lastFrame == 0 ? 0 : (float)(currentTime - lastFrame) / CLOCKS_PER_SEC;
-	inst->lastFrame = currentTime;
+	inst_->partial_time_ = last_frame == 0 ? 0 : static_cast<float>(current_time - last_frame) / CLOCKS_PER_SEC;
+	inst_->last_frame_ = current_time;
 
-	if (inst->idle != NULL)
-		inst->idle(inst->partialTime);
+	if (inst_->idle_ != nullptr)
+		inst_->idle_(inst_->partial_time_);
 
 	glutPostRedisplay();
 }
 
-float Window::getPartialTime() const
+float Window::GetPartialTime() const
 {
-	return partialTime;
+	return partial_time_;
 }
 
-int Window::getFPS() const
+int Window::GetFps() const
 {
-	return fps;
+	return fps_;
 }

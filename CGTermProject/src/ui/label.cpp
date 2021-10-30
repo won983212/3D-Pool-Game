@@ -1,38 +1,40 @@
 #include "uiscreen.h"
 #include "label.h"
+
+#include <utility>
 #include "font.h"
 
 
-bool UELabel::render(std::vector<UIVertex>& vertices)
+bool UELabel::Render(std::vector<UIVertex>& vertices)
 {
-	FontRenderer* fontRenderer = UIScreen::getFontRenderer();
-	if(shadowColor != 0)
-		fontRenderer->renderText(text, x + 1, y + 1, shadowColor, fontPoint, centered);
-	fontRenderer->renderText(text, x, y, color, fontPoint, centered);
+	FontRenderer* font_renderer = UIScreen::GetFontRenderer();
+	if (shadow_color_ != 0)
+		font_renderer->RenderText(text_, x_ + 1, y_ + 1, shadow_color_, font_point_, centered_);
+	font_renderer->RenderText(text_, x_, y_, color_, font_point_, centered_);
 	return false;
 }
 
-void UELabel::setText(std::wstring text)
+void UELabel::SetText(std::wstring text)
 {
-	this->text = text;
+	this->text_ = std::move(text);
 }
 
-void UELabel::setColor(int color)
+void UELabel::SetColor(int color)
 {
-	this->color = color;
+	this->color_ = color;
 }
 
-void UELabel::setShadowColor(int shadowColor)
+void UELabel::SetShadowColor(const int shadow_color)
 {
-	this->shadowColor = shadowColor;
+	this->shadow_color_ = shadow_color;
 }
 
-void UELabel::setUseCentered(bool centered)
+void UELabel::SetUseCentered(bool centered)
 {
-	this->centered = centered;
+	this->centered_ = centered;
 }
 
-void UELabel::setTextPoint(float point)
+void UELabel::SetTextPoint(float point)
 {
-	this->fontPoint = point;
+	this->font_point_ = point;
 }

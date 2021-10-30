@@ -4,70 +4,70 @@
 
 using namespace commoncg;
 
-void LineDebugger::init(int lines)
+void LineDebugger::Init(int lines)
 {
-    points = new linedebugger::Vertex[lines * 2];
-    pointSize = lines * 2;
-    memset(points, 0, sizeof(linedebugger::Vertex) * pointSize);
+	points_ = new linedebugger::Vertex[lines * 2];
+	point_size_ = lines * 2;
+	memset(points_, 0, sizeof(linedebugger::Vertex) * point_size_);
 
-    beamVao.create();
-    beamVbo.create();
-    beamVao.use();
-    beamVbo.buffer(SIZEOF(linedebugger::Vertex, pointSize), points, GL_DYNAMIC_DRAW);
-    beamVao.attr(0, 3, GL_FLOAT, SIZEOF(float, 7), 0);
-    beamVao.attr(1, 4, GL_FLOAT, SIZEOF(float, 7), SIZEOF(float, 3));
-    VAO::unbind();
+	beam_vao_.Create();
+	beam_vbo_.Create();
+	beam_vao_.Use();
+	beam_vbo_.Buffer(SIZEOF(linedebugger::Vertex, point_size_), points_, GL_DYNAMIC_DRAW);
+	beam_vao_.Attrib(0, 3, GL_FLOAT, SIZEOF(float, 7), 0);
+	beam_vao_.Attrib(1, 4, GL_FLOAT, SIZEOF(float, 7), SIZEOF(float, 3));
+	VAO::Unbind();
 
-    ShaderProgram::push();
-    beamShader.addShader("res/shader/ray.vert", GL_VERTEX_SHADER);
-    beamShader.addShader("res/shader/ray.frag", GL_FRAGMENT_SHADER);
-    beamShader.load();
-    beamShader.use();
-    beamShader.setUniform("model", glm::mat4(1.0f));
-    ShaderProgram::pop();
+	ShaderProgram::Push();
+	beam_shader_.AddShader("res/shader/ray.vert", GL_VERTEX_SHADER);
+	beam_shader_.AddShader("res/shader/ray.frag", GL_FRAGMENT_SHADER);
+	beam_shader_.Load();
+	beam_shader_.Use();
+	beam_shader_.SetUniform("model", glm::mat4(1.0f));
+	ShaderProgram::Pop();
 }
 
 void LineDebugger::clear()
 {
-    len = 0;
+	len_ = 0;
 }
 
 void LineDebugger::add(float x, float y, float z)
 {
-    add(x, y, z, color);
+	add(x, y, z, color_);
 }
 
 void LineDebugger::add(float x, float y, float z, int color)
 {
-    if (len >= pointSize)
-    {
-        std::cout << "Error: Full size points" << std::endl;
-        return;
-    }
+	if (len_ >= point_size_)
+	{
+		std::cout << "Error: Full size points" << std::endl;
+		return;
+	}
 
-    float a = ((color >> 24) & 0xff) / 255.0f;
-    float r = ((color >> 16) & 0xff) / 255.0f;
-    float g = ((color >> 8) & 0xff) / 255.0f;
-    float b = (color & 0xff) / 255.0f;
+	float a = (color >> 24 & 0xff) / 255.0f;
+	float r = (color >> 16 & 0xff) / 255.0f;
+	float g = (color >> 8 & 0xff) / 255.0f;
+	float b = (color & 0xff) / 255.0f;
 
-    linedebugger::Vertex v = { {x, y, z}, {r, g, b, a} };
-    points[len++] = v;
+	linedebugger::Vertex v = {{x, y, z}, {r, g, b, a}};
+	points_[len_++] = v;
 }
 
 void LineDebugger::update()
 {
-    beamVao.use();
-    beamVbo.buffer(SIZEOF(linedebugger::Vertex, pointSize), points, GL_DYNAMIC_DRAW);
-    beamVbo.unbind();
-    VAO::unbind();
+	beam_vao_.Use();
+	beam_vbo_.Buffer(SIZEOF(linedebugger::Vertex, point_size_), points_, GL_DYNAMIC_DRAW);
+	beam_vbo_.Unbind();
+	VAO::Unbind();
 }
 
 void LineDebugger::draw()
 {
-    ShaderProgram::push();
-    beamShader.use();
-    beamVao.use();
-    glDrawArrays(GL_LINES, 0, pointSize);
-    VAO::unbind();
-    ShaderProgram::pop();
+	ShaderProgram::Push();
+	beam_shader_.Use();
+	beam_vao_.Use();
+	glDrawArrays(GL_LINES, 0, point_size_);
+	VAO::Unbind();
+	ShaderProgram::Pop();
 }

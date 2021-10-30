@@ -5,141 +5,140 @@
 
 using namespace commoncg;
 
-bool fontReady = false;
-FontRenderer fontRenderer;
+bool font_ready = false;
+FontRenderer font_renderer;
 
 
-FontRenderer* UIScreen::getFontRenderer()
+FontRenderer* UIScreen::GetFontRenderer()
 {
-	if (!fontReady)
-		fontRenderer.init("res/font.ttf");
-	return &fontRenderer;
+	if (!font_ready)
+		font_renderer.Init("res/font.ttf");
+	return &font_renderer;
 }
 
 UIScreen::~UIScreen()
 {
-	for (unsigned int i = 0; i < elements.size(); i++)
-		for (unsigned int j = 0; j < elements[i].size(); j++)
-			delete elements[i][j];
+	for (auto& element : elements_)
+		for (auto& j : element)
+			delete j;
 }
 
-void UIScreen::init()
+void UIScreen::Init()
 {
-	clear();
-	ShaderProgram::push();
-	uiShader.addShader("res/shader/gui.vert", GL_VERTEX_SHADER);
-	uiShader.addShader("res/shader/gui.frag", GL_FRAGMENT_SHADER);
-	uiShader.load();
-	uiShader.use();
-	uiShader.setUniform("projection", glm::ortho(0.0f, (float)SCREEN_WIDTH, (float)SCREEN_HEIGHT, 0.0f, 0.0f, 10.0f));
-	uiShader.setUniform("texture_diffuse", PBR_TEXTURE_INDEX_ALBEDO);
-	uiShader.setUniform("useTexture", false);
-	uiShader.setUniform("useFont", false);
-	ShaderProgram::pop();
+	Clear();
+	ShaderProgram::Push();
+	ui_shader_.AddShader("res/shader/gui.vert", GL_VERTEX_SHADER);
+	ui_shader_.AddShader("res/shader/gui.frag", GL_FRAGMENT_SHADER);
+	ui_shader_.Load();
+	ui_shader_.Use();
+	ui_shader_.SetUniform("projection", glm::ortho(0.0f, static_cast<float>(SCREEN_WIDTH), static_cast<float>(SCREEN_HEIGHT), 0.0f, 0.0f, 10.0f));
+	ui_shader_.SetUniform("texture_diffuse", PBR_TEXTURE_INDEX_ALBEDO);
+	ui_shader_.SetUniform("useTexture", false);
+	ui_shader_.SetUniform("useFont", false);
+	ShaderProgram::Pop();
 
-	vao.create();
-	vbo.create();
-	screenInit();
+	vao_.Create();
+	vbo_.Create();
+	ScreenInit();
 }
 
-void UIScreen::setScreenChangedEvent(IScreenChangedEvent* e)
+void UIScreen::SetScreenChangedEvent(IScreenChangedEvent* e)
 {
-	screenChangeEvent = e;
+	screen_change_event_ = e;
 }
 
-void UIScreen::add(UIElement* element, int screenIdx)
+void UIScreen::Add(UIElement* element, int screen_idx)
 {
-	element->parent = this;
-	elements[screenIdx].push_back(element);
+	element->parent_ = this;
+	elements_[screen_idx].push_back(element);
 }
 
-void UIScreen::addPages(int count)
+void UIScreen::AddPages(int count)
 {
 	for (int i = 0; i < count; i++)
-		elements.push_back(std::vector<UIElement*>());
+		elements_.emplace_back();
 }
 
-void UIScreen::setScreen(int index)
+void UIScreen::SetScreen(int index)
 {
-	if (index < 0 || index >= elements.size())
+	if (index < 0 || index >= elements_.size())
 	{
 		std::cout << "Warning: Invaild index: " << index << std::endl;
 		return;
 	}
 
-	this->index = index;
-	if (screenChangeEvent != nullptr)
-		screenChangeEvent->onScreenChanged(index);
+	this->index_ = index;
+	if (screen_change_event_ != nullptr)
+		screen_change_event_->OnScreenChanged(index);
 }
 
-int UIScreen::getCurrentScreen()
+int UIScreen::GetCurrentScreen() const
 {
-	return index;
+	return index_;
 }
 
-void UIScreen::clear()
+void UIScreen::Clear()
 {
-	elements.clear();
+	elements_.clear();
 }
 
-void UIScreen::render()
+void UIScreen::Render()
 {
 	glDisable(GL_DEPTH_TEST);
 
-	ShaderProgram::push();
-	uiShader.use();
+	ShaderProgram::Push();
+	ui_shader_.Use();
 	glActiveTexture(GL_TEXTURE0 + PBR_TEXTURE_INDEX_ALBEDO);
 
-	vao.use();
-	vbo.use();
-	vao.attr(0, 4, GL_FLOAT, sizeof(UIVertex), 0);
-	vao.attr(1, 4, GL_FLOAT, sizeof(UIVertex), offsetof(UIVertex, color));
+	vao_.Use();
+	vbo_.Use();
+	vao_.Attrib(0, 4, GL_FLOAT, sizeof(UIVertex), 0);
+	vao_.Attrib(1, 4, GL_FLOAT, sizeof(UIVertex), offsetof(UIVertex, color));
 
 	std::vector<UIVertex> vertices;
-	for (unsigned int i = 0; i < elements[index].size(); i++)
+	for (const auto element : elements_[index_])
 	{
-		UIElement* element = elements[index][i];
-		if (!element->visible)
+		if (!element->visible_)
 			continue;
 
 		vertices.clear();
-		uiShader.setUniform("useTexture", element->render(vertices));
+		ui_shader_.SetUniform("useTexture", element->Render(vertices));
 		if (!vertices.empty())
 		{
-			vao.use();
-			vbo.buffer(vertices.size() * sizeof(UIVertex), &vertices[0]);
+			vao_.Use();
+			vbo_.Buffer(vertices.size() * sizeof(UIVertex), &vertices[0]);
 			glDrawArrays(GL_TRIANGLES, 0, vertices.size());
 		}
-		element->postRender();
+		element->PostRender();
 	}
-	onRenderTick();
+	OnRenderTick();
 
-	vbo.unbind();
-	VAO::unbind();
-	ShaderProgram::pop();
+	vbo_.Unbind();
+	VAO::Unbind();
+	ShaderProgram::Pop();
 	glEnable(GL_DEPTH_TEST);
 }
 
-void UIScreen::mouse(int button, int state, int x, int y)
+void UIScreen::Mouse(int button, int state, int x, int y)
 {
-	for (unsigned int i = 0; i < elements[index].size(); i++)
-		if (elements[index][i]->onMouse(button, state, x, y)) break;
+	for (const auto element : elements_[index_])
+		if (element->OnMouse(button, state, x, y)) break;
 }
 
-void UIScreen::mouseDrag(int x, int y)
+void UIScreen::MouseDrag(int x, int y)
 {
-	for (unsigned int i = 0; i < elements[index].size(); i++)
-		elements[index][i]->onMouseDrag(x, y);
+	for (const auto element : elements_[index_])
+		element->OnMouseDrag(x, y);
 }
 
-void UIScreen::mouseWheel(int button, int state, int x, int y)
+void UIScreen::MouseWheel(int button, int state, int x, int y)
 {
-	for (unsigned int i = 0; i < elements[index].size(); i++)
-		elements[index][i]->onMouseWheel(button, state, x, y);
+	for (const auto element : elements_[index_])
+		element->OnMouseWheel(button, state, x, y);
 }
 
-void UIScreen::mouseMove(int x, int y)
+void UIScreen::MouseMove(int x, int y)
 {
-	for (unsigned int i = 0; i < elements[index].size(); i++)
-		elements[index][i]->onMouseMove(x, y);
+	for (const auto element : elements_[index_])
+		element->OnMouseMove(x, y);
 }

@@ -10,27 +10,29 @@ class UIScreen
 {
 public:
 	~UIScreen();
-	void init();
-	void render();
-	void mouse(int button, int state, int x, int y);
-	void mouseWheel(int button, int state, int x, int y);
-	void mouseDrag(int x, int y);
-	void mouseMove(int x, int y);
-	void setScreen(int index);
-	int getCurrentScreen();
-	void setScreenChangedEvent(IScreenChangedEvent* e);
-	virtual void screenInit() {};
-	virtual void onRenderTick() {};
-	static FontRenderer* getFontRenderer();
+	void Init();
+	void Render();
+	void Mouse(int button, int state, int x, int y);
+	void MouseWheel(int button, int state, int x, int y);
+	void MouseDrag(int x, int y);
+	void MouseMove(int x, int y);
+	void SetScreen(int index);
+	int GetCurrentScreen() const;
+	void SetScreenChangedEvent(IScreenChangedEvent* e);
+	virtual void ScreenInit() { }
+	virtual void OnRenderTick() { }
+	static FontRenderer* GetFontRenderer();
+
 protected:
-	void add(UIElement* element, int screenIdx);
-	void addPages(int count = 1);
-	void clear();
+	void Add(UIElement* element, int screen_idx);
+	void AddPages(int count = 1);
+	void Clear();
+
 private:
-	int index = 0;
-	commoncg::ShaderProgram uiShader;
-	commoncg::VAO vao;
-	commoncg::VBO vbo;
-	std::vector<std::vector<UIElement*>> elements;
-	IScreenChangedEvent* screenChangeEvent = nullptr;
+	int index_ = 0;
+	commoncg::ShaderProgram ui_shader_;
+	commoncg::VAO vao_;
+	commoncg::VBO vbo_;
+	std::vector<std::vector<UIElement*>> elements_;
+	IScreenChangedEvent* screen_change_event_ = nullptr;
 };

@@ -1,5 +1,7 @@
 #include <iostream>
+#include "../gfx/shader.h"
 #include "../gfx/texture.h"
+#include "assimp/postprocess.h"
 #include "assetmodel.h"
 #include "assimp/pbrmaterial.h"
 
@@ -9,7 +11,7 @@ using namespace commoncg;
 using namespace std;
 
 
-static string getTexPathAssimp(aiMaterial* material, aiTextureType type, unsigned int index)
+static string GetTexPathAssimp(aiMaterial* material, aiTextureType type, unsigned int index)
 {
 	if (material->GetTextureCount(type) > 0)
 	{
@@ -20,24 +22,24 @@ static string getTexPathAssimp(aiMaterial* material, aiTextureType type, unsigne
 	return "";
 }
 
-static glm::vec4 getVecAssimp(aiMaterial* material, glm::vec4 defaultValue, const char* key, unsigned int type, unsigned int index)
+static glm::vec4 GetVecAssimp(aiMaterial* material, glm::vec4 default_value, const char* key, unsigned int type, unsigned int index)
 {
 	aiColor4D ai_color;
 	if (material->Get(key, type, index, ai_color) == AI_SUCCESS)
 		return glm::vec4(ai_color.r, ai_color.g, ai_color.b, ai_color.a);
-	return defaultValue;
+	return default_value;
 }
 
-static float getFloatAssimp(aiMaterial* material, float defaultValue, const char* key, unsigned int type, unsigned int index)
+static float GetFloatAssimp(aiMaterial* material, float default_value, const char* key, unsigned int type, unsigned int index)
 {
 	float data;
 	if (material->Get(key, type, index, data) == AI_SUCCESS)
 		return data;
-	return defaultValue;
+	return default_value;
 }
 
-Mesh::Mesh(const AssetModel* parent, aiMesh* mesh, const aiScene* scene)
-	: ebo(GL_ELEMENT_ARRAY_BUFFER), parent(parent), indiceSize(0), materialIndex(-1)
+Mesh::Mesh(const AssetModel* parent, aiMesh* mesh)
+	: ebo_(GL_ELEMENT_ARRAY_BUFFER), material_index_(-1), indice_size_(0), parent_(parent)
 {
 	vector<Vertex> vertices;
 	vector<unsigned int> indices;
@@ -63,11 +65,11 @@ Mesh::Mesh(const AssetModel* parent, aiMesh* mesh, const aiScene* scene)
 		// texture
 		if (mesh->HasTextureCoords(0))
 		{
-			vertex.texCoord.x = mesh->mTextureCoords[0][i].x;
-			vertex.texCoord.y = mesh->mTextureCoords[0][i].y;
+			vertex.tex_coord.x = mesh->mTextureCoords[0][i].x;
+			vertex.tex_coord.y = mesh->mTextureCoords[0][i].y;
 		}
 		else
-			vertex.texCoord = glm::vec2(0.0f);
+			vertex.tex_coord = glm::vec2(0.0f);
 
 		vertices.push_back(vertex);
 	}
@@ -78,84 +80,86 @@ Mesh::Mesh(const AssetModel* parent, aiMesh* mesh, const aiScene* scene)
 		for (unsigned int j = 0; j < mesh->mFaces[i].mNumIndices; j++)
 			indices.push_back(mesh->mFaces[i].mIndices[j]);
 	}
-	indiceSize = indices.size();
+	indice_size_ = indices.size();
 
 	// materials
 	if (mesh->mMaterialIndex >= 0)
-		materialIndex = mesh->mMaterialIndex;
+		material_index_ = mesh->mMaterialIndex;
 
 	// allocate at VAO
-	vao.create();
-	vbo.create();
-	ebo.create();
+	vao_.Create();
+	vbo_.Create();
+	ebo_.Create();
 
-	vao.use();
-	vbo.buffer(vertices.size() * sizeof(Vertex), &vertices[0]);
-	ebo.buffer(indices.size() * sizeof(unsigned int), &indices[0]);
+	vao_.Use();
+	vbo_.Buffer(vertices.size() * sizeof(Vertex), &vertices[0]);
+	ebo_.Buffer(indices.size() * sizeof(unsigned int), &indices[0]);
 
-	vao.attr(0, 3, GL_FLOAT, sizeof(Vertex), 0);
-	vao.attr(1, 3, GL_FLOAT, sizeof(Vertex), offsetof(Vertex, normal));
-	vao.attr(2, 2, GL_FLOAT, sizeof(Vertex), offsetof(Vertex, texCoord));
+	vao_.Attrib(0, 3, GL_FLOAT, sizeof(Vertex), 0);
+	vao_.Attrib(1, 3, GL_FLOAT, sizeof(Vertex), offsetof(Vertex, normal));
+	vao_.Attrib(2, 2, GL_FLOAT, sizeof(Vertex), offsetof(Vertex, tex_coord));
 
-	VAO::unbind();
+	VAO::Unbind();
 }
 
-void Mesh::draw()
+void Mesh::Draw()
 {
-	Material* uMat = parent->materials[materialIndex];
-	for (unsigned int i = 0; i < MESH_TEXTURE_TYPE_SIZE; i++)
+	Material* u_mat = parent_->materials_[material_index_];
+	for (unsigned int i = 0; i < MeshTextureTypeSize; i++)
 	{
+		glActiveTexture(GL_TEXTURE0 + TexturePbrIndexes[i]);
+		Texture::Unbind();
+
 		// ignore not loaded texture.
-		if (uMat->texIndex[i] == -1)
+		if (u_mat->tex_index[i] == -1)
 			continue;
-
+		
 		// get texture info
-		ModelTexture* texture = parent->textures[uMat->texIndex[i]];
-		string name = textureUniformNames[(int)texture->type];
+		ModelTexture* texture = parent_->textures_[u_mat->tex_index[i]];
+		string name = TextureUniformNames[static_cast<int>(texture->type)];
 
-		// bind texture
-		ShaderProgram::getContextShader()->setUniform(name.c_str(), texturePBRIndexes[i]);
-		glActiveTexture(GL_TEXTURE0 + texturePBRIndexes[i]);
-		texture->texture->bind();
+		// Bind texture
+		ShaderProgram::GetContextShader()->SetUniform(name.c_str(), TexturePbrIndexes[i]);
+		texture->texture->Bind();
 	}
 
-	// bind material to shader
-	if (materialIndex >= 0)
-		model::bindMaterial(parent->materials[materialIndex]);
+	// Bind material to shader
+	if (material_index_ >= 0)
+		BindMaterial(parent_->materials_[material_index_]);
 
-	vao.use();
-	glDrawElements(GL_TRIANGLES, indiceSize, GL_UNSIGNED_INT, 0);
-	VAO::unbind();
+	vao_.Use();
+	glDrawElements(GL_TRIANGLES, indice_size_, GL_UNSIGNED_INT, nullptr);
+	VAO::Unbind();
 }
 
-void AssetModel::draw()
+void AssetModel::Draw()
 {
-	for (unsigned int i = 0; i < meshes.size(); i++)
-		meshes[i]->draw();
+	for (const auto& mesh : meshes_)
+		mesh->Draw();
 
-	// all texture unbind
-	for (unsigned int i = 0; i < MESH_TEXTURE_TYPE_SIZE; i++)
+	// all texture Unbind
+	for (const int tex_idx : TexturePbrIndexes)
 	{
-		glActiveTexture(GL_TEXTURE0 + texturePBRIndexes[i]);
-		Texture::unbind();
+		glActiveTexture(GL_TEXTURE0 + tex_idx);
+		Texture::Unbind();
 	}
 
 	glActiveTexture(GL_TEXTURE0);
 }
 
-void AssetModel::loadTexture(const aiScene* scene, string texPath, Material* uMat, int id)
+void AssetModel::LoadTexture(const aiScene* scene, const string& tex_path, Material* u_mat, int id)
 {
 	// load texture
-	ModelTexture* tex = new ModelTexture();
-	tex->texture = Texture::cacheImage((directory + '/' + texPath).c_str(), GL_REPEAT, true);
-	tex->type = (TextureType)id;
+	auto tex = new ModelTexture();
+	tex->texture = Texture::CacheImage((directory_ + '/' + tex_path).c_str(), GL_REPEAT, true);
+	tex->type = static_cast<TextureType>(id);
 
 	// set textureIndex
-	uMat->texIndex[id] = textures.size();
-	textures.push_back(tex);
+	u_mat->tex_index[id] = textures_.size();
+	textures_.push_back(tex);
 }
 
-void AssetModel::loadModel(string path)
+void AssetModel::LoadModel(string path)
 {
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs);
@@ -167,66 +171,66 @@ void AssetModel::loadModel(string path)
 	}
 
 	// resource path
-	directory = path.substr(0, path.find_last_of('/'));
+	directory_ = path.substr(0, path.find_last_of('/'));
 
 	// load all materials
 	for (unsigned int i = 0; i < scene->mNumMaterials; i++)
 	{
 		aiMaterial* material = scene->mMaterials[i];
-		Material* uMat = new Material();
+		auto u_mat = new Material();
 
-		for (int j = 0; j < MESH_TEXTURE_TYPE_SIZE; j++)
-			uMat->texIndex[j] = -1;
+		for (int& j : u_mat->tex_index)
+			j = -1;
 
 		// load textures
-		string albedoTexPath = getTexPathAssimp(material, AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_BASE_COLOR_TEXTURE);
-		if (!albedoTexPath.empty())
-			loadTexture(scene, albedoTexPath, uMat, 0);
+		string albedo_tex_path = GetTexPathAssimp(material, AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_BASE_COLOR_TEXTURE);
+		if (!albedo_tex_path.empty())
+			LoadTexture(scene, albedo_tex_path, u_mat, 0);
 
-		string mrTexPath = getTexPathAssimp(material, AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_METALLICROUGHNESS_TEXTURE);
-		if (!mrTexPath.empty())
+		string mr_tex_path = GetTexPathAssimp(material, AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_METALLICROUGHNESS_TEXTURE);
+		if (!mr_tex_path.empty())
 		{
-			int dashIdx = mrTexPath.find("-");
-			if (dashIdx == string::npos)
+			const int dash_idx = mr_tex_path.find('-');
+			if (dash_idx == string::npos)
 			{
-				loadTexture(scene, mrTexPath, uMat, 1);
+				LoadTexture(scene, mr_tex_path, u_mat, 1);
 			}
 			else
 			{
-				loadTexture(scene, mrTexPath.substr(0, dashIdx), uMat, 1);
-				if(mrTexPath.size() > dashIdx + 1)
-					loadTexture(scene, mrTexPath.substr(dashIdx + 1), uMat, 2);
+				LoadTexture(scene, mr_tex_path.substr(0, dash_idx), u_mat, 1);
+				if (mr_tex_path.size() > dash_idx + 1)
+					LoadTexture(scene, mr_tex_path.substr(dash_idx + 1), u_mat, 2);
 			}
 		}
 
-		string normalTexPath = getTexPathAssimp(material, aiTextureType_NORMALS, 0);
-		if (!normalTexPath.empty())
-			loadTexture(scene, normalTexPath, uMat, 3);
+		string normal_tex_path = GetTexPathAssimp(material, aiTextureType_NORMALS, 0);
+		if (!normal_tex_path.empty())
+			LoadTexture(scene, normal_tex_path, u_mat, 3);
 
 		// uniform block material setup
-		uMat->albedo = getVecAssimp(material, glm::vec4(1.0f), AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_BASE_COLOR_FACTOR);
-		uMat->metallic = getFloatAssimp(material, 1.0f, AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_METALLIC_FACTOR);
-		uMat->roughness = getFloatAssimp(material, 1.0f, AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_ROUGHNESS_FACTOR);
-		uMat->ao = DEFAULT_AO;
+		u_mat->albedo = GetVecAssimp(material, glm::vec4(1.0f), AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_BASE_COLOR_FACTOR);
+		u_mat->metallic = GetFloatAssimp(material, 1.0f, AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_METALLIC_FACTOR);
+		u_mat->roughness = GetFloatAssimp(material, 1.0f, AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_ROUGHNESS_FACTOR);
+		u_mat->ao = DefaultAo;
 
 		// add to material dictionary
-		materials.push_back(uMat);
+		materials_.push_back(u_mat);
 	}
 
 	// load all meshes
 	for (unsigned int i = 0; i < scene->mNumMeshes; i++)
 	{
 		aiMesh* mesh = scene->mMeshes[i];
-		meshes.push_back(new Mesh(this, mesh, scene));
+		meshes_.push_back(new Mesh(this, mesh));
 	}
 }
 
 AssetModel::~AssetModel()
 {
-	for (unsigned int i = 0; i < meshes.size(); i++)
-		delete meshes[i];
-	for (unsigned int i = 0; i < materials.size(); i++)
-		delete materials[i];
-	for (unsigned int i = 0; i < textures.size(); i++)
-		delete textures[i];
+	for (const auto& mesh : meshes_)
+		delete mesh;
+	for (const auto& material : materials_)
+		delete material;
+	for (const auto& texture : textures_)
+		delete texture;
 }

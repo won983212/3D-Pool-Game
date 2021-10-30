@@ -7,20 +7,22 @@ namespace commoncg
 	class VBO
 	{
 	public:
-		VBO(int bufferType = GL_ARRAY_BUFFER);
+		VBO(int buffer_type = GL_ARRAY_BUFFER);
 		~VBO();
-		void create();
-		bool isCreated() const;
-		void destroy() const;
-		void use() const;
-		void buffer(GLsizeiptr size, const void* data, GLenum drawingHint = GL_STATIC_DRAW) const;
-		void subBuffer(GLintptr offset, GLsizeiptr size, const void* data) const;
-		void bindBufferRange(GLuint index, GLintptr offset, GLsizeiptr size) const;
-		void unbind() const;
+		void Create();
+		bool IsCreated() const;
+		void Destroy() const;
+		void Use() const;
+		void Buffer(GLsizeiptr size, const void* data, GLenum drawing_hint = GL_STATIC_DRAW) const;
+		void SubBuffer(GLintptr offset, GLsizeiptr size, const void* data) const;
+		void BindBufferRange(GLuint index, GLintptr offset, GLsizeiptr size) const;
+		void Unbind() const;
+
 	private:
-		void checkIfCreated(std::string methodName) const;
+		void CheckIfCreated(const std::string& method_name) const;
+
 	private:
-		GLuint handle;
-		GLenum bufferType;
+		GLuint handle_;
+		GLenum buffer_type_;
 	};
 }

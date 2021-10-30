@@ -2,11 +2,11 @@
 #include "balltracer.h"
 #include "util/util.h"
 
-#define TRACER_Y 0.16f
-#define LINE_POINTS 4
-#define CIRCLE_POINTS 30
+constexpr float TracerY = 0.16f;
+constexpr int LinePoints = 4;
+constexpr int CirclePoints = 30;
 
-namespace __balltracer__
+namespace balltracer
 {
 	struct Vertex
 	{
@@ -14,133 +14,133 @@ namespace __balltracer__
 		glm::vec4 color;
 	};
 
-	static Vertex makeVertex(float x, float y, float z, int color)
+	static Vertex MakeVertex(float x, float y, float z, unsigned int color)
 	{
-		float a = ((color >> 24) & 0xff) / 255.0f;
-		float r = ((color >> 16) & 0xff) / 255.0f;
-		float g = ((color >> 8) & 0xff) / 255.0f;
+		float a = (color >> 24 & 0xff) / 255.0f;
+		float r = (color >> 16 & 0xff) / 255.0f;
+		float g = (color >> 8 & 0xff) / 255.0f;
 		float b = (color & 0xff) / 255.0f;
-		Vertex v = { {x, y, z}, {r, g, b, a} };
+		const Vertex v = {{x, y, z}, {r, g, b, a}};
 		return v;
 	}
 }
 
 using namespace commoncg;
-using namespace __balltracer__;
+using namespace balltracer;
 
 
-void BallTracer::init()
+void BallTracer::Init()
 {
 	// tracing line
-	beamVao.create();
-	beamVbo.create();
-	beamVao.use();
-	beamVbo.buffer(SIZEOF(Vertex, LINE_POINTS), nullptr, GL_DYNAMIC_DRAW);
-	beamVao.attr(0, 3, GL_FLOAT, SIZEOF(float, 7), 0);
-	beamVao.attr(1, 4, GL_FLOAT, SIZEOF(float, 7), SIZEOF(float, 3));
+	beam_vao_.Create();
+	beam_vbo_.Create();
+	beam_vao_.Use();
+	beam_vbo_.Buffer(SIZEOF(Vertex, LinePoints), nullptr, GL_DYNAMIC_DRAW);
+	beam_vao_.Attrib(0, 3, GL_FLOAT, SIZEOF(float, 7), 0);
+	beam_vao_.Attrib(1, 4, GL_FLOAT, SIZEOF(float, 7), SIZEOF(float, 3));
 
 	// ball circle
-	circleVao.create();
-	circleVbo.create();
-	circleVao.use();
+	circle_vao_.Create();
+	circle_vbo_.Create();
+	circle_vao_.Use();
 
-	std::vector<Vertex> circleVerts;
-	float dt = 2 * M_PI / CIRCLE_POINTS;
-	for (int i = 0; i < CIRCLE_POINTS; i++)
+	std::vector<Vertex> circle_verts;
+	constexpr float dt = 2 * M_PI / CirclePoints;
+	for (int i = 0; i < CirclePoints; i++)
 	{
-		float x = BALL_RADIUS * cos(i * dt);
-		float y = BALL_RADIUS * sin(i * dt);
-		circleVerts.push_back(makeVertex(x, 0, y, 0xaaffffff));
+		const float x = BallRadius * cos(i * dt);
+		const float y = BallRadius * sin(i * dt);
+		circle_verts.push_back(MakeVertex(x, 0, y, 0xaaffffff));
 	}
 
-	circleVbo.buffer(sizeof(Vertex) * circleVerts.size(), &circleVerts[0], GL_STATIC_DRAW);
-	circleVao.attr(0, 3, GL_FLOAT, SIZEOF(float, 7), 0);
-	circleVao.attr(1, 4, GL_FLOAT, SIZEOF(float, 7), SIZEOF(float, 3));
-	VAO::unbind();
+	circle_vbo_.Buffer(sizeof(Vertex) * circle_verts.size(), &circle_verts[0], GL_STATIC_DRAW);
+	circle_vao_.Attrib(0, 3, GL_FLOAT, SIZEOF(float, 7), 0);
+	circle_vao_.Attrib(1, 4, GL_FLOAT, SIZEOF(float, 7), SIZEOF(float, 3));
+	VAO::Unbind();
 
 	// prepare shader
-	ShaderProgram::push();
-	beamShader.addShader("res/shader/ray.vert", GL_VERTEX_SHADER);
-	beamShader.addShader("res/shader/ray.frag", GL_FRAGMENT_SHADER);
-	beamShader.load();
-	beamShader.use();
-	beamShader.setUniform("model", glm::mat4(1.0f));
-	ShaderProgram::pop();
+	ShaderProgram::Push();
+	beam_shader_.AddShader("res/shader/ray.vert", GL_VERTEX_SHADER);
+	beam_shader_.AddShader("res/shader/ray.frag", GL_FRAGMENT_SHADER);
+	beam_shader_.Load();
+	beam_shader_.Use();
+	beam_shader_.SetUniform("model", glm::mat4(1.0f));
+	ShaderProgram::Pop();
 }
 
-void BallTracer::update()
+void BallTracer::Update()
 {
-	if (direction.x == 0 && direction.y == 0)
+	if (direction_.x == 0.0f && direction_.y == 0.0f)
 	{
-		visible = false;
+		visible_ = false;
 		return;
 	}
 
-	RaytraceResult traceRes = table.getRaytracedBall(position, direction);
-	if (!traceRes.hit)
+	RaytraceResult trace_res = table_.GetRaytracedBall(position_, direction_);
+	if (!trace_res.hit)
 	{
-		visible = false;
+		visible_ = false;
 		return;
 	}
 
-	glm::vec2 targetBallPos;
-	glm::vec2 collisionVecEnd;
+	glm::vec2 target_ball_pos;
+	glm::vec2 collision_vec_end;
 
-	if (traceRes.hitTargetBall == nullptr)
+	if (trace_res.hit_target_ball == nullptr)
 	{
-		targetBallPos = traceRes.hitBallPos;
-		collisionVecEnd = targetBallPos + 0.5f * glm::normalize(glm::reflect(targetBallPos - position, traceRes.normal));
-	} 
+		target_ball_pos = trace_res.hit_ball_pos;
+		collision_vec_end = target_ball_pos + 0.5f * normalize(reflect(target_ball_pos - position_, trace_res.normal));
+	}
 	else
 	{
-		targetBallPos = traceRes.hitTargetBall->position;
-		collisionVecEnd = targetBallPos + 0.5f * glm::normalize(targetBallPos - traceRes.hitBallPos);
+		target_ball_pos = trace_res.hit_target_ball->position_;
+		collision_vec_end = target_ball_pos + 0.5f * normalize(target_ball_pos - trace_res.hit_ball_pos);
 	}
 
-	hitBallPos = glm::vec3(traceRes.hitBallPos.x, TRACER_Y, traceRes.hitBallPos.y);
-	traceRes.hitBallPos -= BALL_RADIUS * glm::normalize(traceRes.hitBallPos - position);
+	hit_ball_pos_ = glm::vec3(trace_res.hit_ball_pos.x, TracerY, trace_res.hit_ball_pos.y);
+	trace_res.hit_ball_pos -= BallRadius * normalize(trace_res.hit_ball_pos - position_);
 
-	Vertex data[] =
+	const Vertex data[] =
 	{
-		makeVertex(position.x, TRACER_Y, position.y, 0x77ffffff),
-		makeVertex(traceRes.hitBallPos.x, TRACER_Y, traceRes.hitBallPos.y, 0x77ffffff),
-		makeVertex(targetBallPos.x, TRACER_Y, targetBallPos.y, 0xaaffffff),
-		makeVertex(collisionVecEnd.x, TRACER_Y, collisionVecEnd.y, 0x00ffffff)
+		MakeVertex(position_.x, TracerY, position_.y, 0x77ffffff),
+		MakeVertex(trace_res.hit_ball_pos.x, TracerY, trace_res.hit_ball_pos.y, 0x77ffffff),
+		MakeVertex(target_ball_pos.x, TracerY, target_ball_pos.y, 0xaaffffff),
+		MakeVertex(collision_vec_end.x, TracerY, collision_vec_end.y, 0x00ffffff)
 	};
 
-	beamVao.use();
-	beamVbo.buffer(SIZEOF(Vertex, LINE_POINTS), data, GL_DYNAMIC_DRAW);
-	beamVbo.unbind();
-	VAO::unbind();
-	visible = true;
+	beam_vao_.Use();
+	beam_vbo_.Buffer(SIZEOF(Vertex, LinePoints), data, GL_DYNAMIC_DRAW);
+	beam_vbo_.Unbind();
+	VAO::Unbind();
+	visible_ = true;
 }
 
-void BallTracer::draw()
+void BallTracer::Draw() const
 {
-	if (!visible)
+	if (!visible_)
 		return;
 
 	glDisable(GL_DEPTH_TEST);
-	ShaderProgram::push();
-	beamShader.use();
+	ShaderProgram::Push();
+	beam_shader_.Use();
 
 	// beams
 	glLineWidth(4.0f);
-	beamShader.setUniform("model", glm::mat4(1.0f));
-	beamVao.use();
-	glDrawArrays(GL_LINES, 0, LINE_POINTS);
+	beam_shader_.SetUniform("model", glm::mat4(1.0f));
+	beam_vao_.Use();
+	glDrawArrays(GL_LINES, 0, LinePoints);
 
 	// ball ghost
 	glEnable(GL_LINE_STIPPLE);
 	glLineStipple(2, 0xAAAA);
 	glLineWidth(1.5f);
-	beamShader.setUniform("model", glm::translate(glm::mat4(1.0f), hitBallPos));
-	circleVao.use();
-	glDrawArrays(GL_LINE_LOOP, 0, CIRCLE_POINTS);
-	VAO::unbind();
+	beam_shader_.SetUniform("model", translate(glm::mat4(1.0f), hit_ball_pos_));
+	circle_vao_.Use();
+	glDrawArrays(GL_LINE_LOOP, 0, CirclePoints);
+	VAO::Unbind();
 	glDisable(GL_LINE_STIPPLE);
 
-	ShaderProgram::pop();
+	ShaderProgram::Pop();
 	glEnable(GL_DEPTH_TEST);
-	glLineWidth(DEFAULT_LINE_WIDTH);
+	glLineWidth(DefaultLineWidth);
 }

@@ -1,38 +1,39 @@
 #include <iostream>
+#include <string>
 #include "sound.h"
 
-irrklang::ISoundEngine* soundEngine = nullptr;
+irrklang::ISoundEngine* sound_engine = nullptr;
 
 
-void initSoundEngine()
+void InitSoundEngine()
 {
-	soundEngine = irrklang::createIrrKlangDevice();
-	if (soundEngine == nullptr)
+	sound_engine = irrklang::createIrrKlangDevice();
+	if (sound_engine == nullptr)
 	{
 		std::cout << "Error: Can't initialize sound engine." << std::endl;
 		return;
 	}
 
 	// caching sounds
-	soundEngine->play2D(SOUND_BGM);
-	soundEngine->play2D(SOUND_BALL_COLLIDE(0));
-	soundEngine->play2D(SOUND_BALL_COLLIDE(1));
-	soundEngine->play2D(SOUND_BALL_COLLIDE(2));
-	soundEngine->play2D(SOUND_CUE_PUSH(0));
-	soundEngine->play2D(SOUND_CUE_PUSH(1));
-	soundEngine->stopAllSounds();
+	sound_engine->play2D(SOUND_BGM);
+	sound_engine->play2D(SOUND_BALL_COLLIDE(0));
+	sound_engine->play2D(SOUND_BALL_COLLIDE(1));
+	sound_engine->play2D(SOUND_BALL_COLLIDE(2));
+	sound_engine->play2D(SOUND_CUE_PUSH(0));
+	sound_engine->play2D(SOUND_CUE_PUSH(1));
+	sound_engine->stopAllSounds();
 }
 
-irrklang::ISoundEngine* getSoundEngine()
+irrklang::ISoundEngine* GetSoundEngine()
 {
-	return soundEngine;
+	return sound_engine;
 }
 
-void destroySoundEngine()
+void DestroySoundEngine()
 {
-	if (soundEngine == nullptr)
+	if (sound_engine == nullptr)
 		return;
 
-	soundEngine->drop();
-	soundEngine = nullptr;
+	sound_engine->drop();
+	sound_engine = nullptr;
 }

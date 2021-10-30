@@ -10,9 +10,10 @@ namespace model
 	public:
 		void init(float width, float height, glm::vec3 normal);
 		void draw();
+
 	private:
-		commoncg::VAO vao;
-		commoncg::VBO vbo;
-		int verticesSize;
+		commoncg::VAO vao_;
+		commoncg::VBO vbo_;
+		int vertices_size_ = 0;
 	};
 }

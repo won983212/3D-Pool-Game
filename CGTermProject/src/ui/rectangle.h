@@ -4,8 +4,9 @@
 class UERectangle : public UIElement
 {
 public:
-	virtual bool render(std::vector<UIVertex>& vertices);
-	void setColor(int color);
+	bool Render(std::vector<UIVertex>& vertices) override;
+	void SetColor(int color);
+
 private:
-	int color = 0xffffffff;
+	unsigned int color_ = 0xffffffff;
 };

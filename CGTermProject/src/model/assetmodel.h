@@ -4,11 +4,9 @@
 #include <string>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
-#include <assimp/postprocess.h>
 #include "model.h"
 #include "../gfx/vao.h"
 #include "../gfx/vbo.h"
-#include "../gfx/shader.h"
 
 
 namespace model
@@ -20,32 +18,38 @@ namespace model
 	};
 
 	class AssetModel;
+
 	class Mesh
 	{
 	private:
-		commoncg::VAO vao;
-		commoncg::VBO vbo, ebo;
-		int materialIndex;
-		int indiceSize;
-		const AssetModel* parent;
+		commoncg::VAO vao_;
+		commoncg::VBO vbo_, ebo_;
+		int material_index_;
+		int indice_size_;
+		const AssetModel* parent_;
+
 	public:
-		Mesh(const AssetModel* parent, aiMesh* mesh, const aiScene* scene);
-		void draw();
+		Mesh(const AssetModel* parent, aiMesh* mesh);
+		void Draw();
 	};
 
 	class AssetModel
 	{
 	public:
-		AssetModel() {};
+		AssetModel()
+		{
+		};
 		~AssetModel();
-		void draw();
-		void loadModel(std::string path);
+		void Draw();
+		void LoadModel(std::string path);
+
 	private:
-		void loadTexture(const aiScene* scene, std::string texPath, Material* uMat, int id);
+		void LoadTexture(const aiScene* scene, const std::string& tex_path, Material* u_mat, int id);
+
 	public:
-		std::vector<Mesh*> meshes;
-		std::vector<struct Material*> materials;
-		std::vector<ModelTexture*> textures;
-		std::string directory;
+		std::vector<Mesh*> meshes_;
+		std::vector<struct Material*> materials_;
+		std::vector<ModelTexture*> textures_;
+		std::string directory_;
 	};
 }

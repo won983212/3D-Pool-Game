@@ -7,20 +7,22 @@ namespace commoncg
 	{
 	public:
 		~Texture();
-		void loadImage(const char* imageFilePath, GLint wrapParam = GL_CLAMP_TO_EDGE, bool useMipmap = false);
-		void bind(GLenum target = GL_TEXTURE_2D) const;
-		void destroy();
-		GLuint getTextureID() const;
-		int getWidth() const;
-		int getHeight() const;
-		int getCountChannels() const;
-		int getCountMipmap() const;
-		static Texture* cacheImage(const char* imageFilePath, GLint wrapParam = GL_CLAMP_TO_EDGE, bool useMipmap = false);
-		static void unbind(GLenum target = GL_TEXTURE_2D);
+		void LoadTextureImage(const char* image_file_path, GLint wrap_param = GL_CLAMP_TO_EDGE, bool use_mipmap = false);
+		void Bind(GLenum target = GL_TEXTURE_2D) const;
+		void Destroy();
+		GLuint GetTextureId() const;
+		int GetWidth() const;
+		int GetHeight() const;
+		int GetCountChannels() const;
+		int GetCountMipmap() const;
+		static Texture* CacheImage(const char* image_file_path, GLint wrap_param = GL_CLAMP_TO_EDGE, bool use_mipmap = false);
+		static void Unbind(GLenum target = GL_TEXTURE_2D);
+
 	private:
-		void loadDDSImage(const char* imageFilePath, GLint wrapParam = GL_REPEAT);
+		void LoadDdsImage(const char* image_file_path, GLint wrap_param = GL_REPEAT);
+
 	private:
-		GLuint textureId = 0;
-		int width = 0, height = 0, numChannels = 0, mipmapLevels = 1;
+		GLuint texture_id_ = 0;
+		int width_ = 0, height_ = 0, num_channels_ = 0, mipmap_levels_ = 1;
 	};
 }

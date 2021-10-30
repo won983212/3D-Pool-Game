@@ -2,7 +2,6 @@
 #include <vector>
 #include "model.h"
 #include "quad.h"
-#include "../util/util.h"
 
 using namespace std;
 using namespace model;
@@ -11,8 +10,8 @@ using namespace commoncg;
 
 void Quad::init(float width, float height, vec3 normal)
 {
-	float hW = width / 2;
-	float hH = height / 2;
+	float half_w = width / 2;
+	float half_h = height / 2;
 
 	vec3 right;
 	if (normal == vec3(0, 1, 0))
@@ -24,53 +23,53 @@ void Quad::init(float width, float height, vec3 normal)
 
 	vector<Vertex> vertices;
 
-	vao.create();
-	vbo.create();
-	vao.use();
+	vao_.Create();
+	vbo_.Create();
+	vao_.Use();
 
 	Vertex v;
 	v.normal = normalize(normal);
 
 	// top triangle
-	v.position = -hW * right - hH * up;
-	v.texCoord = vec2(0, 0);
+	v.position = -half_w * right - half_h * up;
+	v.tex_coord = vec2(0, 0);
 	vertices.push_back(v);
 
-	v.position = hW * right - hH * up;
-	v.texCoord = vec2(1, 0);
+	v.position = half_w * right - half_h * up;
+	v.tex_coord = vec2(1, 0);
 	vertices.push_back(v);
 
-	v.position = -hW * right + hH * up;
-	v.texCoord = vec2(0, 1);
+	v.position = -half_w * right + half_h * up;
+	v.tex_coord = vec2(0, 1);
 	vertices.push_back(v);
 
 	// bottom triangle
-	v.position = hW * right - hH * up;
-	v.texCoord = vec2(1, 0);
+	v.position = half_w * right - half_h * up;
+	v.tex_coord = vec2(1, 0);
 	vertices.push_back(v);
 
-	v.position = hW * right + hH * up;
-	v.texCoord = vec2(1, 1);
+	v.position = half_w * right + half_h * up;
+	v.tex_coord = vec2(1, 1);
 	vertices.push_back(v);
 
-	v.position = -hW * right + hH * up;
-	v.texCoord = vec2(0, 1);
+	v.position = -half_w * right + half_h * up;
+	v.tex_coord = vec2(0, 1);
 	vertices.push_back(v);
 
-	verticesSize = vertices.size();
-	vbo.buffer(verticesSize * sizeof(Vertex), &vertices[0]);
+	vertices_size_ = vertices.size();
+	vbo_.Buffer(vertices_size_ * sizeof(Vertex), &vertices[0]);
 
-	vao.attr(0, 3, GL_FLOAT, sizeof(Vertex), 0);
-	vao.attr(1, 3, GL_FLOAT, sizeof(Vertex), offsetof(Vertex, Vertex::normal));
-	vao.attr(2, 2, GL_FLOAT, sizeof(Vertex), offsetof(Vertex, Vertex::texCoord));
+	vao_.Attrib(0, 3, GL_FLOAT, sizeof(Vertex), 0);
+	vao_.Attrib(1, 3, GL_FLOAT, sizeof(Vertex), offsetof(Vertex, Vertex::normal));
+	vao_.Attrib(2, 2, GL_FLOAT, sizeof(Vertex), offsetof(Vertex, Vertex::tex_coord));
 
-	vbo.unbind();
-	VAO::unbind();
+	vbo_.Unbind();
+	VAO::Unbind();
 }
 
 void Quad::draw()
 {
-	vao.use();
-	glDrawArrays(GL_TRIANGLES, 0, verticesSize);
-	VAO::unbind();
+	vao_.Use();
+	glDrawArrays(GL_TRIANGLES, 0, vertices_size_);
+	VAO::Unbind();
 }

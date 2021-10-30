@@ -5,13 +5,13 @@
 using namespace commoncg;
 
 // material ubo
-VBO uMaterial(GL_UNIFORM_BUFFER);
+VBO u_material(GL_UNIFORM_BUFFER);
 
-void model::bindMaterial(const struct Material* materials)
+void model::BindMaterial(const struct Material* material)
 {
-	if (!uMaterial.isCreated())
-		uMaterial.create();
-	uMaterial.bindBufferRange(UNIFORM_BINDING_MATERIAL, 0, sizeof(struct Material));
-	uMaterial.buffer(sizeof(struct Material), materials, GL_DYNAMIC_DRAW);
-	uMaterial.unbind();
+	if (!u_material.IsCreated())
+		u_material.Create();
+	u_material.BindBufferRange(UNIFORM_BINDING_MATERIAL, 0, sizeof(struct Material));
+	u_material.Buffer(sizeof(struct Material), material, GL_DYNAMIC_DRAW);
+	u_material.Unbind();
 }

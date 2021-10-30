@@ -8,12 +8,11 @@
 #endif
 
 #ifdef WIN32
-#define drand48() (((float) rand())/((float) RAND_MAX))
-#define srand48(x) (srand((x)))
-#define randomVal(min, max) ((float)(min + (max - min) * drand48()))
+#define DRAND48() (((float) rand())/((float) RAND_MAX))
+#define SRAND48(x) (srand((x)))
+#define RANDOM_VAL(min, max) ((float)(min + (max - min) * drand48()))
 #endif
 
-#define DEFAULT_LINE_WIDTH 1.0f
 #define SCREEN_WIDTH 1280
 #define SCREEN_HEIGHT 720
 
@@ -29,11 +28,15 @@
 #define PBR_TEXTURE_INDEX_SPECULARMAP 5
 #define PBR_TEXTURE_INDEX_BRDFMAP 6
 
-#define BALL_COUNT 16
+// GL constants
+constexpr float DefaultLineWidth = 1.0f;
+constexpr int BallCount = 16;
 
+
+// table & ball constants
 // table size is 2.84m x 1.42m, ball size is 0.06m
-const float BALL_RADIUS = 0.13f;
-const float TABLE_WALL_THICKNESS = 0.17f;
-const float TABLE_HOLE_SIZE = 0.5f;
-const float TABLE_WIDTH = 5.85f;
-const float TABLE_HEIGHT = 11.1f;
+constexpr float BallRadius = 0.13f;
+constexpr float TableWallThickness = 0.17f;
+constexpr float TableHoleSize = 0.5f;
+constexpr float TableWidth = 5.85f;
+constexpr float TableHeight = 11.1f;

@@ -6,11 +6,12 @@ class UEImage : public UIElement
 {
 public:
 	~UEImage();
-	virtual bool render(std::vector<UIVertex>& vertices);
-	void setImage(const char* imagePath);
-	void setUV(int x, int y, int w, int h);
-	void packSize();
+	bool Render(std::vector<UIVertex>& vertices) override;
+	void SetImage(const char* image_path);
+	void SetUV(int x, int y, int w, int h);
+	void PackSize();
+
 private:
-	commoncg::Texture* texture = nullptr;
-	float u1 = 0, v1 = 0, u2 = 1, v2 = 1;
+	commoncg::Texture* texture_ = nullptr;
+	float u1_ = 0, v1_ = 0, u2_ = 1, v2_ = 1;
 };

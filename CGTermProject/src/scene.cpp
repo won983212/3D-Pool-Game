@@ -10,330 +10,331 @@
 using namespace glm;
 using namespace commoncg;
 
+// cue constants
+constexpr float MaxCuePower = 1.0f;
+constexpr float CuePowerModifier = 12.0f;
 
-const float MAX_CUE_POWER = 1.0f;
-const float CUE_POWER_MODIFIER = 12.0f;
+// projection constants
+constexpr float PrjFov = DEGTORAD(45.0f);
+constexpr float PrjAspect = static_cast<float>(SCREEN_WIDTH) / SCREEN_HEIGHT;
+constexpr float PrjNear = 0.1f;
+constexpr float PrjFar = 100.0f;
 
-const float PRJ_FOV = DEGTORAD(45.0f);
-const float PRJ_ASPECT = (float)SCREEN_WIDTH / SCREEN_HEIGHT;
-const float PRJ_NEAR = 0.1f;
-const float PRJ_FAR = 100.0f;
-
-const model::Material BALL_MATERIAL =
+const model::Material BallMaterial =
 {
-	vec4(1.0f, 1.0f, 0.0f, 1.0f),  // albedo
-	0.1f,           // metallic
-	0.1f,           // roughness
-	DEFAULT_AO,     // ao
-	0, -1, -1, -1   // texIndex
+	vec4(1.0f, 1.0f, 0.0f, 1.0f), // albedo
+	0.1f, // metallic
+	0.1f, // roughness
+	DefaultAo, // ao
+	0, -1, -1, -1 // texIndex
 };
 
 
-void Scene::init()
+void Scene::Init()
 {
 	// initalize graphic variables
-	brdfLUT.loadImage("res/texture/brdf.png");
-	uboLight.create();
-	uboView.create();
+	brdf_lut_.LoadTextureImage("res/texture/brdf.png");
+	ubo_light_.Create();
+	ubo_view_.Create();
 
 	// prepare ball textures
-	for (int i = 0; i < BALL_TEXTURE_COUNT; i++)
-		ballTextures[i] = Texture::cacheImage(("res/texture/ball/ball_" + std::to_string(i) + ".png").c_str());
+	for (int i = 0; i < BallCount; i++)
+		ball_textures_[i] = Texture::CacheImage(("res/texture/ball/ball_" + std::to_string(i) + ".png").c_str());
 
 	// model
-	modelPoolTable.loadModel("res/model/pooltable.gltf");
-	modelCue.loadModel("res/model/cue.gltf");
-	modelBall.init(BALL_RADIUS);
+	model_pool_table_.LoadModel("res/model/pooltable.gltf");
+	model_cue_.LoadModel("res/model/cue.gltf");
+	model_ball_.Init(BallRadius);
 
 	// shader
-	shader.addShader("res/shader/pbr.vert", GL_VERTEX_SHADER);
-	shader.addShader("res/shader/pbr.frag", GL_FRAGMENT_SHADER);
-	shader.load();
-	shader.use();
-	shader.setUniform("highlightColor", glm::vec4(0.0f));
-	shader.setUniform("texture_albedo", PBR_TEXTURE_INDEX_ALBEDO);
-	shader.setUniform("texture_metallic", PBR_TEXTURE_INDEX_METALLIC);
-	shader.setUniform("texture_roughness", PBR_TEXTURE_INDEX_ROUGHNESS);
-	shader.setUniform("texture_normal", PBR_TEXTURE_INDEX_NORMAL);
-	shader.setUniform("irradianceMap", PBR_TEXTURE_INDEX_IRRADIANCEMAP);
-	shader.setUniform("specularMap", PBR_TEXTURE_INDEX_SPECULARMAP);
-	shader.setUniform("brdfMap", PBR_TEXTURE_INDEX_BRDFMAP);
+	shader_.AddShader("res/shader/pbr.vert", GL_VERTEX_SHADER);
+	shader_.AddShader("res/shader/pbr.frag", GL_FRAGMENT_SHADER);
+	shader_.Load();
+	shader_.Use();
+	shader_.SetUniform("highlightColor", vec4(0.0f));
+	shader_.SetUniform("texture_albedo", PBR_TEXTURE_INDEX_ALBEDO);
+	shader_.SetUniform("texture_metallic", PBR_TEXTURE_INDEX_METALLIC);
+	shader_.SetUniform("texture_roughness", PBR_TEXTURE_INDEX_ROUGHNESS);
+	shader_.SetUniform("texture_normal", PBR_TEXTURE_INDEX_NORMAL);
+	shader_.SetUniform("irradianceMap", PBR_TEXTURE_INDEX_IRRADIANCEMAP);
+	shader_.SetUniform("specularMap", PBR_TEXTURE_INDEX_SPECULARMAP);
+	shader_.SetUniform("brdfMap", PBR_TEXTURE_INDEX_BRDFMAP);
 
 	// gui screen
-	ui.init();
+	ui_.Init();
 
 	// events setup
-	ui.setScreenChangedEvent(this);
-	table.setBallEvent(this);
-	ballTracer.init();
+	ui_.SetScreenChangedEvent(this);
+	table_.SetBallEvent(this);
+	ball_tracer_.Init();
 
 	// skybox
-	skybox.beginLoad();
-	skybox.loadHDRSkybox("res/texture/skybox/skybox.hdr");
-	skybox.loadDDSIrradianceMap("res/texture/skybox/irr.dds");
-	skybox.loadDDSSpecularMap("res/texture/skybox/env.dds");
-	skybox.endLoad();
+	skybox_.BeginLoad();
+	skybox_.LoadHdrSkybox("res/texture/skybox/skybox.hdr");
+	skybox_.LoadDdsIrradianceMap("res/texture/skybox/irr.dds");
+	skybox_.LoadDdsSpecularMap("res/texture/skybox/env.dds");
+	skybox_.EndLoad();
 
 	// lights
 	LightData light;
 	light.position = vec4(0.0f, 3.0f, 5.0f, 1.0f);
 	light.color = vec4(50);
-	lights[0] = light;
+	lights_[0] = light;
 
 	light.position = vec4(0.0f, 3.0f, 0.0f, 1.0f);
 	light.color = vec4(50);
-	lights[1] = light;
+	lights_[1] = light;
 
 	light.position = vec4(0.0f, 3.0f, -5.0f, 1.0f);
 	light.color = vec4(50);
-	lights[2] = light;
-	updateLight();
+	lights_[2] = light;
+	UpdateLight();
 
 	// camera (view)
-	cam.getViewMatrix(&view.view);
-	view.projection = perspective(PRJ_FOV, PRJ_ASPECT, PRJ_NEAR, PRJ_FAR);
-	updateView();
+	cam_.GetViewMatrix(&view_.view);
+	view_.projection = perspective(PrjFov, PrjAspect, PrjNear, PrjFar);
+	UpdateView();
 }
 
-void Scene::update(float partialTime, int fps)
+void Scene::Update(float partial_time, int fps)
 {
-	if (isBallView)
+	if (is_ball_view_)
 	{
-		vec2 pos = table.getBalls()[0]->position;
-		if (pos.x != cam.center.x || pos.y != cam.center.z)
+		vec2 pos = table_.GetBalls()[0]->position_;
+		if (pos.x != cam_.center_.x || pos.y != cam_.center_.z)
 		{
-			cam.center = vec3(pos.x, BALL_RADIUS / 2, pos.y);
-			cam.update();
+			cam_.center_ = vec3(pos.x, BallRadius / 2, pos.y);
+			cam_.Update();
 		}
 	}
-	else if (cam.center != vec3(0.0f))
+	else if (cam_.center_ != vec3(0.0f))
 	{
-		cam.center = vec3(0.0f);
-		cam.update();
+		cam_.center_ = vec3(0.0f);
+		cam_.Update();
 	}
 
-	if(!ballPlacing && ui.getCurrentScreen() == 2)
-		table.update(partialTime);
-	ui.fpsLabel->setText(std::wstring(L"FPS: ") + std::to_wstring(fps));
+	if (!ball_placing_ && ui_.GetCurrentScreen() == 2)
+		table_.update(partial_time);
+	ui_.fps_label_->SetText(std::wstring(L"FPS: ") + std::to_wstring(fps));
 }
 
-void Scene::updateLight()
+void Scene::UpdateLight() const
 {
-	uboLight.bindBufferRange(UNIFORM_BINDING_LIGHT, 0, sizeof(lights));
-	uboLight.buffer(sizeof(lights), &lights);
-	uboLight.unbind();
+	ubo_light_.BindBufferRange(UNIFORM_BINDING_LIGHT, 0, sizeof lights_);
+	ubo_light_.Buffer(sizeof lights_, &lights_);
+	ubo_light_.Unbind();
 }
 
-void Scene::updateView()
+void Scene::UpdateView() const
 {
-	uboView.bindBufferRange(UNIFORM_BINDING_VIEWMAT, 0, sizeof(view));
-	uboView.buffer(sizeof(view), &view);
-	uboView.unbind();
+	ubo_view_.BindBufferRange(UNIFORM_BINDING_VIEWMAT, 0, sizeof view_);
+	ubo_view_.Buffer(sizeof view_, &view_);
+	ubo_view_.Unbind();
 }
 
-void Scene::resetGame()
+void Scene::ResetGame()
 {
-	turn = true;
-	ballGoals[0] = 0;
-	ballGoals[1] = 0;
-	myBallCount = 0;
-	firstTouchBall = 0;
-	group = BallGroup::NOT_DECIDED;
-	isFirstGroupSet = false;
-	isFoul = false;
-	isTurnOut = false;
-	ballPlacing = false;
+	turn_ = true;
+	ball_goals_[0] = 0;
+	ball_goals_[1] = 0;
+	my_ball_count_ = 0;
+	first_touch_ball_ = 0;
+	group_ = BallGroup::NotDecided;
+	is_first_group_set_ = false;
+	is_foul_ = false;
+	is_turn_out_ = false;
+	ball_placing_ = false;
 }
 
-void Scene::render()
+void Scene::Render()
 {
-	// update only when cam has changed.
-	if (cam.getViewMatrix(&view.view))
-		updateView();
-	shader.setUniform("camPos", cam.getEyePosition());
+	// Update only when cam has changed.
+	if (cam_.GetViewMatrix(&view_.view))
+		UpdateView();
+	shader_.SetUniform("camPos", cam_.GetEyePosition());
 
-	// bind env maps and brdf LUT (lookup texture).
-	skybox.bindEnvironmentTextures();
+	// Bind env maps and brdf LUT (lookup texture).
+	skybox_.BindEnvironmentTextures();
 	glActiveTexture(GL_TEXTURE0 + PBR_TEXTURE_INDEX_BRDFMAP);
-	brdfLUT.bind();
+	brdf_lut_.Bind();
 
 	// balls
-	model::bindMaterial(&BALL_MATERIAL);
-	const std::vector<Ball*> balls = table.getBalls();
+	BindMaterial(&BallMaterial);
+	const std::vector<Ball*> balls = table_.GetBalls();
 	for (unsigned int i = 0; i < balls.size(); i++)
 	{
-		if (!balls[i]->visible)
+		if (!balls[i]->visible_)
 			continue;
 
-		if (balls[i]->highlight)
-			shader.setUniform("highlightColor", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+		if (balls[i]->highlight_)
+			shader_.SetUniform("highlightColor", vec4(1.0f, 0.0f, 0.0f, 1.0f));
 
-		vec2 pos = balls[i]->position;
-		mat4 model = mat4(1.0f);
+		vec2 pos = balls[i]->position_;
+		auto model = mat4(1.0f);
 
-		model = translate(model, vec3(pos.x, BALL_RADIUS, pos.y));
-		model = model * toMat4(balls[i]->rotation);
+		model = translate(model, vec3(pos.x, BallRadius, pos.y));
+		model = model * toMat4(balls[i]->rotation_);
 
 		glActiveTexture(GL_TEXTURE0 + PBR_TEXTURE_INDEX_ALBEDO);
-		ballTextures[i]->bind();
-		shader.setUniform("model", model);
-		modelBall.draw();
+		ball_textures_[i]->Bind();
+		shader_.SetUniform("model", model);
+		model_ball_.Draw();
 
-		if (balls[i]->highlight)
-			shader.setUniform("highlightColor", glm::vec4(0.0f));
+		if (balls[i]->highlight_)
+			shader_.SetUniform("highlightColor", vec4(0.0f));
 	}
-	Texture::unbind();
+	Texture::Unbind();
 
-	// render pool table
-	mat4 model = mat4(1.0f);
+	// Render pool table
+	auto model = mat4(1.0f);
 	model = scale(model, vec3(5.0f));
 	model = rotate(model, DEGTORAD(90.0f), vec3(1, 0, 0));
-	shader.setUniform("model", model);
-	modelPoolTable.draw();
+	shader_.SetUniform("model", model);
+	model_pool_table_.Draw();
 
-	// render cue
-	if (cueTransform.mode != CueMode::INVISIBLE)
+	// Render cue
+	if (cue_transform_.mode_ != CueMode::Invisible)
 	{
-		vec2 whiteBallPos = table.getBalls()[0]->position;
-		if (cueTransform.position != whiteBallPos)
+		const vec2 white_ball_pos = table_.GetBalls()[0]->position_;
+		if (cue_transform_.position_ != white_ball_pos)
 		{
-			cueTransform.position = whiteBallPos;
-			cueTransform.update();
+			cue_transform_.position_ = white_ball_pos;
+			cue_transform_.Update();
 		}
-		shader.setUniform("model", cueTransform.getModelMatrix());
-		modelCue.draw();
+		shader_.SetUniform("model", cue_transform_.GetModelMatrix());
+		model_cue_.Draw();
 	}
 
 	// ball tracer
-	if(cueTransform.mode == CueMode::ROTATION)
-		ballTracer.draw();
+	if (cue_transform_.mode_ == CueMode::Rotation)
+		ball_tracer_.Draw();
 
 	// skybox
-	skybox.render(view.view);
+	skybox_.Render(view_.view);
 
 	// gui
-	ui.render();
+	ui_.Render();
 }
 
-MouseRay Scene::calculateMouseRay(int mouseX, int mouseY)
+MouseRay Scene::CalculateMouseRay(int mouse_x, int mouse_y) const
 {
 	MouseRay ray;
 
-	float sx = mouseX * 2.0f / SCREEN_WIDTH - 1.0f; // to -1 ~ 1
-	float sy = mouseY * 2.0f / SCREEN_HEIGHT - 1.0f; // to -1 ~ 1
-	float halfHeight = tan(PRJ_FOV / 2) * PRJ_NEAR; // near rectangle height/2
+	float sx = mouse_x * 2.0f / SCREEN_WIDTH - 1.0f; // to -1 ~ 1
+	float sy = mouse_y * 2.0f / SCREEN_HEIGHT - 1.0f; // to -1 ~ 1
+	const float half_height = tan(PrjFov / 2) * PrjNear; // near rectangle height/2
 
 	// fits to near rectangle
-	sx *= PRJ_ASPECT * halfHeight;
-	sy *= halfHeight;
+	sx *= PrjAspect * half_height;
+	sy *= half_height;
 
-	ray.position = vec3(cam.getEyePosition());
-	ray.direction = -cam.getUp() * sy + cam.getRight() * sx;
+	ray.position = vec3(cam_.GetEyePosition());
+	ray.direction = -cam_.GetUp() * sy + cam_.GetRight() * sx;
 
 	ray.position = ray.position + ray.direction;
-	ray.direction += normalize(cam.getFront()) * PRJ_NEAR;
+	ray.direction += normalize(cam_.GetFront()) * PrjNear;
 	ray.direction = normalize(ray.direction);
 
 	return ray;
 }
 
-void Scene::keyboard(unsigned char key, int x, int y)
+void Scene::Keyboard(unsigned char key, int x, int y)
 {
-	if (key == ' ' && !isFoul && !ballPlacing)
+	if (key == ' ' && !is_foul_ && !ball_placing_)
 	{
-		isBallView = !isBallView;
-		ui.showMessage(isBallView ? L"°øÀ» Áß½ÉÀ¸·Î º¸±â" : L"Å×ÀÌºíÀ» Áß½ÉÀ¸·Î º¸±â");
+		is_ball_view_ = !is_ball_view_;
+		ui_.ShowMessage(is_ball_view_ ? L"ï¿½ï¿½ï¿½ï¿½ ï¿½ß½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½" : L"ï¿½ï¿½ï¿½Ìºï¿½ï¿½ï¿½ ï¿½ß½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½");
 	}
 }
 
-void Scene::mouse(int button, int state, int x, int y)
+void Scene::Mouse(int button, int state, int x, int y)
 {
-	if (state == GLUT_DOWN && button == GLUT_LEFT_BUTTON && ui.getCurrentScreen() == 2)
+	if (state == GLUT_DOWN && button == GLUT_LEFT_BUTTON && ui_.GetCurrentScreen() == 2)
 	{
-		if (ballPlacing)
+		if (ball_placing_)
 		{
-			if (!table.getBalls()[0]->highlight)
+			if (!table_.GetBalls()[0]->highlight_)
 			{
-				ballPlacing = false;
-				enableCueControl();
-				ui.showMessage((turn ? L"Player 1" : L"Player 2") + std::wstring(L" Â÷·ÊÀÔ´Ï´Ù!"));
+				ball_placing_ = false;
+				EnableCueControl();
+				ui_.ShowMessage((turn_ ? L"Player 1" : L"Player 2") + std::wstring(L" ï¿½ï¿½ï¿½ï¿½ï¿½Ô´Ï´ï¿½!"));
 			}
 			else
 			{
-				ui.showMessage(L"±× À§Ä¡¿¡ ¹èÄ¡ÇÒ ¼ö ¾ø½À´Ï´Ù.");
+				ui_.ShowMessage(L"ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
 			}
-		} 
-		else if (cueTransform.mode == CueMode::ROTATION)
-		{
-			cueTransform.mode = CueMode::PUSHING;
 		}
-		else if (cueTransform.mode == CueMode::PUSHING)
+		else if (cue_transform_.mode_ == CueMode::Rotation)
 		{
-			hitWhiteBall();
-			cueTransform.mode = CueMode::INVISIBLE;
-			cueTransform.pushAmount = -BALL_RADIUS;
-			cueTransform.update();
+			cue_transform_.mode_ = CueMode::Pushing;
+		}
+		else if (cue_transform_.mode_ == CueMode::Pushing)
+		{
+			HitWhiteBall();
+			cue_transform_.mode_ = CueMode::Invisible;
+			cue_transform_.push_amount_ = -BallRadius;
+			cue_transform_.Update();
 		}
 	}
 
-	ui.mouse(button, state, x, y);
+	ui_.Mouse(button, state, x, y);
 }
 
-void Scene::mouseDrag(int button, int x, int y, int dx, int dy)
+void Scene::MouseDrag(int button, int x, int y, int dx, int dy)
 {
-	ui.mouseDrag(x, y);
-	if (ui.getCurrentScreen() != 2)
+	ui_.MouseDrag(x, y);
+	if (ui_.GetCurrentScreen() != 2)
 		return;
 
 	if (button == GLUT_RIGHT_BUTTON)
 	{
-		cam.yaw += dx / 8.0f;
-		cam.pitch += dy / 8.0f;
-		cam.update();
+		cam_.yaw_ += dx / 8.0f;
+		cam_.pitch_ += dy / 8.0f;
+		cam_.Update();
 	}
 }
 
-void Scene::mouseWheel(int button, int state, int x, int y)
+void Scene::MouseWheel(int button, int state, int x, int y)
 {
-	ui.mouseWheel(button, state, x, y);
-	if (ui.getCurrentScreen() != 2)
+	ui_.MouseWheel(button, state, x, y);
+	if (ui_.GetCurrentScreen() != 2)
 		return;
-	
+
 	if (state > 0)
-		cam.zoom -= 0.5f;
+		cam_.zoom_ -= 0.5f;
 	else
-		cam.zoom += 0.5f;
-	cam.update();
+		cam_.zoom_ += 0.5f;
+	cam_.Update();
 }
 
-void Scene::mouseMove(int x, int y)
+void Scene::MouseMove(int x, int y)
 {
-	ui.mouseMove(x, y);
-	if (ui.getCurrentScreen() != 2)
+	ui_.MouseMove(x, y);
+	if (ui_.GetCurrentScreen() != 2)
 		return;
 
-	MouseRay ray = calculateMouseRay(x, y);
-	Ball* ball = table.getBalls()[0];
+	MouseRay ray = CalculateMouseRay(x, y);
+	Ball* ball = table_.GetBalls()[0];
 
-	if (ballPlacing)
+	if (ball_placing_)
 	{
 		vec3 hit = ray.position - ray.direction * (ray.position.y / ray.direction.y);
-		ball->position = vec2(hit.x, hit.z);
-		ball->highlight = !table.canPlaceWhiteBall();
+		ball->position_ = vec2(hit.x, hit.z);
+		ball->highlight_ = !table_.CanPlaceWhiteBall();
 		return;
 	}
 
-	if (cueTransform.mode == CueMode::INVISIBLE)
+	if (cue_transform_.mode_ == CueMode::Invisible)
 		return;
 
-	// ¹Ù´Ú ¸é(y=yLevel=0.16f)°ú intersectµÇ´Â Á¡À» calculate
-	// pos + dir * t = 0.16f(y) ÀÎ t¸¦ Ã£À¸¸é µÈ´Ù.
-	const float yLevel = 0.16f;
-	float t = (yLevel - ray.position.y) / ray.direction.y;
+	// ï¿½Ù´ï¿½ ï¿½ï¿½(y=yLevel=0.16f)ï¿½ï¿½ intersectï¿½Ç´ï¿½ ï¿½ï¿½ï¿½ï¿½ calculate
+	// pos + dir * t = 0.16f(y) ï¿½ï¿½ tï¿½ï¿½ Ã£ï¿½ï¿½ï¿½ï¿½ ï¿½È´ï¿½.
+	constexpr float y_level = 0.16f;
+	float t = (y_level - ray.position.y) / ray.direction.y;
 	vec3 hit = ray.position + ray.direction * t;
-	vec2 diff = cueTransform.position - vec2(hit.x, hit.z);
+	vec2 diff = cue_transform_.position_ - vec2(hit.x, hit.z);
 
-	if (cueTransform.mode == CueMode::ROTATION)
+	if (cue_transform_.mode_ == CueMode::Rotation)
 	{
 		float angle;
 		if (length2(diff) == 0)
@@ -343,159 +344,159 @@ void Scene::mouseMove(int x, int y)
 		else
 		{
 			angle = atan2(diff.y, diff.x);
-			ballTracer.position = ball->position;
-			ballTracer.direction = normalize(diff);
-			ballTracer.update();
+			ball_tracer_.position_ = ball->position_;
+			ball_tracer_.direction_ = normalize(diff);
+			ball_tracer_.Update();
 		}
-		cueTransform.rotation = -angle + DEGTORAD(90.0f);
+		cue_transform_.rotation_ = -angle + DEGTORAD(90.0f);
 	}
-	else if (cueTransform.mode == CueMode::PUSHING)
+	else if (cue_transform_.mode_ == CueMode::Pushing)
 	{
-		float power = dot(cueTransform.getCueDirection(), diff);
-		cueTransform.pushAmount = -clamp(power, BALL_RADIUS, MAX_CUE_POWER + BALL_RADIUS);
+		float power = dot(cue_transform_.GetCueDirection(), diff);
+		cue_transform_.push_amount_ = -clamp(power, BallRadius, MaxCuePower + BallRadius);
 	}
 
-	cueTransform.update();
+	cue_transform_.Update();
 }
 
-void Scene::onScreenChanged(int id)
+void Scene::OnScreenChanged(int id)
 {
 	if (id == 2)
 	{
-		resetGame();
-		setTurn(true);
-		enableCueControl();
-		table.resetBallPosition();
+		ResetGame();
+		SetTurn(true);
+		EnableCueControl();
+		table_.ResetBallPosition();
 	}
 }
 
-void Scene::onAllBallStopped()
+void Scene::OnAllBallStopped()
 {
-	if (ui.getCurrentScreen() != 2 || ballPlacing)
+	if (ui_.GetCurrentScreen() != 2 || ball_placing_)
 		return;
 
 	// set foul when first touch is not my ball or none;
-	bool isSolid = firstTouchBall >= 1 && firstTouchBall <= 7;
-	if (firstTouchBall == 0 || (group != BallGroup::NOT_DECIDED && !isFirstGroupSet && (isSolid == (group == BallGroup::P1SOLID)) != turn))
+	const bool is_solid = first_touch_ball_ >= 1 && first_touch_ball_ <= 7;
+	if (first_touch_ball_ == 0 || group_ != BallGroup::NotDecided && !is_first_group_set_ && is_solid == (group_ == BallGroup::P1Solid) != turn_)
 	{
-		isFoul = true;
-		isTurnOut = true;
+		is_foul_ = true;
+		is_turn_out_ = true;
 	}
 
 	// turn change
-	if (isTurnOut || (!isFirstGroupSet && myBallCount == 0))
+	if (is_turn_out_ || !is_first_group_set_ && my_ball_count_ == 0)
 	{
-		setTurn(!turn);
-		isTurnOut = false;
+		SetTurn(!turn_);
+		is_turn_out_ = false;
 	}
 
-	myBallCount = 0;
-	isFirstGroupSet = false;
-	firstTouchBall = 0;
+	my_ball_count_ = 0;
+	is_first_group_set_ = false;
+	first_touch_ball_ = 0;
 
 	// foul
-	if (isFoul)
+	if (is_foul_)
 	{
-		foul();
-		isFoul = false;
+		ProcessFoul();
+		is_foul_ = false;
 	}
 	else
 	{
-		enableCueControl();
+		EnableCueControl();
 	}
 }
 
-void Scene::onBallHoleIn(int ballId)
+void Scene::OnBallHoleIn(int ball_id)
 {
 	// TODO ball goal-in sound
-	getSoundEngine()->play2D(SOUND_CUE_PUSH(1));
+	GetSoundEngine()->play2D(SOUND_CUE_PUSH(1));
 
 	// foul. white ball is in hole.
-	if (ballId == 0)
+	if (ball_id == 0)
 	{
-		isBallView = false;
-		isFoul = true;
+		is_ball_view_ = false;
+		is_foul_ = true;
 	}
 
-	if (ballId == 8)
+	if (ball_id == 8)
 	{
-		bool win = ballGoals[turn == (group == BallGroup::P1STRIP)] == 7;
-		ui.goGameEnd((turn == win ? L"Player 1ÀÌ" : L"Player 2°¡") + std::wstring(L" ÀÌ°å½À´Ï´Ù."));
+		const bool win = ball_goals_[turn_ == (group_ == BallGroup::P1Strip)] == 7;
+		ui_.GoGameEnd((turn_ == win ? L"Player 1ï¿½ï¿½" : L"Player 2ï¿½ï¿½") + std::wstring(L" ï¿½Ì°ï¿½ï¿½ï¿½Ï´ï¿½."));
 		return;
 	}
 
-	bool isSolid = ballId >= 1 && ballId <= 7;
-	if (group == BallGroup::NOT_DECIDED)
+	const bool is_solid = ball_id >= 1 && ball_id <= 7;
+	if (group_ == BallGroup::NotDecided)
 	{
-		std::wstring message = turn ? L"Player 1Àº" : L"Player 2´Â";
-		group = turn == isSolid ? BallGroup::P1SOLID : BallGroup::P1STRIP;
-		ui.showMessage(message + L"  ¾ÕÀ¸·Î " + (isSolid ? L"´Ü»ö" : L"ÁÙ¹«´Ì") + L"°øÀ» ³Ö¾î¾ßÇÕ´Ï´Ù.");
-		isFirstGroupSet = true;
+		std::wstring message = turn_ ? L"Player 1ï¿½ï¿½" : L"Player 2ï¿½ï¿½";
+		group_ = turn_ == is_solid ? BallGroup::P1Solid : BallGroup::P1Strip;
+		ui_.ShowMessage(message + L"  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ " + (is_solid ? L"ï¿½Ü»ï¿½" : L"ï¿½Ù¹ï¿½ï¿½ï¿½") + L"ï¿½ï¿½ï¿½ï¿½ ï¿½Ö¾ï¿½ï¿½ï¿½Õ´Ï´ï¿½.");
+		is_first_group_set_ = true;
 	}
 	else
 	{
-		if ((isSolid == (group == BallGroup::P1SOLID)) != turn)
+		if (is_solid == (group_ == BallGroup::P1Solid) != turn_)
 		{
-			isTurnOut = true;
+			is_turn_out_ = true;
 		}
 		else
 		{
-			myBallCount++;
+			my_ball_count_++;
 		}
 	}
 
-	ballGoals[!isSolid]++;
-	setTurn(turn); // update progress
+	ball_goals_[!is_solid]++;
+	SetTurn(turn_); // Update progress
 }
 
-void Scene::onWhiteBallCollide(int ballId)
+void Scene::OnWhiteBallCollide(int ball_id)
 {
-	if (firstTouchBall == 0)
+	if (first_touch_ball_ == 0)
 	{
-		firstTouchBall = ballId;
+		first_touch_ball_ = ball_id;
 	}
 }
 
-void Scene::setTurn(bool turn)
+void Scene::SetTurn(bool turn)
 {
 	// get percent of ball goal count
 	float percent = 0.0f;
-	if(group != BallGroup::NOT_DECIDED)
-		percent = ballGoals[turn == (group == BallGroup::P1STRIP)] / 8.0f;
+	if (group_ != BallGroup::NotDecided)
+		percent = ball_goals_[turn == (group_ == BallGroup::P1Strip)] / 8.0f;
 
-	ui.setTurn(turn, group, percent);
-	if (this->turn != turn)
+	ui_.SetTurn(turn, group_, percent);
+	if (this->turn_ != turn)
 	{
-		ui.showMessage((turn ? L"Player 1" : L"Player 2") + std::wstring(L" Â÷·ÊÀÔ´Ï´Ù!"));
-		this->turn = turn;
+		ui_.ShowMessage((turn ? L"Player 1" : L"Player 2") + std::wstring(L" ï¿½ï¿½ï¿½ï¿½ï¿½Ô´Ï´ï¿½!"));
+		this->turn_ = turn;
 	}
 }
 
-void Scene::enableCueControl()
+void Scene::EnableCueControl()
 {
-	cueTransform.mode = CueMode::ROTATION;
-	cueTransform.pushAmount = -BALL_RADIUS;
-	cueTransform.update();
-	ballTracer.position = table.getBalls()[0]->position;
-	ballTracer.update();
+	cue_transform_.mode_ = CueMode::Rotation;
+	cue_transform_.push_amount_ = -BallRadius;
+	cue_transform_.Update();
+	ball_tracer_.position_ = table_.GetBalls()[0]->position_;
+	ball_tracer_.Update();
 }
 
-void Scene::hitWhiteBall()
+void Scene::HitWhiteBall()
 {
-	Ball* ball = table.getBalls()[0];
-	float power = -(cueTransform.pushAmount + BALL_RADIUS);
-	int powerLevel = power > MAX_CUE_POWER * 0.5f;
+	Ball* ball = table_.GetBalls()[0];
+	const float power = -(cue_transform_.push_amount_ + BallRadius);
+	const int power_level = power > MaxCuePower * 0.5f;
 
-	getSoundEngine()->play2D(SOUND_CUE_PUSH(powerLevel));
-	ball->velocity = power * CUE_POWER_MODIFIER * cueTransform.getCueDirection();
+	GetSoundEngine()->play2D(SOUND_CUE_PUSH(power_level));
+	ball->velocity_ = power * CuePowerModifier * cue_transform_.GetCueDirection();
 }
 
-void Scene::foul()
+void Scene::ProcessFoul()
 {
-	ui.showMessage(L"ÆÄ¿ïÀÔ´Ï´Ù. Èò»ö°øÀ» ¹èÄ¡ÇÏ¼¼¿ä.");
-	table.getBalls()[0]->velocity = vec2(0.0f);
-	table.getBalls()[0]->position = vec2(0, -TABLE_HEIGHT / 3);
-	table.getBalls()[0]->visible = true;
-	cueTransform.mode = CueMode::INVISIBLE;
-	ballPlacing = true;
+	ui_.ShowMessage(L"ï¿½Ä¿ï¿½ï¿½Ô´Ï´ï¿½. ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½Ï¼ï¿½ï¿½ï¿½.");
+	table_.GetBalls()[0]->velocity_ = vec2(0.0f);
+	table_.GetBalls()[0]->position_ = vec2(0, -TableHeight / 3);
+	table_.GetBalls()[0]->visible_ = true;
+	cue_transform_.mode_ = CueMode::Invisible;
+	ball_placing_ = true;
 }

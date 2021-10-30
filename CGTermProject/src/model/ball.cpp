@@ -9,15 +9,15 @@ using namespace model;
 using namespace glm;
 using namespace commoncg;
 
-static void addSphereVertex(vector<Vertex>& vertices, int iPitch, int iYaw, int step, float radius)
+static void AddSphereVertex(vector<Vertex>& vertices, int i_pitch, int i_yaw, int step, float radius)
 {
-	const float pitchStep = M_PI / step;
-	const float yawStep = 2 * M_PI / step;
-	const float texStep = 1.0f / step;
+	const float pitch_step = M_PI / step;
+	const float yaw_step = 2 * M_PI / step;
+	const float tex_step = 1.0f / step;
 
 	vec3 normal;
-	float pitch = pitchStep * (iPitch - step / 2);
-	float yaw = yawStep * iYaw;
+	float pitch = pitch_step * (i_pitch - step / 2);
+	float yaw = yaw_step * i_yaw;
 
 	normal.x = cos(pitch) * cos(yaw);
 	normal.y = sin(pitch);
@@ -26,11 +26,11 @@ static void addSphereVertex(vector<Vertex>& vertices, int iPitch, int iYaw, int 
 	Vertex vert;
 	vert.position = radius * normal;
 	vert.normal = normal;
-	vert.texCoord = vec2(1 - texStep * iYaw, 1 - texStep * iPitch);
+	vert.tex_coord = vec2(1 - tex_step * i_yaw, 1 - tex_step * i_pitch);
 	vertices.push_back(vert);
 }
 
-void Ball::init(float radius, int step)
+void Ball::Init(float radius, int step)
 {
 	if (step < 2)
 	{
@@ -40,9 +40,9 @@ void Ball::init(float radius, int step)
 
 	vector<Vertex> vertices;
 
-	vao.create();
-	vbo.create();
-	vao.use();
+	vao_.Create();
+	vbo_.Create();
+	vao_.Use();
 
 	// prepare vertices
 	for (int i = 0; i < step; i++) // pitch
@@ -50,31 +50,31 @@ void Ball::init(float radius, int step)
 		for (int j = 0; j < step; j++) // yaw
 		{
 			// top triangle
-			addSphereVertex(vertices, i, j, step, radius);
-			addSphereVertex(vertices, i + 1, j, step, radius);
-			addSphereVertex(vertices, i, j + 1, step, radius);
+			AddSphereVertex(vertices, i, j, step, radius);
+			AddSphereVertex(vertices, i + 1, j, step, radius);
+			AddSphereVertex(vertices, i, j + 1, step, radius);
 
 			// bottom triangle
-			addSphereVertex(vertices, i + 1, j, step, radius);
-			addSphereVertex(vertices, i + 1, j + 1, step, radius);
-			addSphereVertex(vertices, i, j + 1, step, radius);
+			AddSphereVertex(vertices, i + 1, j, step, radius);
+			AddSphereVertex(vertices, i + 1, j + 1, step, radius);
+			AddSphereVertex(vertices, i, j + 1, step, radius);
 		}
 	}
 
-	verticesSize = vertices.size();
-	vbo.buffer(verticesSize * sizeof(Vertex), &vertices[0]);
+	vertices_size_ = vertices.size();
+	vbo_.Buffer(vertices_size_ * sizeof(Vertex), &vertices[0]);
 
-	vao.attr(0, 3, GL_FLOAT, sizeof(Vertex), 0);
-	vao.attr(1, 3, GL_FLOAT, sizeof(Vertex), offsetof(Vertex, normal));
-	vao.attr(2, 2, GL_FLOAT, sizeof(Vertex), offsetof(Vertex, texCoord));
+	vao_.Attrib(0, 3, GL_FLOAT, sizeof(Vertex), 0);
+	vao_.Attrib(1, 3, GL_FLOAT, sizeof(Vertex), offsetof(Vertex, normal));
+	vao_.Attrib(2, 2, GL_FLOAT, sizeof(Vertex), offsetof(Vertex, tex_coord));
 
-	vbo.unbind();
-	VAO::unbind();
+	vbo_.Unbind();
+	VAO::Unbind();
 }
 
-void Ball::draw()
+void Ball::Draw()
 {
-	vao.use();
-	glDrawArrays(GL_TRIANGLES, 0, verticesSize);
-	VAO::unbind();
+	vao_.Use();
+	glDrawArrays(GL_TRIANGLES, 0, vertices_size_);
+	VAO::Unbind();
 }

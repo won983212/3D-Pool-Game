@@ -5,16 +5,17 @@
 class UELabel : public UIElement
 {
 public:
-	virtual bool render(std::vector<UIVertex>& vertices);
-	void setText(std::wstring text);
-	void setColor(int color);
-	void setShadowColor(int shadowColor);
-	void setUseCentered(bool centered);
-	void setTextPoint(float point);
+	bool Render(std::vector<UIVertex>& vertices) override;
+	void SetText(std::wstring text);
+	void SetColor(int color);
+	void SetShadowColor(int shadow_color);
+	void SetUseCentered(bool centered);
+	void SetTextPoint(float point);
+
 private:
-	std::wstring text;
-	int color = 0xffffffff;
-	int shadowColor = 0;
-	bool centered = false;
-	float fontPoint = 24;
+	std::wstring text_;
+	int color_ = 0xffffffff;
+	int shadow_color_ = 0;
+	bool centered_ = false;
+	float font_point_ = 24;
 };

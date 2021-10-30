@@ -3,11 +3,11 @@
 class IButtonEvent
 {
 public:
-	virtual void onButtonClick(int id) = 0;
+	virtual void OnButtonClick(int id) = 0;
 };
 
 class IScreenChangedEvent
 {
 public:
-	virtual void onScreenChanged(int screenId) = 0;
+	virtual void OnScreenChanged(int screen_id) = 0;
 };

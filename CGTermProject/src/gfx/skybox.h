@@ -2,7 +2,6 @@
 
 #include "gfx.h"
 #include "shader.h"
-#include "texture.h"
 #include "vao.h"
 #include "vbo.h"
 
@@ -11,21 +10,23 @@ namespace commoncg
 	class Skybox
 	{
 	public:
-		void beginLoad();
-		void loadHDRSkybox(const char* hdrTexturePath);
-		void loadDDSIrradianceMap(const char* ddsTexturePath);
-		void loadDDSSpecularMap(const char* ddsTexturePath);
-		void endLoad();
-		void render(glm::mat4 view) const;
-		void bindEnvironmentTextures() const;
+		void BeginLoad();
+		void LoadHdrSkybox(const char* hdr_texture_path);
+		void LoadDdsIrradianceMap(const char* dds_texture_path);
+		void LoadDdsSpecularMap(const char* dds_texture_path);
+		void EndLoad() const;
+		void Render(glm::mat4 view) const;
+		void BindEnvironmentTextures() const;
+
 	private:
-		GLuint loadEquirectangularMap(const char* texturePath, int width, int height, bool flipY);
+		GLuint LoadEquirectangularMap(const char* texture_path, int width, int height, bool flip_y) const;
+
 	private:
-		ShaderProgram skyboxShader;
-		GLuint textureId, irrTextureId, specularTextureId;
-		VAO vao;
-		VBO vbo;
-		GLuint fbo, rbo;
-		ShaderProgram cubemapConvertShader;
+		ShaderProgram skybox_shader_;
+		GLuint texture_id_ = 0, irr_texture_id_ = 0, specular_texture_id_ = 0;
+		VAO vao_;
+		VBO vbo_;
+		GLuint fbo_ = 0, rbo_ = 0;
+		ShaderProgram cubemap_convert_shader_;
 	};
 }
