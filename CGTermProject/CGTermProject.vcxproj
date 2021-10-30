@@ -153,6 +153,7 @@
   <ItemGroup>
     <ClInclude Include="src\3rd\stb_image.h" />
     <ClInclude Include="src\balltracer.h" />
+    <ClInclude Include="src\game.h" />
     <ClInclude Include="src\gameenum.h" />
     <ClInclude Include="src\gfx\camera.h" />
     <ClInclude Include="src\gfx\gfx.h" />
@@ -185,6 +186,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\balltracer.cpp" />
+    <ClCompile Include="src\game.cpp" />
     <ClCompile Include="src\gfx\camera.cpp" />
     <ClCompile Include="src\gfx\skybox.cpp" />
     <ClCompile Include="src\model\assetmodel.cpp" />

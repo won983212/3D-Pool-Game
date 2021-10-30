@@ -9,6 +9,7 @@
 #include "model/assetmodel.h"
 #include "model/ball.h"
 #include "pooltable.h"
+#include "game.h"
 #include "balltracer.h"
 #include "util/util.h"
 #include "gameenum.h"
@@ -61,7 +62,9 @@ private:
 class Scene : public IBallEvent, IScreenChangedEvent
 {
 public:
-	Scene() : ubo_light_(GL_UNIFORM_BUFFER), ubo_view_(GL_UNIFORM_BUFFER), ball_tracer_(table_), cam_(0, 30, 10) {}
+	Scene() : 
+		ubo_light_(GL_UNIFORM_BUFFER), ubo_view_(GL_UNIFORM_BUFFER), ball_tracer_(table_), 
+		cam_(0, 30, 10), game(this, &ui_) {}
 	void Init();
 	void Update(float partial_time, int fps);
 	void Render();
@@ -70,20 +73,19 @@ public:
 	void MouseMove(int x, int y);
 	void MouseDrag(int button, int x, int y, int dx, int dy);
 	void Keyboard(unsigned char key, int x, int y);
-	void ResetGame();
-	void OnScreenChanged(int id) override;
-	void OnAllBallStopped() override;
-	void OnBallHoleIn(int ball_id) override;
-	void OnWhiteBallCollide(int ball_id) override;
+	virtual void OnScreenChanged(int id);
+	virtual void OnAllBallStopped();
+	virtual void OnBallHoleIn(int ball_id);
+	virtual void OnWhiteBallCollide(int ball_id);
+	void EnableCueControl();
+	void DisableCueControl();
+	void ResetWhiteBall();
 
 private:
 	void UpdateLight() const;
 	void UpdateView() const;
 	MouseRay CalculateMouseRay(int mouse_x, int mouse_y) const;
-	void HitWhiteBall() const;
-	void EnableCueControl();
-	void ProcessFoul();
-	void SetTurn(bool turn);
+	void StrikeWhiteBall() const;
 
 private:
 	// camera ball view
@@ -96,7 +98,10 @@ private:
 	commoncg::VBO ubo_view_;
 	// pool table physics simulator
 	PoolTable table_;
+	// ball ghost/line tracer
 	BallTracer ball_tracer_;
+	// game manager
+	Game game;
 	// models
 	CueTransform cue_transform_;
 	model::AssetModel model_pool_table_;
@@ -109,14 +114,4 @@ private:
 	commoncg::Texture brdf_lut_;
 	commoncg::Texture* ball_textures_[BallCount];
 	GuiScreen ui_;
-	// game variables
-	bool turn_; // true = player1
-	int ball_goals_[2]; // remaining solid, strip count
-	int my_ball_count_;
-	int first_touch_ball_;
-	BallGroup group_;
-	bool is_first_group_set_;
-	bool is_foul_;
-	bool is_turn_out_;
-	bool ball_placing_;
 };
