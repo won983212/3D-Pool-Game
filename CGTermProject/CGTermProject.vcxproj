@@ -179,6 +179,7 @@
     <ClInclude Include="src\ui\rectangle.h" />
     <ClInclude Include="src\ui\uielement.h" />
     <ClInclude Include="src\ui\uiscreen.h" />
+    <ClInclude Include="src\strings.h" />
     <ClInclude Include="src\util\sound.h" />
     <ClInclude Include="src\util\util.h" />
   </ItemGroup>

@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include "scene.h"
@@ -6,6 +6,7 @@
 #include "model/quad.h"
 #include "ui/button.h"
 #include "util/sound.h"
+#include "strings.h"
 
 using namespace glm;
 using namespace commoncg;
@@ -244,7 +245,7 @@ void Scene::Keyboard(unsigned char key, int x, int y)
 	if (key == ' ' && !is_foul_ && !ball_placing_)
 	{
 		is_ball_view_ = !is_ball_view_;
-		ui_.ShowMessage(is_ball_view_ ? L"���� �߽����� ����" : L"���̺��� �߽����� ����");
+		ui_.ShowMessage(is_ball_view_ ? MSG_VIEW_CENTER_BALL : MSG_VIEW_CENTER_TABLE);
 	}
 }
 
@@ -258,11 +259,11 @@ void Scene::Mouse(int button, int state, int x, int y)
 			{
 				ball_placing_ = false;
 				EnableCueControl();
-				ui_.ShowMessage((turn_ ? L"Player 1" : L"Player 2") + std::wstring(L" �����Դϴ�!"));
+				ui_.ShowMessage(MSG_TURN(turn_));
 			}
 			else
 			{
-				ui_.ShowMessage(L"�� ��ġ�� ��ġ�� �� �����ϴ�.");
+				ui_.ShowMessage(MSG_CANNOT_PLACE_THERE);
 			}
 		}
 		else if (cue_transform_.mode_ == CueMode::Rotation)
@@ -328,8 +329,8 @@ void Scene::MouseMove(int x, int y)
 	if (cue_transform_.mode_ == CueMode::Invisible)
 		return;
 
-	// �ٴ� ��(y=yLevel=0.16f)�� intersect�Ǵ� ���� calculate
-	// pos + dir * t = 0.16f(y) �� t�� ã���� �ȴ�.
+	// 바닥 면(y=yLevel=0.16f)과 intersect되는 점을 calculate
+	// pos + dir * t = 0.16f(y) 인 t를 찾으면 된다.
 	constexpr float y_level = 0.16f;
 	float t = (y_level - ray.position.y) / ray.direction.y;
 	vec3 hit = ray.position + ray.direction * t;
@@ -422,16 +423,15 @@ void Scene::OnBallHoleIn(int ball_id)
 	if (ball_id == 8)
 	{
 		const bool win = ball_goals_[turn_ == (group_ == BallGroup::P1Strip)] == 7;
-		ui_.GoGameEnd((turn_ == win ? L"Player 1��" : L"Player 2��") + std::wstring(L" �̰���ϴ�."));
+		ui_.GoGameEnd(MSG_WIN(turn_));
 		return;
 	}
 
 	const bool is_solid = ball_id >= 1 && ball_id <= 7;
 	if (group_ == BallGroup::NotDecided)
 	{
-		std::wstring message = turn_ ? L"Player 1��" : L"Player 2��";
 		group_ = turn_ == is_solid ? BallGroup::P1Solid : BallGroup::P1Strip;
-		ui_.ShowMessage(message + L"  ������ " + (is_solid ? L"�ܻ�" : L"�ٹ���") + L"���� �־���մϴ�.");
+		ui_.ShowMessage(MSG_DECIDED_BALL(turn_, is_solid));
 		is_first_group_set_ = true;
 	}
 	else
@@ -468,7 +468,7 @@ void Scene::SetTurn(bool turn)
 	ui_.SetTurn(turn, group_, percent);
 	if (this->turn_ != turn)
 	{
-		ui_.ShowMessage((turn ? L"Player 1" : L"Player 2") + std::wstring(L" �����Դϴ�!"));
+		ui_.ShowMessage(MSG_TURN(turn));
 		this->turn_ = turn;
 	}
 }
@@ -482,7 +482,7 @@ void Scene::EnableCueControl()
 	ball_tracer_.Update();
 }
 
-void Scene::HitWhiteBall()
+void Scene::HitWhiteBall() const
 {
 	Ball* ball = table_.GetBalls()[0];
 	const float power = -(cue_transform_.push_amount_ + BallRadius);
@@ -494,7 +494,7 @@ void Scene::HitWhiteBall()
 
 void Scene::ProcessFoul()
 {
-	ui_.ShowMessage(L"�Ŀ��Դϴ�. ������� ��ġ�ϼ���.");
+	ui_.ShowMessage(MSG_FOUL);
 	table_.GetBalls()[0]->velocity_ = vec2(0.0f);
 	table_.GetBalls()[0]->position_ = vec2(0, -TableHeight / 3);
 	table_.GetBalls()[0]->visible_ = true;

@@ -4,6 +4,7 @@
 #include "guiscreen.h"
 #include "ui/button.h"
 #include "util/util.h"
+#include "strings.h"
 
 constexpr clock_t MessageDuration = 3 * CLOCKS_PER_SEC;
 constexpr float TurnRectW = 200;
@@ -35,21 +36,21 @@ void GuiScreen::ScreenInit()
 	auto btn = new UEButton();
 	btn->id_ = 0;
 	btn->SetBounds(btn_x, btn_y_base, 300, 50);
-	btn->SetText(L"게임 시작");
+	btn->SetText(TEXT_BTN_START_GAME);
 	btn->SetButtonEvent(this);
 	Add(btn, 0);
 
 	btn = new UEButton();
 	btn->id_ = 1;
 	btn->SetBounds(btn_x, btn_y_base + 80, 300, 50);
-	btn->SetText(L"게임 방법");
+	btn->SetText(TEXT_BTN_HOW_TO_PLAY);
 	btn->SetButtonEvent(this);
 	Add(btn, 0);
 
 	btn = new UEButton();
 	btn->id_ = 2;
 	btn->SetBounds(btn_x, btn_y_base + 160, 300, 50);
-	btn->SetText(L"종료");
+	btn->SetText(TEXT_BTN_EXIT);
 	btn->SetButtonEvent(this);
 	Add(btn, 0);
 
@@ -62,7 +63,7 @@ void GuiScreen::ScreenInit()
 	btn = new UEButton();
 	btn->id_ = 3;
 	btn->SetBounds(btn_x, btn_y_base, 300, 50);
-	btn->SetText(L"Back");
+	btn->SetText(TEXT_BTN_TO_MAIN);
 	btn->SetButtonEvent(this);
 	Add(btn, 1);
 
@@ -126,7 +127,7 @@ void GuiScreen::ScreenInit()
 	btn = new UEButton();
 	btn->id_ = 3;
 	btn->SetBounds(btn_x, btn_y_base, 300, 50);
-	btn->SetText(L"메인 메뉴로");
+	btn->SetText(TEXT_BTN_TO_MAIN);
 	btn->SetButtonEvent(this);
 	Add(btn, 3);
 }
@@ -149,13 +150,13 @@ void GuiScreen::SetTurn(bool turn, BallGroup group, float achieve) const
 	if (turn)
 	{
 		turn_icon_->SetUV(group == BallGroup::P1Solid ? 0 : 24, 0, 24, 24);
-		turn_label_->SetText(L"Player 1");
+		turn_label_->SetText(PLAYER1_NAME);
 		turn_quad_->width_ = achieve * TurnRectW;
 	}
 	else
 	{
 		turn_icon_->SetUV(group == BallGroup::P1Solid ? 24 : 0, 0, 24, 24);
-		turn_label_->SetText(L"Player 2");
+		turn_label_->SetText(PLAYER2_NAME);
 		turn_quad_->width_ = achieve * TurnRectW;
 	}
 }
@@ -164,7 +165,7 @@ void GuiScreen::OnRenderTick()
 {
 	if (last_message_tick_ != 0)
 	{
-		clock_t t = clock();
+		const clock_t t = clock();
 		message_label_->SetVisible(t - last_message_tick_ < MessageDuration);
 	}
 }
@@ -186,7 +187,7 @@ void GuiScreen::OnButtonClick(int id)
 		SetScreen(0);
 		break;
 	default:
-		std::cout << "Error: Invaild Button id: " << id << std::endl;
+		std::cout << "Warning: Invaild Button id: " << id << std::endl;
 		break;
 	}
 }

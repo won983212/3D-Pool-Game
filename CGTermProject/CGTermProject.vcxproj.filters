@@ -105,6 +105,9 @@
     <ClInclude Include="src\ui\event.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="src\strings.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\gfx\shader.cpp">

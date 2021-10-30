@@ -189,9 +189,11 @@ void PoolTable::Update(float partial_time)
 			balls_[i]->position_ += penetration / 2 * -j_norm;
 			balls_[j]->position_ += penetration / 2 * j_norm;
 
-			// play sound
+			// calculate power level
 			power = std::abs(power);
 			int power_level = static_cast<int>(power / 2.0f);
+
+			// play sound
 			irrklang::ISound* sound = GetSoundEngine()->play2D(SOUND_BALL_COLLIDE(std::min(power_level, 2)), false, false, true);
 			sound->setVolume(glm::clamp(power - power_level * 2.0f, 0.3f, 1.0f));
 			sound->drop();
@@ -233,15 +235,18 @@ void PoolTable::Update(float partial_time)
 bool PoolTable::CanPlaceWhiteBall() const
 {
 	const glm::vec2 pos = balls_[0]->position_;
+
 	if (std::abs(pos.x) > TableWidth / 2 - BallRadius - CornerReduce)
 		return false;
 	if (std::abs(pos.y) > TableHeight / 2 - BallRadius - CornerReduce)
 		return false;
+
 	for (int i = 1; i < balls_.size(); i++)
 	{
 		if (length2(balls_[i]->position_ - pos) < BallRadius * BallRadius * 4)
 			return false;
 	}
+
 	return true;
 }
 

@@ -80,7 +80,7 @@ private:
 	void UpdateLight() const;
 	void UpdateView() const;
 	MouseRay CalculateMouseRay(int mouse_x, int mouse_y) const;
-	void HitWhiteBall();
+	void HitWhiteBall() const;
 	void EnableCueControl();
 	void ProcessFoul();
 	void SetTurn(bool turn);
