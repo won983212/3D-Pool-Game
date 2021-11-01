@@ -44,7 +44,7 @@ public:
 		model_mat_ = glm::mat4(1.0f);
 		model_mat_ = translate(model_mat_, glm::vec3(position_.x, 0.16f, position_.y)); // location
 		model_mat_ = rotate(model_mat_, rotation_, glm::vec3(0, 1, 0)); // rotation
-		model_mat_ = translate(model_mat_, glm::vec3(0.0f, 0.0f, push_amount_)); // Push model
+		model_mat_ = translate(model_mat_, glm::vec3(0.0f, 0.0f, -push_amount_)); // Push model
 		model_mat_ = rotate(model_mat_, DEGTORAD(90.0f), glm::vec3(1, 0, 0));
 		model_mat_ = scale(model_mat_, glm::vec3(0.05f));
 	}
@@ -58,6 +58,7 @@ public:
 private:
 	glm::mat4 model_mat_ = glm::mat4(1.0f);
 };
+
 
 class Scene : public IBallEvent, IScreenChangedEvent
 {

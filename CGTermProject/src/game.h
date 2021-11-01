@@ -7,7 +7,7 @@ class Game
 public:
 	Game(Scene* scene_, GuiScreen* ui_);
 	void ResetGame();
-	void SetTurn(bool turn);
+	void SetTurn(bool is_p1_turn);
 	bool IsBallPlacingMode();
 	bool CanInteractWhiteBall();
 	bool IsPlayer1Turn();
@@ -22,7 +22,7 @@ private:
 	// game variables
 	bool turn_; // true = player1
 	int ball_goals_[2]; // count of remaining balls (solid, strip)
-	int my_ball_count_;
+	int turn_goal_ball_count_;
 	int first_touch_ball_;
 	BallGroup group_;
 	bool is_first_group_set_;

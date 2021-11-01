@@ -22,6 +22,7 @@ constexpr float PrjAspect = static_cast<float>(SCREEN_WIDTH) / SCREEN_HEIGHT;
 constexpr float PrjNear = 0.1f;
 constexpr float PrjFar = 100.0f;
 
+// ball material constant (PBR)
 constexpr model::Material BallMaterial =
 {
 	vec4(1.0f, 1.0f, 0.0f, 1.0f), // albedo
@@ -100,9 +101,10 @@ void Scene::Init()
 
 void Scene::Update(float partial_time, int fps)
 {
+	// update camera
 	if (is_ball_view_)
 	{
-		vec2 pos = table_.GetBalls()[0]->position_;
+		vec2 pos = table_.GetWhiteBall()->position_;
 		if (pos.x != cam_.center_.x || pos.y != cam_.center_.z)
 		{
 			cam_.center_ = vec3(pos.x, BallRadius / 2, pos.y);
@@ -115,8 +117,11 @@ void Scene::Update(float partial_time, int fps)
 		cam_.Update();
 	}
 
+	// update ball physics
 	if (!game.IsBallPlacingMode() && ui_.GetCurrentScreen() == 2)
 		table_.Update(partial_time);
+
+	// update fps label
 	ui_.fps_label_->SetText(std::wstring(L"FPS: ") + std::to_wstring(fps));
 }
 
@@ -183,7 +188,7 @@ void Scene::Render()
 	// Render cue
 	if (cue_transform_.mode_ != CueMode::Invisible)
 	{
-		const vec2 white_ball_pos = table_.GetBalls()[0]->position_;
+		const vec2 white_ball_pos = table_.GetWhiteBall()->position_;
 		if (cue_transform_.position_ != white_ball_pos)
 		{
 			cue_transform_.position_ = white_ball_pos;
@@ -210,7 +215,7 @@ MouseRay Scene::CalculateMouseRay(int mouse_x, int mouse_y) const
 
 	float sx = mouse_x * 2.0f / SCREEN_WIDTH - 1.0f; // to -1 ~ 1
 	float sy = mouse_y * 2.0f / SCREEN_HEIGHT - 1.0f; // to -1 ~ 1
-	const float half_height = tan(PrjFov / 2) * PrjNear; // near rectangle height/2
+	const float half_height = tan(PrjFov / 2) * PrjNear; // near view rectangle height/2
 
 	// fits to near rectangle
 	sx *= PrjAspect * half_height;
@@ -228,7 +233,7 @@ MouseRay Scene::CalculateMouseRay(int mouse_x, int mouse_y) const
 
 void Scene::Keyboard(unsigned char key, int x, int y)
 {
-	if (key == ' ' && game.CanInteractWhiteBall())
+	if (key == ' ' && game.CanInteractWhiteBall()) // spacebar: ball view / table view 전환
 	{
 		is_ball_view_ = !is_ball_view_;
 		ui_.ShowMessage(is_ball_view_ ? MSG_VIEW_CENTER_BALL : MSG_VIEW_CENTER_TABLE);
@@ -239,9 +244,9 @@ void Scene::Mouse(int button, int state, int x, int y)
 {
 	if (state == GLUT_DOWN && button == GLUT_LEFT_BUTTON && ui_.GetCurrentScreen() == 2)
 	{
-		if (game.IsBallPlacingMode())
+		if (game.IsBallPlacingMode()) // white ball 배치 모드
 		{
-			if (!table_.GetBalls()[0]->highlight_)
+			if (!table_.GetWhiteBall()->highlight_)
 			{
 				game.OnBallPlaced();
 				EnableCueControl();
@@ -252,15 +257,15 @@ void Scene::Mouse(int button, int state, int x, int y)
 				ui_.ShowMessage(MSG_CANNOT_PLACE_THERE);
 			}
 		}
-		else if (cue_transform_.mode_ == CueMode::Rotation)
+		else if (cue_transform_.mode_ == CueMode::Rotation) // 큐 각도 조절
 		{
 			cue_transform_.mode_ = CueMode::Pushing;
 		}
-		else if (cue_transform_.mode_ == CueMode::Pushing)
+		else if (cue_transform_.mode_ == CueMode::Pushing) // 큐 파워 조절
 		{
 			StrikeWhiteBall();
 			cue_transform_.mode_ = CueMode::Invisible;
-			cue_transform_.push_amount_ = -BallRadius;
+			cue_transform_.push_amount_ = BallRadius;
 			cue_transform_.Update();
 		}
 	}
@@ -274,6 +279,7 @@ void Scene::MouseDrag(int button, int x, int y, int dx, int dy)
 	if (ui_.GetCurrentScreen() != 2)
 		return;
 
+	// cam angle 조절
 	if (button == GLUT_RIGHT_BUTTON)
 	{
 		cam_.yaw_ += dx / 8.0f;
@@ -288,6 +294,7 @@ void Scene::MouseWheel(int button, int state, int x, int y)
 	if (ui_.GetCurrentScreen() != 2)
 		return;
 
+	// cam zoom 조절
 	if (state > 0)
 		cam_.zoom_ -= 0.5f;
 	else
@@ -302,8 +309,9 @@ void Scene::MouseMove(int x, int y)
 		return;
 
 	MouseRay ray = CalculateMouseRay(x, y);
-	Ball* ball = table_.GetBalls()[0];
+	Ball* ball = table_.GetWhiteBall();
 
+	// ball placing 모드라면 ball 위치 조절
 	if (game.IsBallPlacingMode())
 	{
 		vec3 hit = ray.position - ray.direction * (ray.position.y / ray.direction.y);
@@ -322,7 +330,7 @@ void Scene::MouseMove(int x, int y)
 	vec3 hit = ray.position + ray.direction * t;
 	vec2 diff = cue_transform_.position_ - vec2(hit.x, hit.z);
 
-	if (cue_transform_.mode_ == CueMode::Rotation)
+	if (cue_transform_.mode_ == CueMode::Rotation) // cue 각도 조절 모드
 	{
 		float angle;
 		if (length2(diff) == 0.0f)
@@ -338,10 +346,10 @@ void Scene::MouseMove(int x, int y)
 		}
 		cue_transform_.rotation_ = -angle + DEGTORAD(90.0f);
 	}
-	else if (cue_transform_.mode_ == CueMode::Pushing)
+	else if (cue_transform_.mode_ == CueMode::Pushing) // cue 파워 조절 모드
 	{
 		const float power = dot(cue_transform_.GetCueDirection(), diff);
-		cue_transform_.push_amount_ = -clamp(power, BallRadius + MinCuePower, BallRadius + MaxCuePower);
+		cue_transform_.push_amount_ = clamp(power, BallRadius + MinCuePower, BallRadius + MaxCuePower);
 	}
 
 	cue_transform_.Update();
@@ -386,9 +394,9 @@ void Scene::OnWhiteBallCollide(int ball_id)
 void Scene::EnableCueControl()
 {
 	cue_transform_.mode_ = CueMode::Rotation;
-	cue_transform_.push_amount_ = -BallRadius;
+	cue_transform_.push_amount_ = BallRadius;
 	cue_transform_.Update();
-	ball_tracer_.position_ = table_.GetBalls()[0]->position_;
+	ball_tracer_.position_ = table_.GetWhiteBall()->position_;
 	ball_tracer_.Update();
 }
 
@@ -399,17 +407,17 @@ void Scene::DisableCueControl()
 
 void Scene::ResetWhiteBall()
 {
-	table_.GetBalls()[0]->velocity_ = vec2(0.0f);
-	table_.GetBalls()[0]->position_ = vec2(0, -TableHeight / 3);
-	table_.GetBalls()[0]->visible_ = true;
+	Ball* white_ball = table_.GetWhiteBall();
+	white_ball->velocity_ = vec2(0.0f);
+	white_ball->position_ = vec2(0, -TableHeight / 3);
+	white_ball->visible_ = true;
 }
 
 void Scene::StrikeWhiteBall() const
 {
-	Ball* ball = table_.GetBalls()[0];
-	const float power = -(cue_transform_.push_amount_ + BallRadius);
-	const int power_level = power > MaxCuePower * 0.5f;
+	const float power = cue_transform_.push_amount_ - BallRadius;
+	const int power_level = power > (MaxCuePower - MinCuePower) * 0.5f;
 
 	GetSoundEngine()->play2D(SOUND_CUE_PUSH(power_level));
-	ball->velocity_ = power * CuePowerModifier * cue_transform_.GetCueDirection();
+	table_.GetWhiteBall()->velocity_ = power * CuePowerModifier * cue_transform_.GetCueDirection();
 }

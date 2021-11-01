@@ -45,12 +45,12 @@ public:
 	bool CanPlaceWhiteBall() const;
 	RaytraceResult GetRaytracedBall(glm::vec2 pos, glm::vec2 dir) const;
 
-private:
-	Ball* AddBall(float x, float y);
-
-public:
 	void SetBallEvent(IBallEvent* e) { ball_event_ = e; }
 	const std::vector<Ball*>& GetBalls() const { return balls_; }
+	Ball* GetWhiteBall() const { return balls_[0]; }
+
+private:
+	Ball* AddBall(float x, float y);
 
 private:
 	std::vector<Ball*> balls_;
