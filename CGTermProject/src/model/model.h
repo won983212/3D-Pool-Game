@@ -6,7 +6,7 @@
 
 constexpr int MeshTextureTypeSize = 4;
 constexpr int MeshMaterialTypeSize = 4;
-constexpr float DefaultAo = 0.3f;
+constexpr float DefaultAo = 1.0f;
 
 namespace model
 {

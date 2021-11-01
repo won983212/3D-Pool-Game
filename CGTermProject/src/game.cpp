@@ -26,7 +26,7 @@ void Game::ResetGame()
 	first_touch_ball_ = 0;
 	group_ = BallGroup::NotDecided;
 	is_first_group_set_ = false;
-	is_foul_ = false;
+	is_foul_next_ = false;
 	is_turn_out_ = false;
 	ball_placing_ = false;
 }
@@ -60,7 +60,8 @@ void Game::OnBallHoleIn(int ball_id)
 	// foul. white ball is in hole.
 	if (ball_id == 0)
 	{
-		is_foul_ = true;
+		is_foul_next_ = true;
+		return;
 	}
 
 	// game end.
@@ -74,7 +75,7 @@ void Game::OnBallHoleIn(int ball_id)
 	const bool is_solid = ball_id >= 1 && ball_id <= 7;
 	if (group_ == BallGroup::NotDecided)
 	{
-		// solid인지 stripe인지 결정
+		// solid인지 stripe인지 결정.
 		group_ = turn_ == is_solid ? BallGroup::P1Solid : BallGroup::P1Strip;
 		ui_->ShowMessage(MSG_DECIDED_BALL(turn_, is_solid));
 		is_first_group_set_ = true;
@@ -92,7 +93,7 @@ void Game::OnBallHoleIn(int ball_id)
 	}
 
 	ball_goals_[!is_solid]++;
-	SetTurn(turn_); // Update progress
+	SetTurn(turn_); // for updating progress
 }
 
 void Game::OnAllBallStopped()
@@ -107,7 +108,7 @@ void Game::OnAllBallStopped()
 	const bool my_ball_touch = is_solid != ((group_ == BallGroup::P1Solid) != turn_);
 	if (first_touch_ball_ == 0 || group_ != BallGroup::NotDecided && !is_first_group_set_ && !my_ball_touch)
 	{
-		is_foul_ = true;
+		is_foul_next_ = true;
 		is_turn_out_ = true;
 	}
 
@@ -125,13 +126,13 @@ void Game::OnAllBallStopped()
 	first_touch_ball_ = 0;
 
 	// foul
-	if (is_foul_)
+	if (is_foul_next_)
 	{
 		ui_->ShowMessage(MSG_FOUL);
 		scene_->DisableCueControl();
 		scene_->ResetWhiteBall();
 		ball_placing_ = true;
-		is_foul_ = false;
+		is_foul_next_ = false;
 	}
 	else
 	{
@@ -151,7 +152,7 @@ bool Game::IsBallPlacingMode()
 
 bool Game::CanInteractWhiteBall()
 {
-	return !is_foul_ && !ball_placing_;
+	return !is_foul_next_ && !ball_placing_;
 }
 
 bool Game::IsPlayer1Turn()

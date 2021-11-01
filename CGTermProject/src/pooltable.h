@@ -45,6 +45,7 @@ public:
 	bool CanPlaceWhiteBall() const;
 	RaytraceResult GetRaytracedBall(glm::vec2 pos, glm::vec2 dir) const;
 
+public:
 	void SetBallEvent(IBallEvent* e) { ball_event_ = e; }
 	const std::vector<Ball*>& GetBalls() const { return balls_; }
 	Ball* GetWhiteBall() const { return balls_[0]; }

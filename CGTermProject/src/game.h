@@ -19,14 +19,15 @@ public:
 private:
 	Scene* scene_;
 	GuiScreen* ui_;
+
 	// game variables
 	bool turn_; // true = player1
-	int ball_goals_[2]; // count of remaining balls (solid, strip)
-	int turn_goal_ball_count_;
-	int first_touch_ball_;
+	int ball_goals_[2]; // count of goal balls ([0] solid, [1] stripe)
+	int turn_goal_ball_count_; // 이번 턴에 넣은 나의 공(solid or stripe)의 개수
+	int first_touch_ball_; // white ball과 닿은 최초의 ball id
 	BallGroup group_;
-	bool is_first_group_set_;
-	bool is_foul_;
+	bool is_first_group_set_; // 이번턴에서 group이 결정되었는가?
+	bool is_foul_next_;
 	bool is_turn_out_;
-	bool ball_placing_;
+	bool ball_placing_; // 파울이어서 흰색 공의 위치를 옮기고 있는가?
 };

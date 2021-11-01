@@ -47,7 +47,7 @@ constexpr int BallIndexes[] = {1, 11, 3, 6, 8, 14, 13, 15, 4, 9, 7, 2, 10, 5, 12
 
 PoolTable::PoolTable()
 {
-	constexpr float gap = TableHeight * 0.8f / 15.0f;
+	constexpr float gap = TableHeight * 0.8f / static_cast<float>(BallCount - 1);
 	for (int i = 0; i < BallCount; i++)
 		AddBall(0.0f, i * gap - TableHeight * 0.8f / 2.0f);
 }
@@ -68,12 +68,13 @@ void PoolTable::ResetBallPosition()
 	balls_[0]->visible_ = true;
 
 	// 1~15 ball setup
+	constexpr float extra_gap = 0.01f;
 	int i = 0;
 	for (int row = 0; row < 5; row++)
 	{
 		for (int column = 0; column <= row; column++)
 		{
-			glm::vec2 location = glm::vec2(2 * column - row, row * Sq3) * BallRadius;
+			glm::vec2 location = glm::vec2(2 * column - row, row * Sq3) * (BallRadius + extra_gap);
 			location.y += TableHeight / 4;
 			balls_[BallIndexes[i]]->position_ = location;
 			balls_[BallIndexes[i]]->velocity_ = glm::vec2(0.0f);
@@ -177,9 +178,11 @@ void PoolTable::Update(float partial_time)
 				}
 			}
 
-			// apply impulse
+			// calculate impulse power
 			glm::vec2 j_norm = normalize(delta);
 			float power = dot(balls_[j]->velocity_ - v, j_norm);
+
+			// apply impulse
 			glm::vec2 impulse = power * j_norm;
 			I += impulse;
 			balls_[j]->velocity_ -= impulse;
@@ -189,7 +192,7 @@ void PoolTable::Update(float partial_time)
 			balls_[i]->position_ += penetration / 2 * -j_norm;
 			balls_[j]->position_ += penetration / 2 * j_norm;
 
-			// calculate power level
+			// calculate power level for sound volume
 			power = std::abs(power);
 			int power_level = static_cast<int>(power / 2.0f);
 
@@ -267,6 +270,7 @@ RaytraceResult PoolTable::GetRaytracedBall(glm::vec2 pos, glm::vec2 dir) const
 		float dist = std::abs(dot(diff, glm::vec2(right.x, right.z)));
 		if (dist < 2 * BallRadius)
 		{
+			// calculate collision result
 			float L = sqrt(length2(diff) - dist * dist);
 			float S = sqrt(BallRadius * BallRadius * 4 - dist * dist);
 
@@ -308,7 +312,7 @@ RaytraceResult PoolTable::GetRaytracedBall(glm::vec2 pos, glm::vec2 dir) const
 
 Ball* PoolTable::AddBall(float x, float y)
 {
-	const auto ball = new Ball();
+	Ball* ball = new Ball();
 	ball->position_.x = x;
 	ball->position_.y = y;
 	ball->velocity_ = {0, 0};
