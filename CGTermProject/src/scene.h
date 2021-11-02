@@ -87,28 +87,37 @@ private:
 	void UpdateView() const;
 	MouseRay CalculateMouseRay(int mouse_x, int mouse_y) const;
 	void StrikeWhiteBall() const;
+	void InitPost();
 
 private:
 	// camera ball view
 	bool is_ball_view_ = false;
+
 	// light
 	LightData lights_[3];
 	commoncg::VBO ubo_light_;
+
 	// view
 	ViewMatrixData view_;
 	commoncg::VBO ubo_view_;
+
 	// pool table physics simulator
 	PoolTable table_;
+
 	// ball ghost/line tracer
 	BallTracer ball_tracer_;
+
 	// game manager
 	Game game;
+
 	// models
 	CueTransform cue_transform_;
 	model::AssetModel model_pool_table_;
 	model::AssetModel model_cue_;
 	model::Ball model_ball_;
+
 	// graphics
+	bool is_initialized_ = false;
 	commoncg::ShaderProgram shader_;
 	commoncg::Skybox skybox_;
 	commoncg::Camera cam_;

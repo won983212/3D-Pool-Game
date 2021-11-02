@@ -7,15 +7,27 @@
 #include "ui/image.h"
 #include "gameenum.h"
 
+enum class ScreenPage
+{
+	Loading,
+	Menu,
+	About,
+	InGame,
+	GameEnd
+};
+
 class GuiScreen : public UIScreen, IButtonEvent
 {
 public:
-	void ScreenInit() override;
-	void OnButtonClick(int id) override;
-	void OnRenderTick() override;
+	virtual void ScreenInit();
+	virtual void OnButtonClick(int id);
+	virtual void OnRenderTick();
 	void ShowMessage(std::wstring message);
 	void SetTurn(bool turn, BallGroup group, float achieve) const;
 	void GoGameEnd(std::wstring message);
+	void SetPage(ScreenPage page);
+	ScreenPage GetCurrentPage() const;
+	void AddToPage(UIElement* element, ScreenPage page);
 
 public:
 	UELabel* fps_label_;

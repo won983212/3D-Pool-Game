@@ -15,22 +15,36 @@ void GuiScreen::ScreenInit()
 	constexpr int btn_y_base = 380;
 	constexpr int btn_x = static_cast<int>((SCREEN_WIDTH - 300) / 2.0f);
 
-	// 3 screens (menu, about, ingameHUD, game end)
-	AddPages(4);
+	// add screens (loading, menu, about, ingameHUD, game end)
+	AddPages(5);
 
-	// menu screen
+	// loading screen
 	// background panel
 	const auto rect = new UERectangle();
 	rect->SetBounds(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 	rect->SetColor(0x66ffffff);
-	Add(rect, 0);
+	AddToPage(rect, ScreenPage::Loading);
+
+	// Loading text
+	UELabel* loading_label = new UELabel();
+	loading_label->SetLocation(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+	loading_label->SetUseCentered(true);
+	loading_label->SetTextPoint(64);
+	loading_label->SetShadowColor(0xff000000);
+	loading_label->SetText(L"리소스 로드중입니다...");
+	AddToPage(loading_label, ScreenPage::Loading);
+
+
+	// menu screen
+	// background panel
+	AddToPage(rect, ScreenPage::Menu);
 
 	// title banner
 	const auto img = new UEImage();
 	img->SetImage("res/texture/title.png");
 	img->PackSize();
 	img->SetLocation((SCREEN_WIDTH - img->width_) / 2.0f, 80);
-	Add(img, 0);
+	AddToPage(img, ScreenPage::Menu);
 
 	// buttons
 	auto btn = new UEButton();
@@ -38,26 +52,26 @@ void GuiScreen::ScreenInit()
 	btn->SetBounds(btn_x, btn_y_base, 300, 50);
 	btn->SetText(TEXT_BTN_START_GAME);
 	btn->SetButtonEvent(this);
-	Add(btn, 0);
+	AddToPage(btn, ScreenPage::Menu);
 
 	btn = new UEButton();
 	btn->id_ = 1;
 	btn->SetBounds(btn_x, btn_y_base + 80, 300, 50);
 	btn->SetText(TEXT_BTN_HOW_TO_PLAY);
 	btn->SetButtonEvent(this);
-	Add(btn, 0);
+	AddToPage(btn, ScreenPage::Menu);
 
 	btn = new UEButton();
 	btn->id_ = 2;
 	btn->SetBounds(btn_x, btn_y_base + 160, 300, 50);
 	btn->SetText(TEXT_BTN_EXIT);
 	btn->SetButtonEvent(this);
-	Add(btn, 0);
+	AddToPage(btn, ScreenPage::Menu);
 
 
 	// TODO howtoplay screen
 	// background panel
-	Add(rect, 1);
+	AddToPage(rect, ScreenPage::About);
 
 	// Back button
 	btn = new UEButton();
@@ -65,7 +79,7 @@ void GuiScreen::ScreenInit()
 	btn->SetBounds(btn_x, btn_y_base, 300, 50);
 	btn->SetText(TEXT_BTN_TO_MAIN);
 	btn->SetButtonEvent(this);
-	Add(btn, 1);
+	AddToPage(btn, ScreenPage::About);
 
 
 	// ingame HUD
@@ -75,7 +89,7 @@ void GuiScreen::ScreenInit()
 	fps_label_->SetTextPoint(24);
 	fps_label_->SetShadowColor(0xff000000);
 	fps_label_->SetText(L"FPS: 60");
-	Add(fps_label_, 2);
+	AddToPage(fps_label_, ScreenPage::InGame);
 
 	message_label_ = new UELabel();
 	message_label_->SetLocation(SCREEN_WIDTH / 2, 50);
@@ -85,7 +99,7 @@ void GuiScreen::ScreenInit()
 	message_label_->SetUseCentered(true);
 	message_label_->SetVisible(false);
 	message_label_->SetText(L"");
-	Add(message_label_, 2);
+	AddToPage(message_label_, ScreenPage::InGame);
 
 	turn_label_ = new UELabel();
 	turn_label_->SetLocation(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 50);
@@ -94,26 +108,26 @@ void GuiScreen::ScreenInit()
 	turn_label_->SetColor(0xffffffff);
 	turn_label_->SetUseCentered(true);
 	turn_label_->SetText(L"");
-	Add(turn_label_, 2);
+	AddToPage(turn_label_, ScreenPage::InGame);
 
 	const auto turn_quad_bg = new UERectangle();
 	turn_quad_bg->SetBounds((SCREEN_WIDTH - TurnRectW) / 2.0f, SCREEN_HEIGHT - 30, TurnRectW, 5);
 	turn_quad_bg->SetColor(0xff666666);
-	Add(turn_quad_bg, 2);
+	AddToPage(turn_quad_bg, ScreenPage::InGame);
 
 	turn_quad_ = new UERectangle();
 	turn_quad_->SetBounds((SCREEN_WIDTH - TurnRectW) / 2.0f, SCREEN_HEIGHT - 30, TurnRectW, 5);
 	turn_quad_->SetColor(0xffE34E46);
-	Add(turn_quad_, 2);
+	AddToPage(turn_quad_, ScreenPage::InGame);
 
 	turn_icon_ = new UEImage();
 	turn_icon_->SetImage("res/texture/ball_icon.png");
 	turn_icon_->SetBounds(SCREEN_WIDTH / 2.0f - 55, SCREEN_HEIGHT - 56, 12, 12);
-	Add(turn_icon_, 2);
+	AddToPage(turn_icon_, ScreenPage::InGame);
 
 	// game end screen
 	// background panel
-	Add(rect, 3);
+	AddToPage(rect, ScreenPage::GameEnd);
 
 	game_end_label_ = new UELabel();
 	game_end_label_->SetLocation(SCREEN_WIDTH / 2, btn_y_base - 80);
@@ -121,7 +135,7 @@ void GuiScreen::ScreenInit()
 	game_end_label_->SetShadowColor(0xff000000);
 	game_end_label_->SetColor(0xffffffff);
 	game_end_label_->SetUseCentered(true);
-	Add(game_end_label_, 3);
+	AddToPage(game_end_label_, ScreenPage::GameEnd);
 
 	// main menu button
 	btn = new UEButton();
@@ -129,7 +143,7 @@ void GuiScreen::ScreenInit()
 	btn->SetBounds(btn_x, btn_y_base, 300, 50);
 	btn->SetText(TEXT_BTN_TO_MAIN);
 	btn->SetButtonEvent(this);
-	Add(btn, 3);
+	AddToPage(btn, ScreenPage::GameEnd);
 }
 
 void GuiScreen::GoGameEnd(std::wstring message)
@@ -190,4 +204,19 @@ void GuiScreen::OnButtonClick(int id)
 		std::cout << "Warning: Invaild Button id: " << id << std::endl;
 		break;
 	}
+}
+
+void GuiScreen::SetPage(ScreenPage page)
+{
+	SetScreen((int)page);
+}
+
+ScreenPage GuiScreen::GetCurrentPage() const
+{
+	return (ScreenPage)GetCurrentScreen();
+}
+
+void GuiScreen::AddToPage(UIElement* element, ScreenPage page)
+{
+	Add(element, (int)page);
 }

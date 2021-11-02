@@ -35,10 +35,28 @@ constexpr model::Material BallMaterial =
 
 void Scene::Init()
 {
+	// gui screen
+	ui_.Init();
+
+	// events setup
+	ui_.SetScreenChangedEvent(this);
+	table_.SetBallEvent(this);
+
+	// camera (view)
+	ubo_view_.Create();
+	cam_.GetViewMatrix(&view_.view);
+	view_.projection = perspective(PrjFov, PrjAspect, PrjNear, PrjFar);
+	UpdateView();
+}
+
+void Scene::InitPost()
+{
+	// ball tracer init
+	ball_tracer_.Init();
+
 	// initalize graphic variables
 	brdf_lut_.LoadTextureImage("res/texture/brdf.png");
 	ubo_light_.Create();
-	ubo_view_.Create();
 
 	// prepare ball textures
 	for (int i = 0; i < BallCount; i++)
@@ -63,14 +81,6 @@ void Scene::Init()
 	shader_.SetUniform("specularMap", PBR_TEXTURE_INDEX_SPECULARMAP);
 	shader_.SetUniform("brdfMap", PBR_TEXTURE_INDEX_BRDFMAP);
 
-	// gui screen
-	ui_.Init();
-
-	// events setup
-	ui_.SetScreenChangedEvent(this);
-	table_.SetBallEvent(this);
-	ball_tracer_.Init();
-
 	// skybox
 	skybox_.BeginLoad();
 	skybox_.LoadHDRSkybox("res/texture/skybox/skybox.hdr");
@@ -93,14 +103,19 @@ void Scene::Init()
 	lights_[2] = light;
 	UpdateLight();
 
-	// camera (view)
-	cam_.GetViewMatrix(&view_.view);
-	view_.projection = perspective(PrjFov, PrjAspect, PrjNear, PrjFar);
-	UpdateView();
+	// finish initpost
+	ui_.SetPage(ScreenPage::Menu);
+	is_initialized_ = true;
 }
 
 void Scene::Update(float partial_time, int fps)
 {
+	if (!is_initialized_)
+	{
+		InitPost();
+		return;
+	}
+
 	// update camera
 	if (is_ball_view_)
 	{
@@ -118,7 +133,7 @@ void Scene::Update(float partial_time, int fps)
 	}
 
 	// update ball physics
-	if (!game.IsBallPlacingMode() && ui_.GetCurrentScreen() == 2)
+	if (!game.IsBallPlacingMode() && ui_.GetCurrentPage() == ScreenPage::InGame)
 		table_.Update(partial_time);
 
 	// update fps label
@@ -139,6 +154,9 @@ void Scene::UpdateView() const
 	ubo_view_.Unbind();
 }
 
+// TODO 게임 시작하면 table 돌아가면서 줌하는 animation추가
+// TODO Ball Shadow
+// TODO Render floor.
 void Scene::Render()
 {
 	// Update only when cam has changed.
@@ -146,64 +164,67 @@ void Scene::Render()
 		UpdateView();
 	shader_.SetUniform("camPos", cam_.GetEyePosition());
 
-	// Bind env maps and brdf LUT (lookup texture).
-	skybox_.BindEnvironmentTextures();
-	glActiveTexture(GL_TEXTURE0 + PBR_TEXTURE_INDEX_BRDFMAP);
-	brdf_lut_.Bind();
-
-	// balls
-	BindMaterial(&BallMaterial);
-	const std::vector<Ball*> balls = table_.GetBalls();
-	for (unsigned int i = 0; i < balls.size(); i++)
+	if (is_initialized_)
 	{
-		if (!balls[i]->visible_)
-			continue;
+		// Bind env maps and brdf LUT (lookup texture).
+		skybox_.BindEnvironmentTextures();
+		glActiveTexture(GL_TEXTURE0 + PBR_TEXTURE_INDEX_BRDFMAP);
+		brdf_lut_.Bind();
 
-		if (balls[i]->highlight_)
-			shader_.SetUniform("highlightColor", vec4(1.0f, 0.0f, 0.0f, 1.0f));
-
-		vec2 pos = balls[i]->position_;
-		auto model = mat4(1.0f);
-
-		model = translate(model, vec3(pos.x, BallRadius, pos.y));
-		model = model * toMat4(balls[i]->rotation_);
-
-		glActiveTexture(GL_TEXTURE0 + PBR_TEXTURE_INDEX_ALBEDO);
-		ball_textures_[i]->Bind();
-		shader_.SetUniform("model", model);
-		model_ball_.Draw();
-
-		if (balls[i]->highlight_)
-			shader_.SetUniform("highlightColor", vec4(0.0f));
-	}
-	Texture::Unbind();
-
-	// Render pool table
-	auto model = mat4(1.0f);
-	model = scale(model, vec3(5.0f));
-	model = rotate(model, DEGTORAD(90.0f), vec3(1, 0, 0));
-	shader_.SetUniform("model", model);
-	model_pool_table_.Draw();
-
-	// Render cue
-	if (cue_transform_.mode_ != CueMode::Invisible)
-	{
-		const vec2 white_ball_pos = table_.GetWhiteBall()->position_;
-		if (cue_transform_.position_ != white_ball_pos)
+		// balls
+		BindMaterial(&BallMaterial);
+		const std::vector<Ball*> balls = table_.GetBalls();
+		for (unsigned int i = 0; i < balls.size(); i++)
 		{
-			cue_transform_.position_ = white_ball_pos;
-			cue_transform_.Update();
+			if (!balls[i]->visible_)
+				continue;
+
+			if (balls[i]->highlight_)
+				shader_.SetUniform("highlightColor", vec4(1.0f, 0.0f, 0.0f, 1.0f));
+
+			vec2 pos = balls[i]->position_;
+			auto model = mat4(1.0f);
+
+			model = translate(model, vec3(pos.x, BallRadius, pos.y));
+			model = model * toMat4(balls[i]->rotation_);
+
+			glActiveTexture(GL_TEXTURE0 + PBR_TEXTURE_INDEX_ALBEDO);
+			ball_textures_[i]->Bind();
+			shader_.SetUniform("model", model);
+			model_ball_.Draw();
+
+			if (balls[i]->highlight_)
+				shader_.SetUniform("highlightColor", vec4(0.0f));
 		}
-		shader_.SetUniform("model", cue_transform_.GetModelMatrix());
-		model_cue_.Draw();
+		Texture::Unbind();
+
+		// Render pool table
+		auto model = mat4(1.0f);
+		model = scale(model, vec3(5.0f));
+		model = rotate(model, DEGTORAD(90.0f), vec3(1, 0, 0));
+		shader_.SetUniform("model", model);
+		model_pool_table_.Draw();
+
+		// Render cue
+		if (cue_transform_.mode_ != CueMode::Invisible)
+		{
+			const vec2 white_ball_pos = table_.GetWhiteBall()->position_;
+			if (cue_transform_.position_ != white_ball_pos)
+			{
+				cue_transform_.position_ = white_ball_pos;
+				cue_transform_.Update();
+			}
+			shader_.SetUniform("model", cue_transform_.GetModelMatrix());
+			model_cue_.Draw();
+		}
+
+		// ball tracer
+		if (cue_transform_.mode_ == CueMode::Rotation)
+			ball_tracer_.Draw();
+
+		// skybox
+		skybox_.Render(view_.view);
 	}
-
-	// ball tracer
-	if (cue_transform_.mode_ == CueMode::Rotation)
-		ball_tracer_.Draw();
-
-	// skybox
-	skybox_.Render(view_.view);
 
 	// gui
 	ui_.Render();
@@ -233,6 +254,9 @@ MouseRay Scene::CalculateMouseRay(int mouse_x, int mouse_y) const
 
 void Scene::Keyboard(unsigned char key, int x, int y)
 {
+	if (!is_initialized_)
+		return;
+
 	if (key == ' ' && game.CanInteractWhiteBall()) // spacebar: ball view / table view 전환
 	{
 		is_ball_view_ = !is_ball_view_;
@@ -242,7 +266,10 @@ void Scene::Keyboard(unsigned char key, int x, int y)
 
 void Scene::Mouse(int button, int state, int x, int y)
 {
-	if (state == GLUT_DOWN && button == GLUT_LEFT_BUTTON && ui_.GetCurrentScreen() == 2)
+	if (!is_initialized_)
+		return;
+
+	if (state == GLUT_DOWN && button == GLUT_LEFT_BUTTON && ui_.GetCurrentPage() == ScreenPage::InGame)
 	{
 		if (game.IsBallPlacingMode()) // white ball 배치 모드
 		{
@@ -275,8 +302,11 @@ void Scene::Mouse(int button, int state, int x, int y)
 
 void Scene::MouseDrag(int button, int x, int y, int dx, int dy)
 {
+	if (!is_initialized_)
+		return;
+
 	ui_.MouseDrag(x, y);
-	if (ui_.GetCurrentScreen() != 2)
+	if (ui_.GetCurrentPage() != ScreenPage::InGame)
 		return;
 
 	// cam angle 조절
@@ -290,8 +320,11 @@ void Scene::MouseDrag(int button, int x, int y, int dx, int dy)
 
 void Scene::MouseWheel(int button, int state, int x, int y)
 {
+	if (!is_initialized_)
+		return;
+
 	ui_.MouseWheel(button, state, x, y);
-	if (ui_.GetCurrentScreen() != 2)
+	if (ui_.GetCurrentPage() != ScreenPage::InGame)
 		return;
 
 	// cam zoom 조절
@@ -304,8 +337,11 @@ void Scene::MouseWheel(int button, int state, int x, int y)
 
 void Scene::MouseMove(int x, int y)
 {
+	if (!is_initialized_)
+		return;
+
 	ui_.MouseMove(x, y);
-	if (ui_.GetCurrentScreen() != 2)
+	if (ui_.GetCurrentPage() != ScreenPage::InGame)
 		return;
 
 	MouseRay ray = CalculateMouseRay(x, y);
@@ -357,7 +393,7 @@ void Scene::MouseMove(int x, int y)
 
 void Scene::OnScreenChanged(int id)
 {
-	if (id == 2)
+	if (id == (int)ScreenPage::InGame)
 	{
 		game.ResetGame();
 		game.SetTurn(true);
@@ -368,7 +404,7 @@ void Scene::OnScreenChanged(int id)
 
 void Scene::OnAllBallStopped()
 {
-	if (ui_.GetCurrentScreen() != 2)
+	if (ui_.GetCurrentPage() != ScreenPage::InGame)
 		return;
 
 	game.OnAllBallStopped();
@@ -384,6 +420,8 @@ void Scene::OnBallHoleIn(int ball_id)
 		is_ball_view_ = false;
 
 	game.OnBallHoleIn(ball_id);
+
+	// TODO Particle effect
 }
 
 void Scene::OnWhiteBallCollide(int ball_id)

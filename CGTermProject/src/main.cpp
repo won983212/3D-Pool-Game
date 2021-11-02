@@ -30,14 +30,15 @@ void init()
 	UIScreen::GetFontRenderer();
 
 	glLineWidth(DefaultLineWidth);
-	scene.Init();
-	glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	for (auto& i : last_mouse)
 		i = {0, 0};
+
+	scene.Init();
 }
 
 void render()
