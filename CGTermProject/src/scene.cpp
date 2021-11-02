@@ -47,6 +47,9 @@ void Scene::Init()
 	cam_.GetViewMatrix(&view_.view);
 	view_.projection = perspective(PrjFov, PrjAspect, PrjNear, PrjFar);
 	UpdateView();
+
+	// game start animation setup
+	start_game_animation_.SetEaseMode(false);
 }
 
 void Scene::InitPost()
@@ -116,6 +119,16 @@ void Scene::Update(float partial_time, int fps)
 		return;
 	}
 
+	// update animation
+	start_game_animation_.Update(partial_time);
+	if (!start_game_animation_.isFinish())
+	{
+		float frame = start_game_animation_.GetValue();
+		cam_.yaw_ = 360.0f * frame;
+		cam_.zoom_ = -8.0f * frame + 18.0f;
+		cam_.Update();
+	}
+
 	// update camera
 	if (is_ball_view_)
 	{
@@ -154,7 +167,6 @@ void Scene::UpdateView() const
 	ubo_view_.Unbind();
 }
 
-// TODO 게임 시작하면 table 돌아가면서 줌하는 animation추가
 // TODO Ball Shadow
 // TODO Render floor.
 void Scene::Render()
@@ -310,7 +322,7 @@ void Scene::MouseDrag(int button, int x, int y, int dx, int dy)
 		return;
 
 	// cam angle 조절
-	if (button == GLUT_RIGHT_BUTTON)
+	if (start_game_animation_.isFinish() && button == GLUT_RIGHT_BUTTON)
 	{
 		cam_.yaw_ += dx / 8.0f;
 		cam_.pitch_ += dy / 8.0f;
@@ -328,11 +340,14 @@ void Scene::MouseWheel(int button, int state, int x, int y)
 		return;
 
 	// cam zoom 조절
-	if (state > 0)
-		cam_.zoom_ -= 0.5f;
-	else
-		cam_.zoom_ += 0.5f;
-	cam_.Update();
+	if (start_game_animation_.isFinish())
+	{
+		if (state > 0)
+			cam_.zoom_ -= 0.5f;
+		else
+			cam_.zoom_ += 0.5f;
+		cam_.Update();
+	}
 }
 
 void Scene::MouseMove(int x, int y)
@@ -395,6 +410,7 @@ void Scene::OnScreenChanged(int id)
 {
 	if (id == (int)ScreenPage::InGame)
 	{
+		start_game_animation_.Reset();
 		game.ResetGame();
 		game.SetTurn(true);
 		EnableCueControl();

@@ -181,6 +181,7 @@
     <ClInclude Include="src\ui\uielement.h" />
     <ClInclude Include="src\ui\uiscreen.h" />
     <ClInclude Include="src\strings.h" />
+    <ClInclude Include="src\util\animation.h" />
     <ClInclude Include="src\util\sound.h" />
     <ClInclude Include="src\util\util.h" />
   </ItemGroup>
@@ -210,6 +211,7 @@
     <ClCompile Include="src\ui\rectangle.cpp" />
     <ClCompile Include="src\ui\uielement.cpp" />
     <ClCompile Include="src\ui\uiscreen.cpp" />
+    <ClCompile Include="src\util\animation.cpp" />
     <ClCompile Include="src\util\sound.cpp" />
   </ItemGroup>
   <ItemGroup>

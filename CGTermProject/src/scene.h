@@ -12,6 +12,7 @@
 #include "game.h"
 #include "balltracer.h"
 #include "util/util.h"
+#include "util/animation.h"
 #include "gameenum.h"
 
 
@@ -65,7 +66,7 @@ class Scene : public IBallEvent, IScreenChangedEvent
 public:
 	Scene() : 
 		ubo_light_(GL_UNIFORM_BUFFER), ubo_view_(GL_UNIFORM_BUFFER), ball_tracer_(table_), 
-		cam_(0, 30, 10), game(this, &ui_) {}
+		cam_(0, 30, 10), game(this, &ui_), start_game_animation_(0, 1, 1.5f) {}
 	void Init();
 	void Update(float partial_time, int fps);
 	void Render();
@@ -90,8 +91,10 @@ private:
 	void InitPost();
 
 private:
-	// camera ball view
+	// scene visual
 	bool is_ball_view_ = false;
+	BallTracer ball_tracer_;
+	Animation start_game_animation_;
 
 	// light
 	LightData lights_[3];
@@ -103,9 +106,6 @@ private:
 
 	// pool table physics simulator
 	PoolTable table_;
-
-	// ball ghost/line tracer
-	BallTracer ball_tracer_;
 
 	// game manager
 	Game game;

@@ -189,16 +189,16 @@ void GuiScreen::OnButtonClick(int id)
 	switch (id)
 	{
 	case 0:
-		SetScreen(2);
+		SetPage(ScreenPage::InGame);
 		break;
 	case 1:
-		SetScreen(1);
+		SetPage(ScreenPage::About);
 		break;
 	case 2:
 		glutLeaveMainLoop();
 		break;
 	case 3:
-		SetScreen(0);
+		SetPage(ScreenPage::Menu);
 		break;
 	default:
 		std::cout << "Warning: Invaild Button id: " << id << std::endl;
