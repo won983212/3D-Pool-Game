@@ -1,5 +1,5 @@
 ﻿#include <iostream>
-#include <glm/gtc/quaternion.hpp>
+#include <random>
 #include <glm/gtx/quaternion.hpp>
 #include "scene.h"
 #include "gfx/texture.h"
@@ -32,6 +32,10 @@ constexpr model::Material BallMaterial =
 	{0, -1, -1, -1} // texIndex
 };
 
+// global random
+std::random_device rd;
+std::mt19937 r_engine(rd());
+
 
 void Scene::Init()
 {
@@ -54,10 +58,9 @@ void Scene::Init()
 
 void Scene::InitPost()
 {
-	// ball tracer init
-	ball_tracer_.Init();
-
 	// initalize graphic variables
+	particle_.Init();
+	ball_tracer_.Init();
 	brdf_lut_.LoadTextureImage("res/texture/brdf.png");
 	ubo_light_.Create();
 
@@ -151,6 +154,9 @@ void Scene::Update(float partial_time, int fps)
 
 	// update fps label
 	ui_.fps_label_->SetText(std::wstring(L"FPS: ") + std::to_wstring(fps));
+
+	// update particle
+	particle_.Update(partial_time);
 }
 
 void Scene::UpdateLight() const
@@ -236,6 +242,9 @@ void Scene::Render()
 
 		// skybox
 		skybox_.Render(view_.view);
+
+		// particle
+		particle_.Render();
 	}
 
 	// gui
@@ -435,9 +444,21 @@ void Scene::OnBallHoleIn(int ball_id)
 	if (ball_id == 0)
 		is_ball_view_ = false;
 
-	game.OnBallHoleIn(ball_id);
+	// particle effect
+	/*std::uniform_real_distribution<> dist(-5, 5);
+	for (int i = 0; i < 30; i++)
+	{
+		Particle* particle = new Particle();
+		glm::vec2 ball_pos = table_.GetBalls()[ball_id]->position_;
+		particle->position_ = glm::vec3(ball_pos.x, BallRadius, ball_pos.y);
+		particle->velocity_.x = dist(r_engine);
+		particle->velocity_.y = dist(r_engine);
+		particle->velocity_.z = dist(r_engine);
+		particle_.Add(particle);
+	}*/
 
-	// TODO Particle effect
+	// event call
+	game.OnBallHoleIn(ball_id);
 }
 
 void Scene::OnWhiteBallCollide(int ball_id)

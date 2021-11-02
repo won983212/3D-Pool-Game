@@ -5,15 +5,16 @@
 #include "gfx/vbo.h"
 #include "gfx/camera.h"
 #include "gfx/skybox.h"
-#include "guiscreen.h"
+#include "gfx/particle.h"
 #include "model/assetmodel.h"
 #include "model/ball.h"
-#include "pooltable.h"
-#include "game.h"
-#include "balltracer.h"
 #include "util/util.h"
 #include "util/animation.h"
+#include "pooltable.h"
+#include "game.h"
 #include "gameenum.h"
+#include "balltracer.h"
+#include "guiscreen.h"
 
 
 struct LightData
@@ -123,5 +124,6 @@ private:
 	commoncg::Camera cam_;
 	commoncg::Texture brdf_lut_;
 	commoncg::Texture* ball_textures_[BallCount];
+	commoncg::ParticleSystem particle_;
 	GuiScreen ui_;
 };

@@ -114,6 +114,9 @@
     <ClInclude Include="src\util\animation.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="src\gfx\particle.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\gfx\shader.cpp">
@@ -195,6 +198,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="src\util\animation.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gfx\particle.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

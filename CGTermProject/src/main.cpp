@@ -1,4 +1,5 @@
 #include <iostream>
+#include <ctime>
 #include "gfx/window.h"
 #include "scene.h"
 #include "util/sound.h"
@@ -92,6 +93,7 @@ void update(float partial_time)
 
 int main(int argc, char* argv[])
 {
+	// setup window
 	wnd.Init("Pocket ball (CG Term Project)", &argc, argv);
 	wnd.Create(init, render, true);
 	wnd.SetMouseDragFunc(drag);

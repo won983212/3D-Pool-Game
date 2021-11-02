@@ -7,6 +7,7 @@
 
 using namespace commoncg;
 
+constexpr float FPSLimit = 60.0f;
 Window* Window::inst_ = nullptr;
 
 void Window::Init(const char* title, int* argcp, char** argv)
@@ -15,6 +16,7 @@ void Window::Init(const char* title, int* argcp, char** argv)
 	glutInit(argcp, argv);
 }
 
+// TODO FPS Fix please
 void Window::Create(WindowCallback init, WindowCallback render, bool use_msaa)
 {
 	if (use_msaa)
@@ -43,7 +45,7 @@ void Window::Create(WindowCallback init, WindowCallback render, bool use_msaa)
 	inst_ = this;
 
 	glutDisplayFunc(RenderWrapper);
-	glutIdleFunc(Update);
+	glutTimerFunc(1000 / FPSLimit, Timer, 0);
 }
 
 void Window::Loop() const
@@ -51,6 +53,12 @@ void Window::Loop() const
 	glutMainLoop();
 	if (destroy_ != nullptr)
 		destroy_();
+}
+
+void Window::Timer(int val)
+{
+	Update();
+	glutTimerFunc(1000 / FPSLimit, Timer, 0);
 }
 
 void Window::SetDestroyFunc(WindowCallback destory)

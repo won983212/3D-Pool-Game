@@ -30,6 +30,7 @@ namespace commoncg
 	private:
 		static void RenderWrapper();
 		static void Update();
+		static void Timer(int val);
 
 	private:
 		static Window* inst_;

@@ -157,6 +157,7 @@
     <ClInclude Include="src\gameenum.h" />
     <ClInclude Include="src\gfx\camera.h" />
     <ClInclude Include="src\gfx\gfx.h" />
+    <ClInclude Include="src\gfx\particle.h" />
     <ClInclude Include="src\gfx\skybox.h" />
     <ClInclude Include="src\model\assetmodel.h" />
     <ClInclude Include="src\gfx\shader.h" />
@@ -189,6 +190,7 @@
     <ClCompile Include="src\balltracer.cpp" />
     <ClCompile Include="src\game.cpp" />
     <ClCompile Include="src\gfx\camera.cpp" />
+    <ClCompile Include="src\gfx\particle.cpp" />
     <ClCompile Include="src\gfx\skybox.cpp" />
     <ClCompile Include="src\model\assetmodel.cpp" />
     <ClCompile Include="src\gfx\shader.cpp" />
