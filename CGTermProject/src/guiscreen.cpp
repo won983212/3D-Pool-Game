@@ -149,7 +149,7 @@ void GuiScreen::ScreenInit()
 void GuiScreen::GoGameEnd(std::wstring message)
 {
 	game_end_label_->SetText(std::move(message));
-	SetScreen(3);
+	SetPage(ScreenPage::GameEnd);
 }
 
 void GuiScreen::ShowMessage(std::wstring message)

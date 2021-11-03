@@ -7,12 +7,6 @@
 #define SIZEOF(type, len) ((len) * sizeof(type)) // sizeof multiple types
 #endif
 
-#ifdef WIN32
-#define DRAND48() (((float) rand())/((float) RAND_MAX))
-#define SRAND48(x) (srand((x)))
-#define RANDOM_VAL(min, max) ((float)(min + (max - min) * drand48()))
-#endif
-
 #define SCREEN_WIDTH 1280
 #define SCREEN_HEIGHT 720
 
@@ -40,3 +34,8 @@ constexpr float TableWallThickness = 0.17f;
 constexpr float TableHoleSize = 0.5f;
 constexpr float TableWidth = 5.85f;
 constexpr float TableHeight = 11.1f;
+
+
+// random function
+float RandomFloat();
+float RandomFloat(float min, float max);

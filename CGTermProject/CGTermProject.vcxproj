@@ -215,6 +215,7 @@
     <ClCompile Include="src\ui\uiscreen.cpp" />
     <ClCompile Include="src\util\animation.cpp" />
     <ClCompile Include="src\util\sound.cpp" />
+    <ClCompile Include="src\util\util.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp-vc142-mtd.dll" />

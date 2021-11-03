@@ -1,6 +1,4 @@
 ﻿#include <iostream>
-#include <random>
-#include <glm/gtx/quaternion.hpp>
 #include "scene.h"
 #include "gfx/texture.h"
 #include "model/quad.h"
@@ -14,7 +12,7 @@ using namespace commoncg;
 // cue constants
 constexpr float MinCuePower = 0.05f;
 constexpr float MaxCuePower = 1.0f;
-constexpr float CuePowerModifier = 12.0f;
+constexpr float CuePowerModifier = 15.0f;
 
 // projection constants
 constexpr float PrjFov = DEGTORAD(45.0f);
@@ -31,10 +29,6 @@ constexpr model::Material BallMaterial =
 	DefaultAo, // ao
 	{0, -1, -1, -1} // texIndex
 };
-
-// global random
-std::random_device rd;
-std::mt19937 r_engine(rd());
 
 
 void Scene::Init()
@@ -445,17 +439,18 @@ void Scene::OnBallHoleIn(int ball_id)
 		is_ball_view_ = false;
 
 	// particle effect
-	/*std::uniform_real_distribution<> dist(-5, 5);
-	for (int i = 0; i < 30; i++)
+	for (int i = 0; i < 50; i++)
 	{
 		Particle* particle = new Particle();
 		glm::vec2 ball_pos = table_.GetBalls()[ball_id]->position_;
 		particle->position_ = glm::vec3(ball_pos.x, BallRadius, ball_pos.y);
-		particle->velocity_.x = dist(r_engine);
-		particle->velocity_.y = dist(r_engine);
-		particle->velocity_.z = dist(r_engine);
+		particle->velocity_.x = RandomFloat(-2, 2);
+		particle->velocity_.y = RandomFloat(0, 5);
+		particle->velocity_.z = RandomFloat(-2, 2);
+		particle->scale_ = RandomFloat(0.3f, 1.0f);
+		particle->SetLifeTime(1.0f);
 		particle_.Add(particle);
-	}*/
+	}
 
 	// event call
 	game.OnBallHoleIn(ball_id);

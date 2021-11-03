@@ -3,24 +3,29 @@
 #include <vector>
 #include "gfx.h"
 #include "../model/quad.h"
+#include "../util/util.h"
 
 namespace commoncg
 {
 	class Particle 
 	{
 	public:
-		Particle() : position_(0.0f), velocity_(0.0f) {}
+		Particle();
 		bool Update(float partial_time);
 		void SetLifeTime(float life_time) { life_time_ = life_time; }
 
 	public:
 		glm::vec3 position_;
 		glm::vec3 velocity_;
-		glm::quat rotation_;
+		glm::vec3 color_;
+		float scale_ = 1.0f;
 
 	private:
 		float age_ = 0.0f;
 		float life_time_ = 1.0f;
+		glm::quat rotation_;
+		glm::vec3 rotation_axis_;
+
 		friend class ParticleSystem;
 	};
 

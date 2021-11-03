@@ -16,7 +16,6 @@ void Window::Init(const char* title, int* argcp, char** argv)
 	glutInit(argcp, argv);
 }
 
-// TODO FPS Fix please
 void Window::Create(WindowCallback init, WindowCallback render, bool use_msaa)
 {
 	if (use_msaa)

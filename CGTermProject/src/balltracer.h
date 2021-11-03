@@ -1,5 +1,4 @@
 #pragma once
-#include <glm/gtx/quaternion.hpp>
 #include "gfx/vao.h"
 #include "gfx/vbo.h"
 #include "gfx/shader.h"
