@@ -83,6 +83,48 @@ void PoolTable::ResetBallPosition()
 	}
 }
 
+void UpdatePhysics(Ball* ball, float partial_time)
+{
+	// update velocity
+	float vel = length(ball->velocity_);
+	if (vel > 0)
+		ball->velocity_ *= FrictionModifier; // friction
+
+	// velocity가 너무 낮으면 정지
+	if (vel * FrictionModifier < 0.02)
+	{
+		ball->velocity_ = glm::vec2(0.0f);
+		vel = 0;
+	}
+
+	// update position
+	ball->position_ += partial_time * ball->velocity_;
+
+	// update rotation
+	if (vel > 0)
+	{
+		auto vel3d = glm::vec3(ball->velocity_.x, 0, ball->velocity_.y);
+		glm::vec3 rotation_axis = cross(glm::vec3(0, 1, 0), vel3d);
+		float d_angle = partial_time * length(ball->velocity_) / BallRadius; // dt*|v|/r
+		ball->rotation_ = angleAxis(d_angle, normalize(rotation_axis)) * ball->rotation_;
+	}
+}
+
+void SolveWallCollision(Ball* ball)
+{
+	for (const auto& wall : Walls)
+	{
+		glm::vec2 diff = ball->position_ - wall.position;
+		glm::vec2 wall_norm = normalize(wall.normal);
+		float dist = dot(diff, wall_norm);
+		if (dist < BallRadius && (length2(diff) - dist * dist) * 4 < wall.size * wall.size)
+		{
+			ball->position_ += (BallRadius - dist) * wall_norm;
+			ball->velocity_ = reflect(ball->velocity_, wall_norm);
+		}
+	}
+}
+
 void PoolTable::Update(float partial_time)
 {
 	bool is_all_stop = true;
@@ -92,33 +134,9 @@ void PoolTable::Update(float partial_time)
 		if (!ball->visible_)
 			continue;
 
-		// update velocity
-		float vel = length(ball->velocity_);
-		if (vel > 0)
-			ball->velocity_ *= FrictionModifier; // friction
-
-		// velocity가 너무 낮으면 정지
-		if (vel * FrictionModifier < 0.02)
-		{
-			ball->velocity_ = glm::vec2(0.0f);
-			vel = 0;
-		}
-		else
-		{
+		UpdatePhysics(ball, partial_time);
+		if (length(ball->velocity_) * FrictionModifier > 0.02)
 			is_all_stop = false;
-		}
-
-		// update position
-		ball->position_ += partial_time * ball->velocity_;
-
-		// update rotation
-		if (vel > 0)
-		{
-			auto vel3d = glm::vec3(ball->velocity_.x, 0, ball->velocity_.y);
-			glm::vec3 rotation_axis = cross(glm::vec3(0, 1, 0), vel3d);
-			float d_angle = partial_time * length(ball->velocity_) / BallRadius; // dt*|v|/r
-			ball->rotation_ = angleAxis(d_angle, normalize(rotation_axis)) * ball->rotation_;
-		}
 
 		constexpr int hole_size = sizeof(Holes) / sizeof(glm::vec2);
 		constexpr float adj_hole_size = (TableHoleSize + 0.2f) * 0.5f;
@@ -204,20 +222,9 @@ void PoolTable::Update(float partial_time)
 			if (i == 0 && ball_event_ != nullptr)
 				ball_event_->OnWhiteBallCollide(j);
 		}
-		balls_[i]->velocity_ += I;
 
-		// wall collision test
-		for (const auto& wall : Walls)
-		{
-			glm::vec2 diff = ball->position_ - wall.position;
-			glm::vec2 wall_norm = normalize(wall.normal);
-			float dist = dot(diff, wall_norm);
-			if (dist < BallRadius && (length2(diff) - dist * dist) * 4 < wall.size * wall.size)
-			{
-				ball->position_ += (BallRadius - dist) * wall_norm;
-				ball->velocity_ = reflect(ball->velocity_, wall_norm);
-			}
-		}
+		balls_[i]->velocity_ += I;
+		SolveWallCollision(ball);
 	}
 
 	if (is_all_stop)
