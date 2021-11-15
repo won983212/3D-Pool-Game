@@ -238,6 +238,8 @@
     <None Include="ikpFlac.dll" />
     <None Include="ikpMP3.dll" />
     <None Include="irrKlang.dll" />
+    <None Include="res\shader\phong.frag" />
+    <None Include="res\shader\phong.vert" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\texture\container.jpg">

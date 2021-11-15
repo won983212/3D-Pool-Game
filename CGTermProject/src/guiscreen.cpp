@@ -77,13 +77,13 @@ void GuiScreen::ScreenInit()
 	img = new UEImage();
 	img->SetImage("res/texture/how1.png");
 	img->PackSize();
-	img->SetLocation((SCREEN_WIDTH - img->width_) / 2.0f, 80);
+	img->SetLocation((SCREEN_WIDTH - img->width_) / 2.0f, 120);
 	AddToPage(img, ScreenPage::About1);
 
 	// Back/Next button
 	btn = new UEButton();
 	btn->id_ = 4;
-	btn->SetBounds((SCREEN_WIDTH - 650) / 2.0f, 520, 300, 50);
+	btn->SetBounds((SCREEN_WIDTH - 650) / 2.0f, 570, 300, 50);
 	btn->SetText(TEXT_BTN_NEXT);
 	btn->SetButtonEvent(this);
 	AddToPage(btn, ScreenPage::About1);
@@ -91,7 +91,7 @@ void GuiScreen::ScreenInit()
 	// Go Main button
 	btn = new UEButton();
 	btn->id_ = 3;
-	btn->SetBounds((SCREEN_WIDTH - 650) / 2.0f + 350, 520, 300, 50);
+	btn->SetBounds((SCREEN_WIDTH - 650) / 2.0f + 350, 570, 300, 50);
 	btn->SetText(TEXT_BTN_TO_MAIN);
 	btn->SetButtonEvent(this);
 	AddToPage(btn, ScreenPage::About1);
@@ -104,13 +104,13 @@ void GuiScreen::ScreenInit()
 	img = new UEImage();
 	img->SetImage("res/texture/how2.png");
 	img->PackSize();
-	img->SetLocation((SCREEN_WIDTH - img->width_) / 2.0f, 80);
+	img->SetLocation((SCREEN_WIDTH - img->width_) / 2.0f, 120);
 	AddToPage(img, ScreenPage::About2);
 
 	// Back/Next button
 	btn = new UEButton();
 	btn->id_ = 5;
-	btn->SetBounds((SCREEN_WIDTH - 650) / 2.0f, 520, 300, 50);
+	btn->SetBounds((SCREEN_WIDTH - 650) / 2.0f, 570, 300, 50);
 	btn->SetText(TEXT_BTN_BACK);
 	btn->SetButtonEvent(this);
 	AddToPage(btn, ScreenPage::About2);
@@ -118,7 +118,7 @@ void GuiScreen::ScreenInit()
 	// Go Main button
 	btn = new UEButton();
 	btn->id_ = 3;
-	btn->SetBounds((SCREEN_WIDTH - 650) / 2.0f + 350, 520, 300, 50);
+	btn->SetBounds((SCREEN_WIDTH - 650) / 2.0f + 350, 570, 300, 50);
 	btn->SetText(TEXT_BTN_TO_MAIN);
 	btn->SetButtonEvent(this);
 	AddToPage(btn, ScreenPage::About2);

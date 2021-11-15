@@ -68,8 +68,10 @@ void Scene::InitPost()
 	model_ball_.Init(BallRadius);
 
 	// shader
-	shader_.AddShader("res/shader/pbr.vert", GL_VERTEX_SHADER);
-	shader_.AddShader("res/shader/pbr.frag", GL_FRAGMENT_SHADER);
+	/*shader_.AddShader("res/shader/pbr.vert", GL_VERTEX_SHADER);
+	shader_.AddShader("res/shader/pbr.frag", GL_FRAGMENT_SHADER);*/
+	shader_.AddShader("res/shader/phong.vert", GL_VERTEX_SHADER);
+	shader_.AddShader("res/shader/phong.frag", GL_FRAGMENT_SHADER);
 	shader_.Load();
 	shader_.Use();
 	shader_.SetUniform("highlightColor", vec4(0.0f));

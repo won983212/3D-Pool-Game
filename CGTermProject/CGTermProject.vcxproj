@@ -237,6 +237,8 @@
     <None Include="res\shader\gui.vert" />
     <None Include="res\shader\pbr.frag" />
     <None Include="res\shader\pbr.vert" />
+    <None Include="res\shader\phong.frag" />
+    <None Include="res\shader\phong.vert" />
     <None Include="res\shader\skybox.frag" />
     <None Include="res\shader\skybox.vert" />
     <None Include="res\shader\ray.frag" />
