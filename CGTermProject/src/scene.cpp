@@ -167,8 +167,6 @@ void Scene::UpdateView() const
 	ubo_view_.Unbind();
 }
 
-// TODO Ball Shadow
-// TODO Render floor.
 void Scene::Render()
 {
 	// Update only when cam has changed.
@@ -413,6 +411,7 @@ void Scene::OnScreenChanged(int id)
 {
 	if (id == (int)ScreenPage::InGame)
 	{
+		GetSoundEngine()->play2D(SOUND_SPIN);
 		start_game_animation_.Reset();
 		game.ResetGame();
 		game.SetTurn(true);
@@ -431,8 +430,7 @@ void Scene::OnAllBallStopped()
 
 void Scene::OnBallHoleIn(int ball_id)
 {
-	// TODO ball goal-in sound
-	GetSoundEngine()->play2D(SOUND_CUE_PUSH(1));
+	GetSoundEngine()->play2D(SOUND_GOAL);
 
 	// foul. white ball is in hole. disable ball view
 	if (ball_id == 0)

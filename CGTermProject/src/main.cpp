@@ -13,10 +13,9 @@ Window wnd;
 
 void init()
 {
-	// TODO (Debug) Turn on BGM
 	// initialize sound engine
 	InitSoundEngine();
-	/*irrklang::ISound* sound = getSoundEngine()->play2D(SOUND_BGM, true, false, true);
+	irrklang::ISound* sound = GetSoundEngine()->play2D(SOUND_BGM, true, false, true);
 	if (!sound)
 	{
 	    std::cout << "Warning: Can't play BGM" << std::endl;
@@ -25,7 +24,7 @@ void init()
 	{
 	    sound->setVolume(0.2f);
 	    sound->drop();
-	}*/
+	}
 
 	// initialize font
 	UIScreen::GetFontRenderer();

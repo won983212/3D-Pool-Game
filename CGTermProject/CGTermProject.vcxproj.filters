@@ -332,6 +332,12 @@
     <Image Include="res\texture\ball_icon.png">
       <Filter>리소스 파일</Filter>
     </Image>
+    <Image Include="res\texture\how1.png">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\texture\how2.png">
+      <Filter>리소스 파일</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Font Include="res\font.ttf" />
@@ -356,6 +362,12 @@
       <Filter>리소스 파일</Filter>
     </Media>
     <Media Include="res\sound\cue_1.wav">
+      <Filter>리소스 파일</Filter>
+    </Media>
+    <Media Include="res\sound\ball_drop.wav">
+      <Filter>리소스 파일</Filter>
+    </Media>
+    <Media Include="res\sound\model_spin.wav">
       <Filter>리소스 파일</Filter>
     </Media>
   </ItemGroup>

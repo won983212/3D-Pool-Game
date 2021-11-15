@@ -11,7 +11,8 @@ enum class ScreenPage
 {
 	Loading,
 	Menu,
-	About,
+	About1,
+	About2,
 	InGame,
 	GameEnd
 };

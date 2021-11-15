@@ -16,6 +16,8 @@
 #define TEXT_BTN_HOW_TO_PLAY				L"게임 방법"
 #define TEXT_BTN_EXIT						L"종료"
 #define TEXT_BTN_TO_MAIN					L"메인 메뉴로"
+#define TEXT_BTN_NEXT						L"다음"
+#define TEXT_BTN_BACK						L"이전"
 
 // Messages
 #define MSG_VIEW_CENTER_BALL				L"공을 중심으로 보기"

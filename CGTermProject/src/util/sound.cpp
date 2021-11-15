@@ -4,7 +4,6 @@
 
 irrklang::ISoundEngine* sound_engine = nullptr;
 
-
 void InitSoundEngine()
 {
 	sound_engine = irrklang::createIrrKlangDevice();
@@ -16,6 +15,8 @@ void InitSoundEngine()
 
 	// caching sounds
 	sound_engine->play2D(SOUND_BGM);
+	sound_engine->play2D(SOUND_GOAL);
+	sound_engine->play2D(SOUND_SPIN);
 	sound_engine->play2D(SOUND_BALL_COLLIDE(0));
 	sound_engine->play2D(SOUND_BALL_COLLIDE(1));
 	sound_engine->play2D(SOUND_BALL_COLLIDE(2));

@@ -270,6 +270,8 @@
     <Image Include="res\texture\ball\ball_9.png" />
     <Image Include="res\texture\ball_icon.png" />
     <Image Include="res\texture\brdf.png" />
+    <Image Include="res\texture\how1.png" />
+    <Image Include="res\texture\how2.png" />
     <Image Include="res\texture\skybox\env.dds" />
     <Image Include="res\texture\skybox\irr.dds" />
     <Image Include="res\texture\container.jpg" />
@@ -287,9 +289,11 @@
     <Media Include="res\sound\ball_0.wav" />
     <Media Include="res\sound\ball_1.wav" />
     <Media Include="res\sound\ball_2.wav" />
+    <Media Include="res\sound\ball_drop.wav" />
     <Media Include="res\sound\bgm.wav" />
     <Media Include="res\sound\cue_0.wav" />
     <Media Include="res\sound\cue_1.wav" />
+    <Media Include="res\sound\model_spin.wav" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

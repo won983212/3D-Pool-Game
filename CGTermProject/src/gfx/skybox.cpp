@@ -159,7 +159,7 @@ void Skybox::BeginLoad()
 	vao_.Create();
 	vbo_.Create();
 	vao_.Use();
-	vbo_.Buffer(sizeof SkyboxVertices, SkyboxVertices);
+	vbo_.Buffer(sizeof(SkyboxVertices), SkyboxVertices);
 	vao_.Attrib(0, 3, GL_FLOAT, SIZEOF(float, 3), 0);
 	VAO::Unbind();
 
