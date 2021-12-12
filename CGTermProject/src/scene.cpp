@@ -4,6 +4,7 @@
 #include "model/quad.h"
 #include "ui/button.h"
 #include "util/sound.h"
+#include "linedebugger.h"
 #include "strings.h"
 
 using namespace glm;
@@ -90,17 +91,21 @@ void Scene::InitPost()
 
 	// lights
 	LightData light;
-	light.position = vec4(0.0f, 3.0f, 5.0f, 1.0f);
+	light.position = vec4(2.0f, 5.0f, 5.0f, 1.0f);
 	light.color = vec4(50);
 	lights_[0] = light;
 
-	light.position = vec4(0.0f, 3.0f, 0.0f, 1.0f);
+	light.position = vec4(-2.0f, 5.0f, 5.0f, 1.0f);
 	light.color = vec4(50);
 	lights_[1] = light;
 
-	light.position = vec4(0.0f, 3.0f, -5.0f, 1.0f);
+	light.position = vec4(2.0f, 5.0f, -5.0f, 1.0f);
 	light.color = vec4(50);
 	lights_[2] = light;
+
+	light.position = vec4(-2.0f, 5.0f, -5.0f, 1.0f);
+	light.color = vec4(50);
+	lights_[3] = light;
 	UpdateLight();
 
 	// finish initpost

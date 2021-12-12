@@ -98,7 +98,7 @@ private:
 	Animation start_game_animation_;
 
 	// light
-	LightData lights_[3];
+	LightData lights_[4];
 	commoncg::VBO ubo_light_;
 
 	// view

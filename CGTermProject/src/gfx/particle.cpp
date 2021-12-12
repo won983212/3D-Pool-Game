@@ -33,7 +33,7 @@ static glm::vec3 HSVtoRGB(float H, float S, float V)
 
 Particle::Particle() : position_(0.0f), velocity_(0.0f)
 {
-	color_ = HSVtoRGB(RandomFloat(0, 360), 1, 1);
+	color_ = glm::vec3(1.0f);
 	rotation_ = angleAxis(90.0f, glm::vec3(0, 1, 0));
 	rotation_axis_ = glm::vec3(RandomFloat(), 0.0f, RandomFloat());
 	rotation_axis_ = glm::normalize(rotation_axis_);
