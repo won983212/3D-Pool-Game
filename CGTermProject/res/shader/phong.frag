@@ -1,55 +1,23 @@
-#version 420
-
-layout (std140, binding = 1) uniform Material 
-{
-	vec4 albedo;
-	float metallic;
-	float roughness;
-	float ao;
-	int texIndexAlbedo;
-	int texIndexMetallic;
-	int texIndexRoughness;
-	int texIndexNormal;
-} material;
-
-struct LightData 
-{
-	vec4 position;
-	vec4 color;
-};
-
-layout (std140, binding = 2) uniform Light 
-{
-	LightData lights[3];
-};
+#version 330
 
 out vec4 FragColor;
 
-in vec3 fragPos;
+in vec3 pos;
 in vec3 normal;
 in vec2 texCoord;
 
 uniform vec3 camPos;
-uniform sampler2D texture_albedo;
 
 void main()
 {
-	vec3 albedo = material.texIndexAlbedo != -1 ? texture(texture_albedo, texCoord).rgb : vec3(material.albedo);
-	
+	// 프로그램을 간소화하기 위해 쉐이더에 직접 color / material / light direction 대입
+	vec3 color = vec3(1.0, 0.0, 0.0);
 	vec3 lightDir = normalize(vec3(1.0f, 1.0f, 1.0f));
 	vec3 norm = normalize(normal);
-	vec3 viewVec = normalize(camPos - fragPos);
+	vec3 viewVec = normalize(camPos - pos);
 
-	// ambient: 0.2
-	vec3 ambient = vec3(lights[0].color) * 0.01;
-	
-	// diffuse: 0.8
-	float diffuseScale = max(dot(lightDir, norm), 0.0f);
-	vec3 diffuse = vec3(lights[0].color) * diffuseScale * 0.02;
-
-	// apply texture
-	diffuse *= vec3(albedo);
-	ambient *= vec3(albedo);
+	vec3 ambient = vec3(0.1) * vec3(color);
+	vec3 diffuse = vec3(max(dot(lightDir, norm), 0.0f) * 0.5) * vec3(color);
 	
 	// specular
 	vec3 reflectVec = reflect(-lightDir, normal);
