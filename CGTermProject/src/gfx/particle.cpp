@@ -15,21 +15,6 @@ model::Material ParticleMaterialTemplate =
 	{-1, -1, -1, -1} // texIndex
 };
 
-// 0 ¡Â H ¡Â 360, 0 ¡Â S ¡Â 1, 0 ¡Â V ¡Â 1
-static glm::vec3 HSVtoRGB(float H, float S, float V)
-{
-	float C = S * V;
-	float X = C * (1 - abs(fmod(H / 60.0, 2) - 1));
-	float m = V - C;
-	float rgbMap[] = {C, X, 0, 0, X, C, X, C, C, X, 0, 0, 0, 0, X, C, C, X};
-	int rgbIdx = (int)(H / 60.0f);
-	
-	glm::vec3 rgb;
-	rgb.r = rgbMap[rgbIdx] + m;
-	rgb.g = rgbMap[rgbIdx + 6] + m;
-	rgb.b = rgbMap[rgbIdx + 12] + m;
-	return rgb;
-}
 
 Particle::Particle() : position_(0.0f), velocity_(0.0f)
 {
